@@ -1,0 +1,25 @@
+"Check last 100 debug log records","Check last 100 debug log records"
+"Check last 100 error log records","Check last 100 error log records"
+"Run Selftest","Run Selftest"
+"Check for latest versions","Check for latest versions"
+"Manual & Support","Manual & Support"
+"test passed","test passed"
+"test failed","test failed"
+"Great, you are using the latest version.","Great, you are using the latest version."
+"There is a new version available <span>(%1)</span> see <button type=""button"" id=""mollie-subscriptions-button_changelog"">changelog</button>.","There is a new version available <span>(%1)</span> see <button type=""button"" id=""mollie-subscriptions-button_changelog"">changelog</button>."
+"last 100 debug log lines","last 100 debug log lines"
+"download as .txt file","download as .txt file"
+ok,ok
+"last 100 error log records","last 100 error log records"
+Selftest,Selftest
+"Show more.","Show more."
+"Show less.","Show less."
+Magmodules,Magmodules
+Dummy,Dummy
+Branding,Branding
+"Debug & Logging","Debug & Logging"
+Logging,Logging
+"Debug Mode","Debug Mode"
+General,General
+Version,Version
+Enabled,Enabled

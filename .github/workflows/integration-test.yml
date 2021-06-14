@@ -1,0 +1,51 @@
+name: Integration Tests
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - PHP_VERSION: php73-fpm
+            MAGENTO_VERSION: 2.3.6-p1
+          - PHP_VERSION: php73-fpm
+            MAGENTO_VERSION: 2.4.2
+          - PHP_VERSION: php74-fpm
+            MAGENTO_VERSION: 2.4.2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Public repository
+      - uses: actions/checkout@v2
+        if: "contains(github.repository, 'mollie/magento2')"
+        with:
+          repository: mollie/magento2
+          path: mollie-base
+          ref: master
+
+      # Internal repository
+      - uses: actions/checkout@v2
+        if: "contains(github.repository, 'magmodules')"
+        with:
+          repository: magmodules/mollie-magento2
+          path: mollie-base
+          ssh-key: ${{ secrets.MAGMODULES_MOLLIE_MAGENTO2_KEY }}
+
+      - name: Start Docker
+        run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
+
+      - name: Create branch for Composer
+        run: git checkout -b continuous-integration-test-branch
+
+      - name: Upload the code into the docker container
+        run: docker cp $(pwd)/mollie-base/ magento-project-community-edition:/data/extensions/mollie-magento2/ && rm -rf mollie-base/ && docker cp $(pwd)/. magento-project-community-edition:/data/extensions/mollie-magento2-subscriptions/
+
+      - name: Install Mollie and Mollie Subscription extensions
+        run: docker exec magento-project-community-edition composer require mollie/magento2:"dev-master as 1.99.99" mollie/magento2-subscriptions:"dev-continuous-integration-test-branch as 1.99.99"
+
+      - name: Enable developer mode
+        run: docker exec magento-project-community-edition php bin/magento deploy:mode:set developer
+
+      - name: Run tests
+        run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && /data/vendor/bin/phpunit -c /data/dev/tests/integration/phpunit.xml"

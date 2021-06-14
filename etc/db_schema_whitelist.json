@@ -1,0 +1,15 @@
+{
+  "mollie_subscription_to_product": {
+    "column": {
+      "entity_id": true,
+      "customer_id": true,
+      "subscription_id": true,
+      "product_id": true,
+      "store_id": true,
+      "has_price_update": true
+    },
+    "constaint": {
+      "PRIMARY": true
+    }
+  }
+}

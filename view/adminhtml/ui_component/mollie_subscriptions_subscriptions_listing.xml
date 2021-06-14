@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd" class="Mollie\Subscriptions\Model\MollieSubscriptionsListing">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">mollie_subscriptions_subscriptions_listing.mollie_subscriptions_subscriptions_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>mollie_subscriptions_subscriptions_listing.mollie_subscriptions_subscriptions_listing_data_source</dep>
+        </deps>
+        <spinner>mollie_subscriptions_subscriptions_columns</spinner>
+    </settings>
+    <dataSource name="mollie_subscriptions_subscriptions_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">id</param>
+            </storageConfig>
+        </settings>
+        <aclResource>Mollie_Subscriptions::view_subscriptions</aclResource>
+        <dataProvider name="mollie_subscriptions_subscriptions_listing_data_source" class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top" template="Mollie_Subscriptions/grid/toolbar">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <paging name="listing_paging" component="Mollie_Subscriptions/js/grid/cursor-based-paging"/>
+        <columnsControls name="columns_controls"/>
+        <bookmark name="bookmarks"/>
+        <filters name="listing_filters">
+            <filterSelect name="store_id" provider="${ $.parentName }">
+                <settings>
+                    <options class="Magento\Store\Ui\Component\Listing\Column\Store\Options"/>
+                    <caption translate="true">All Store Views</caption>
+                    <label translate="true">Store View</label>
+                    <dataScope>store_id</dataScope>
+                </settings>
+            </filterSelect>
+        </filters>
+    </listingToolbar>
+    <columns name="mollie_subscriptions_subscriptions_columns">
+        <column name="id">
+            <settings>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="customer_name">
+            <settings>
+                <label translate="true">Customer Name</label>
+            </settings>
+        </column>
+        <column name="status">
+            <settings>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="amount" class="Magento\Catalog\Ui\Component\Listing\Columns\Price">
+            <settings>
+                <label translate="true">Amount</label>
+            </settings>
+        </column>
+        <column name="description">
+            <settings>
+                <label translate="true">Description</label>
+            </settings>
+        </column>
+        <column name="created_at" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <label translate="true">Created at</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Mollie\Subscriptions\Ui\Component\Listing\Column\Actions">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

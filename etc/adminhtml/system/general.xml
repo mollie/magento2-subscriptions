@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="general" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+           showInStore="1">
+        <label>General</label>
+        <field id="version_button" translate="label" type="button" sortOrder="10" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Version</label>
+            <frontend_model>Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\VersionCheck</frontend_model>
+        </field>
+        <field id="enable" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/general/enable</config_path>
+        </field>
+        <field id="add_to_cart_text" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Add to cart button text</label>
+            <config_path>mollie_subscriptions/general/add_to_cart_text</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="shipping_method" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Shipping method</label>
+            <source_model>Mollie\Subscriptions\Config\Source\ActiveShippingMethods</source_model>
+            <config_path>mollie_subscriptions/general/shipping_method</config_path>
+            <comment>This method is used when recurring orders are created.</comment>
+        </field>
+    </group>
+</include>

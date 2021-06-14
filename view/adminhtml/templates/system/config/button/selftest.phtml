@@ -1,0 +1,19 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\Selftest;
+
+/**
+ * @see \Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\Selftest
+ * @var Selftest $block
+ */
+?>
+<div id="mollie-subscriptions-result_test-modal"
+     data-mollie-subscriptions-endpoind-url="<?= $block->escapeUrl($block->getSelftestUrl()) ?>">
+    <div id="mollie-subscriptions-result_test">
+        <ul class="result"></ul>
+    </div>
+</div>

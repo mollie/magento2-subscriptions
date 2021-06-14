@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\DebugCheck;
+
+/**
+ * @see \Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\DebugCheck
+ * @var DebugCheck $block
+ */
+?>
+<div id="mollie-subscriptions-result_debug-modal"
+     data-mollie-subscriptions-endpoind-url="<?= $block->escapeUrl($block->getDebugCheckUrl()) ?>">
+    <div id="mollie-subscriptions-result_debug">
+        <div class="result"></div>
+    </div>
+</div>
+<?= $block->getButtonHtml() ?>
+

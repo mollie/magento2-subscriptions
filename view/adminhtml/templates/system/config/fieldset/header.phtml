@@ -1,0 +1,29 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @var Mollie\Subscriptions\Block\Adminhtml\Magmodules\Header $block
+ */
+?>
+<div class="mollie-subscriptions-header" style="background-image: url(<?= $block->escapeUrl($block->getImage()); ?>)">
+    <div class="">
+        <p class="mollie-subscriptions-header-text">
+            <strong>Developed by Magmodules.</strong><br>
+            A Magento only eCommerce Agency located in the Netherlands.
+        </p>
+    </div>
+    <div class="mollie-subscriptions-header-actions">
+        <a id="mollie-subscriptions-button_help"
+           class="helpbutton" href="<?= $block->escapeUrl($block->getSupportLink()); ?>"
+           target="_blank">
+            <i class="mollie-subscriptions-icon__question-circled"></i>
+            <span><?= $block->escapeUrl(__('Manual & Support')); ?></span>
+        </a>
+        <button id="mollie-subscriptions-button_test" title="<?= $block->escapeUrl(__('Run Self-test')); ?>"
+                type="button" class="action-default scalable">
+            <i class="mollie-subscriptions-icon__list-unordered-four"></i>
+            <span><?= $block->escapeUrl(__('Run Self-test')); ?></span>
+        </button>
+    </div>
+</div>

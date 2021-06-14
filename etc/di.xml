@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Mollie\Subscriptions\Api\Log\RepositoryInterface" type="Mollie\Subscriptions\Model\Log\Repository"/>
+    <preference for="Mollie\Subscriptions\Api\Selftest\RepositoryInterface" type="Mollie\Subscriptions\Model\Selftest\Repository"/>
+
+    <preference for="Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface" type="Mollie\Subscriptions\Model\SubscriptionToProductRepository"/>
+    <preference for="Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface" type="Mollie\Subscriptions\Model\Data\SubscriptionToProduct"/>
+    <preference for="Mollie\Subscriptions\Api\Data\SubscriptionToProductSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <type name="Mollie\Subscriptions\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Mollie\Subscriptions\Logger\ErrorLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">MollieSubscriptionsError</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Mollie\Subscriptions\Logger\Handler\Error</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Mollie\Subscriptions\Logger\DebugLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">MollieSubscriptionsDebug</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Mollie\Subscriptions\Logger\Handler\Debug</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Subscriptions\Model\Selftest\Repository">
+        <arguments>
+            <argument name="testList" xsi:type="array">
+                <item name="phpVersion" xsi:type="object">Mollie\Subscriptions\Service\Test\PhpVersion</item>
+                <item name="cron" xsi:type="object">Mollie\Subscriptions\Service\Test\Cron</item>
+                <item name="extensionStatus" xsi:type="object">Mollie\Subscriptions\Service\Test\ExtensionStatus</item>
+                <item name="phpExtensions" xsi:type="object">Mollie\Subscriptions\Service\Test\PhpExtensions</item>
+                <item name="magentoVersion" xsi:type="object">Mollie\Subscriptions\Service\Test\MagentoVersion</item>
+                <item name="extensionVersion" xsi:type="object">Mollie\Subscriptions\Service\Test\ExtensionVersion</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Subscriptions\Console\Command\Selftest">
+        <arguments>
+            <argument name="selftestRepository" xsi:type="object">Mollie\Subscriptions\Model\Selftest\Repository\Proxy</argument>
+        </arguments>
+    </type>
+
+    <!-- Command line block start -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="MollieSubscriptionsSelftest" xsi:type="object">Mollie\Subscriptions\Console\Command\Selftest</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Command line block end -->
+
+    <type name="Mollie\Payment\Service\Order\BuildTransaction">
+        <arguments>
+            <argument name="parts" xsi:type="array">
+                <item name="create_customer_for_subscription_carts" xsi:type="object">Mollie\Subscriptions\Service\Order\TransactionPart\CreateCustomerForSubscriptionCarts</item>
+                <item name="sequenceType" xsi:type="object">Mollie\Subscriptions\Service\Order\TransactionPart\SequenceType</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Subscriptions\Controller\Index\Index">
+        <plugin name="authentication" type="Magento\Sales\Controller\Order\Plugin\Authentication"/>
+    </type>
+
+    <type name="Magento\Quote\Api\PaymentMethodManagementInterface">
+        <plugin name="mollie_subscriptions_limit_payment_methods" type="Mollie\Subscriptions\Plugin\Quote\Api\PaymentMethodManagementPlugin" />
+    </type>
+
+    <type name="Mollie\Payment\Service\Mollie\MethodParameters">
+        <arguments>
+            <argument name="parametersParts" xsi:type="array">
+                <item name="sequenceType" xsi:type="object">Mollie\Subscriptions\Service\Mollie\MethodParameters\SequenceType</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!--
+  ~ Copyright © Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="mollie_subscription_to_product" engine="innodb" comment="mollie_subscription_to_product">
+        <column name="entity_id" xsi:type="int" comment="entity_id" nullable="true" identity="true" unsigned="true" padding="10"/>
+        <column name="customer_id" xsi:type="text" comment="customer_id" nullable="true"/>
+        <column name="subscription_id" xsi:type="text" comment="subscription_id" nullable="true"/>
+        <column name="product_id" xsi:type="int" comment="product_id" nullable="true"/>
+        <column name="store_id" xsi:type="int" comment="store_id" nullable="false"/>
+        <column name="has_price_update" xsi:type="int" comment="has_price_update" nullable="false" default="0"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+</schema>

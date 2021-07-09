@@ -7,7 +7,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
         <job instance="Mollie\Subscriptions\Cron\UpdateSubscriptionsWithAPriceUpdate" method="execute" name="mollie_subscriptions_update_subscriptions_with_a_price_update">
-            <schedule>*/5 1 * * *</schedule>
+            <schedule>*/4 1 * * *</schedule>
+        </job>
+        <job instance="Mollie\Subscriptions\Cron\SendPrePaymentReminderEmailCron" method="execute" name="mollie_subscriptions_send_prepayment_reminders">
+            <schedule>*/5 10 * * *</schedule>
         </job>
     </group>
 </config>

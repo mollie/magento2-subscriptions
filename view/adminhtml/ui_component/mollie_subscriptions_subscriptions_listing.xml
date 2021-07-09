@@ -75,6 +75,18 @@
                 <label translate="true">Description</label>
             </settings>
         </column>
+        <column name="next_payment_date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <dateFormat>yyyy-MM-dd</dateFormat>
+                <label translate="true">Next payment at</label>
+            </settings>
+        </column>
+        <column name="prepayment_reminder_date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <dateFormat>yyyy-MM-dd</dateFormat>
+                <label translate="true">Pre-payment reminder</label>
+            </settings>
+        </column>
         <column name="created_at" component="Magento_Ui/js/grid/columns/date">
             <settings>
                 <label translate="true">Created at</label>

@@ -6,7 +6,8 @@
       "subscription_id": true,
       "product_id": true,
       "store_id": true,
-      "has_price_update": true
+      "has_price_update": true,
+      "next_payment_date": true
     },
     "constaint": {
       "PRIMARY": true

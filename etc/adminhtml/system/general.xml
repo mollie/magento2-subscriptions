@@ -7,7 +7,7 @@
 -->
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="general" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+    <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
            showInStore="1">
         <label>General</label>
         <field id="version_button" translate="label" type="button" sortOrder="10" showInDefault="1"
@@ -34,6 +34,33 @@
             <source_model>Mollie\Subscriptions\Config\Source\ActiveShippingMethods</source_model>
             <config_path>mollie_subscriptions/general/shipping_method</config_path>
             <comment>This method is used when recurring orders are created.</comment>
+        </field>
+    </group>
+
+    <group id="prepayment_reminder" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+           showInStore="1">
+        <label>Pre-payment reminder email</label>
+        <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/prepayment_reminder/enabled</config_path>
+        </field>
+        <field id="template" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Email template</label>
+            <config_path>mollie_subscriptions/prepayment_reminder/template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="days_before_reminder" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Days before reminder</label>
+            <config_path>mollie_subscriptions/prepayment_reminder/days_before_reminder</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
         </field>
     </group>
 </include>

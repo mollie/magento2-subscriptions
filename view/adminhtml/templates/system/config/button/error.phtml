@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\ErrorCheck;
+
+/**
+ * @see \Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\ErrorCheck
+ * @var ErrorCheck $block
+ */
+?>
+<div id="mollie-subscriptions-result_error-modal"
+     data-mollie-subscriptions-endpoind-url="<?= $block->escapeUrl($block->getErrorCheckUrl()) ?>">
+    <div id="mollie-subscriptions-result_error">
+        <div class="result"></div>
+    </div>
+</div>
+<?= $block->getButtonHtml() ?>

@@ -1,0 +1,59 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Mollie\Subscriptions\Block\Frontend\Customer\Account\ActiveSubscriptions $block */
+?>
+
+<div class="table-wrapper orders-history">
+    <table class="data table table-order-items history" id="my-orders-table">
+        <caption class="table-caption"><?= $block->escapeHtml(__('Orders')) ?></caption>
+        <thead>
+        <tr>
+            <th scope="col" class="col id"><?= $block->escapeHtml(__('ID')) ?></th>
+            <th scope="col" class="col date"><?= $block->escapeHtml(__('Date')) ?></th>
+            <?= $block->getChildHtml('extra.column.header') ?>
+            <th scope="col" class="col status"><?= $block->escapeHtml(__('Status')) ?></th>
+            <th scope="col" class="col description"><?= $block->escapeHtml(__('Description')) ?></th>
+            <th scope="col" class="col total"><?= $block->escapeHtml(__('Amount')) ?></th>
+            <th scope="col" class="col actions"><?= $block->escapeHtml(__('Action')) ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($block->getSubscriptions() as $subscription): ?>
+            <tr>
+                <td data-th="<?= $block->escapeHtml(__('ID')) ?>" class="col id"><?= $block->escapeHtml($subscription->getId()) ?></td>
+                <td data-th="<?= $block->escapeHtml(__('Date')) ?>" class="col date"><?= /* @noEscape */ $block->formatDate($subscription->getCreatedAt()) ?></td>
+                <?php $extra = $block->getChildBlock('extra.container'); ?>
+                <?php if ($extra) : ?>
+                    <?php $extra->setSubscription($subscription); ?>
+                    <?= $extra->getChildHtml() ?>
+                <?php endif; ?>
+                <td data-th="<?= $block->escapeHtml(__('Status')) ?>" class="col"><?= $subscription->getStatus() ?></td>
+                <td data-th="<?= $block->escapeHtml(__('Description')) ?>" class="col"><?= $subscription->getDescription() ?></td>
+                <td data-th="<?= $block->escapeHtml(__('Total')) ?>" class="col total"><?= /* @noEscape */ $block->formatPrice($subscription->getAmount()) ?></td>
+                <?php /**
+                <td data-th="<?= $block->escapeHtml(__('Status')) ?>" class="col status"><?= $block->escapeHtml($_order->getStatusLabel()) ?></td>
+                */ ?>
+                <td data-th="<?= $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                    <?php if (!$block->hasParent($subscription->getId())): ?>
+                        <?php if ($subscription->getStatus() == 'active'): ?>
+                            <a href="#" data-post='{"action": "<?=$block->getUrl('mollie_subscriptions/index/cancel'); ?>", "data": {"subscription_id": "<?=$subscription->getId(); ?>", "confirmation": true, "confirmationMessage": "<?=__('Are you sure you want to delete the subscription with ID %1?', $subscription->getId()); ?>"}}' class="action delete">
+                                <span><?= $block->escapeHtml(__('Cancel')); ?></span>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($subscription->getStatus() == 'canceled'): ?>
+                            <a href="#" data-post='{"action": "<?=$block->getUrl('mollie_subscriptions/index/restart'); ?>", "data": {"subscription_id": "<?=$subscription->getId(); ?>"}}' class="action">
+                                <span><?= $block->escapeHtml(__('Restart')); ?></span>
+                            </a>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>

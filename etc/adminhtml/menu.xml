@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Mollie_Subscriptions::view_subscriptions_title" title="Mollie Subscriptions" translate="title" module="Mollie_Subscriptions" sortOrder="10" parent="Magento_Sales::sales" resource="Mollie_Subscriptions::view_subscriptions_title" />
+        <add id="Mollie_Subscriptions::view_subscriptions" title="View active subscriptions" translate="title" module="Mollie_Subscriptions" sortOrder="10" parent="Mollie_Subscriptions::view_subscriptions_title" action="mollie_subscriptions/subscriptions" resource="Mollie_Subscriptions::view_subscriptions"/>
+    </menu>
+</config>

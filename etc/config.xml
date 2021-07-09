@@ -15,6 +15,11 @@
                 <debug>0</debug>
                 <add_to_cart_text>Subscribe</add_to_cart_text>
             </general>
+            <prepayment_reminder>
+                <enabled>0</enabled>
+                <template>mollie_subscriptions_pre_payment_reminder_template</template>
+                <days_before_reminder>3</days_before_reminder>
+            </prepayment_reminder>
         </mollie_subscriptions>
     </default>
 </config>

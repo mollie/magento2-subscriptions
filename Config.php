@@ -21,11 +21,14 @@ use Magento\Store\Model\StoreManagerInterface;
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Subscriptions';
+    const XML_PATH_ADD_TO_CART_TEXT = 'mollie_subscriptions/general/add_to_cart_text';
     const XML_PATH_EXTENSION_VERSION = 'mollie_subscriptions/general/version';
     const XML_PATH_EXTENSION_ENABLE = 'mollie_subscriptions/general/enable';
     const XML_PATH_EXTENSION_SHIPPING_METHOD = 'mollie_subscriptions/general/shipping_method';
     const XML_PATH_DEBUG = 'mollie_subscriptions/general/debug';
-    const XML_PATH_ADD_TO_CART_TEXT = 'mollie_subscriptions/general/add_to_cart_text';
+    const XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER = 'mollie_subscriptions/prepayment_reminder/days_before_reminder';
+    const XML_PATH_PREPAYMENT_REMINDER_ENABLED = 'mollie_subscriptions/prepayment_reminder/enabled';
+    const XML_PATH_PREPAYMENT_REMINDER_TEMPLATE = 'mollie_subscriptions/prepayment_reminder/template';
     const MODULE_SUPPORT_LINK = 'https://www.magmodules.eu/help/%s';
 
     /**
@@ -192,5 +195,35 @@ class Config
     public function getAddToCartText($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
         return $this->getStoreValue(static::XML_PATH_ADD_TO_CART_TEXT, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool|null
+     */
+    public function isPrepaymentReminderEnabled($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?bool
+    {
+        return $this->getFlag(static::XML_PATH_PREPAYMENT_REMINDER_ENABLED, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function prepaymentReminderTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_PREPAYMENT_REMINDER_TEMPLATE, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function daysBeforePrepaymentReminder($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER, $storeId, $scope);
     }
 }

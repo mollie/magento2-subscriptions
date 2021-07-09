@@ -7,9 +7,10 @@ declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Model\Data;
 
+use Magento\Framework\Api\AbstractExtensibleObject;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 
-class SubscriptionToProduct extends \Magento\Framework\Api\AbstractExtensibleObject implements SubscriptionToProductInterface
+class SubscriptionToProduct extends AbstractExtensibleObject implements SubscriptionToProductInterface
 {
     /**
      * Get entity_id
@@ -123,6 +124,25 @@ class SubscriptionToProduct extends \Magento\Framework\Api\AbstractExtensibleObj
     public function setHasPriceUpdate(int $hasPriceUpdate)
     {
         return $this->setData(self::HAS_PRICE_UPDATE, $hasPriceUpdate);
+    }
+
+    /**
+     * Get next_payment_date
+     * @return string|null
+     */
+    public function getNextPaymentDate(): ?string
+    {
+        return $this->_get(self::NEXT_PAYMENT_DATE);
+    }
+
+    /**
+     * Set next_payment_date
+     * @param string $nextPaymentDate
+     * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
+     */
+    public function setNextPaymentDate(string $nextPaymentDate)
+    {
+        return $this->setData(self::NEXT_PAYMENT_DATE, $nextPaymentDate);
     }
 
     /**

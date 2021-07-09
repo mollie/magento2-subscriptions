@@ -10,8 +10,9 @@
         <column name="customer_id" xsi:type="text" comment="customer_id" nullable="true"/>
         <column name="subscription_id" xsi:type="text" comment="subscription_id" nullable="true"/>
         <column name="product_id" xsi:type="int" comment="product_id" nullable="true"/>
-        <column name="store_id" xsi:type="int" comment="store_id" nullable="false"/>
         <column name="has_price_update" xsi:type="int" comment="has_price_update" nullable="false" default="0"/>
+        <column name="store_id" xsi:type="int" comment="store_id" nullable="false"/>
+        <column name="next_payment_date" xsi:type="date" comment="Next payment date" nullable="false"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>

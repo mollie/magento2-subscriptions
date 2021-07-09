@@ -169,6 +169,7 @@ class Restart extends Action implements HttpPostActionInterface
         $model->setSubscriptionId($subscription->id);
         $model->setProductId($productId);
         $model->setStoreId($this->storeManager->getStore()->getId());
+        $model->setNextPaymentDate($subscription->nextPaymentDate);
 
         $model = $this->subscriptionToProductRepository->save($model);
 

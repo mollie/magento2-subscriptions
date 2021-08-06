@@ -80,6 +80,7 @@ class SubscriptionOptions
         $this->addDescription();
         $this->addMetadata();
         $this->addWebhookUrl();
+        $this->addStartDate();
 
         return new SubscriptionOption(
             $orderItem->getProductId(),
@@ -89,6 +90,7 @@ class SubscriptionOptions
             $this->options['description'] ?? '',
             $this->options['metadata'] ?? [],
             $this->options['webhookUrl'] ?? '',
+            $this->options['startDate'],
             $this->options['times'] ?? null
         );
     }
@@ -138,6 +140,38 @@ class SubscriptionOptions
     private function addWebhookUrl()
     {
         $this->options['webhookUrl'] = $this->urlBuilder->getUrl('mollie-subscriptions/api/webhook');
+    }
+
+    private function addStartDate()
+    {
+        $now = new \DateTimeImmutable();
+
+        $this->options['startDate'] = $now->add(new \DateInterval('P' . $this->getDateInterval()));
+    }
+
+    /**
+     * Examples:
+     * 7D (7 days)
+     * 2W (2 weeks)
+     * 3M (3 months)
+     *
+     * @return string
+     */
+    private function getDateInterval(): string
+    {
+        $product = $this->orderItem->getProduct();
+        $interval = $product->getData('mollie_subscription_interval_type');
+        $intervalAmount = (int)$product->getData('mollie_subscription_interval_amount');
+
+        if ($interval == IntervalType::DAYS) {
+            return $intervalAmount . 'D';
+        }
+
+        if ($interval == IntervalType::WEEKS) {
+            return $intervalAmount . 'W';
+        }
+
+        return $intervalAmount . 'M';
     }
 
     private function getIntervalDescription()

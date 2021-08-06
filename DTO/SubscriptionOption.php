@@ -45,6 +45,11 @@ class SubscriptionOption
     private $webhookUrl;
 
     /**
+     * @var \DateTimeImmutable
+     */
+    private $startDate;
+
+    /**
      * @var int|null
      */
     private $times;
@@ -57,6 +62,7 @@ class SubscriptionOption
         string $description,
         array $metadata,
         string $webhookUrl,
+        \DateTimeImmutable $startDate,
         int $times = null
     ) {
         $this->productId = $productId;
@@ -66,6 +72,7 @@ class SubscriptionOption
         $this->description = $description;
         $this->metadata = $metadata;
         $this->webhookUrl = $webhookUrl;
+        $this->startDate = $startDate;
         $this->times = $times;
     }
 
@@ -87,6 +94,7 @@ class SubscriptionOption
             'description' => $this->description,
             'metadata' => $this->metadata,
             'webhookUrl' => $this->webhookUrl,
+            'startDate' => $this->startDate->format('Y-m-d'),
         ];
 
         if ($this->times) {

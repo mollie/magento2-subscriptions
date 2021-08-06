@@ -185,6 +185,34 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertStringContainsString('api/webhook', $subscription->toArray()['webhookUrl']);
     }
 
+    /**
+     * @dataProvider addsTheStartDate
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @param $input
+     * @param $expected
+     */
+    public function testAddsTheStartDate($input, $expected)
+    {
+        $order = $this->loadOrder('100000001');
+        $items = $order->getItems();
+        $item = array_shift($items)->getProduct();
+
+        $item->setData('mollie_subscription_product', 1);
+        $item->setData('mollie_subscription_interval_amount', $input['amount']);
+        $item->setData('mollie_subscription_interval_type', $input['type']);
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $this->assertCount(1, $result);
+        $subscription = $result[0];
+        $this->assertInstanceOf(SubscriptionOption::class, $subscription);
+        $this->assertArrayHasKey('startDate', $subscription->toArray());
+        $this->assertEquals($expected->format('Y-m-d'), $subscription->toArray()['startDate']);
+    }
+
     public function includesTheCorrectIntervalProvider()
     {
         return [
@@ -207,6 +235,21 @@ class SubscriptionOptionsTest extends IntegrationTestCase
             'single month' => [['amount' => 1, 'type' => IntervalType::MONTHS], 'Every month'],
             'multiple months' => [['amount' => 3, 'type' => IntervalType::MONTHS], 'Every 3 months'],
             'float months' => [['amount' => '3.0000', 'type' => IntervalType::MONTHS], 'Every 3 months'],
+        ];
+    }
+
+    public function addsTheStartDate()
+    {
+        $now = new \DateTimeImmutable('now');
+
+        return [
+            'single day' => [['amount' => 1, 'type' => IntervalType::DAYS], $now->add(new \DateInterval('P1D'))],
+            'day' => [['amount' => 7, 'type' => IntervalType::DAYS], $now->add(new \DateInterval('P7D'))],
+            'single week' => [['amount' => 1, 'type' => IntervalType::WEEKS], $now->add(new \DateInterval('P1W'))],
+            'multiple weeks' => [['amount' => 3, 'type' => IntervalType::WEEKS], $now->add(new \DateInterval('P3W'))],
+            'single month' => [['amount' => 1, 'type' => IntervalType::MONTHS], $now->add(new \DateInterval('P1M'))],
+            'multiple months' => [['amount' => 3, 'type' => IntervalType::MONTHS], $now->add(new \DateInterval('P3M'))],
+            'float months' => [['amount' => '3.0000', 'type' => IntervalType::MONTHS], $now->add(new \DateInterval('P3M'))],
         ];
     }
 }

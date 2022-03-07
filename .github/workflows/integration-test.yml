@@ -1,5 +1,9 @@
 name: Integration Tests
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   build:
@@ -18,7 +22,7 @@ jobs:
 
       # Public repository
       - uses: actions/checkout@v2
-        if: "contains(github.repository, 'mollie/magento2')"
+        if: "!contains(github.repository, 'magmodules')"
         with:
           repository: mollie/magento2
           path: mollie-base

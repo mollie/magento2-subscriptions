@@ -12,6 +12,7 @@ use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Subscriptions\Config\Source\IntervalType;
 use Mollie\Subscriptions\Config\Source\RepetitionType;
+use Mollie\Subscriptions\DTO\ProductSubscriptionOption;
 use Mollie\Subscriptions\DTO\SubscriptionOption;
 
 class SubscriptionOptions
@@ -41,12 +42,24 @@ class SubscriptionOptions
      */
     private $urlBuilder;
 
+    /**
+     * @var ParseSubscriptionOptions
+     */
+    private $parseSubscriptionOptions;
+
+    /**
+     * @var ProductSubscriptionOption
+     */
+    private $currentOption;
+
     public function __construct(
         General $mollieHelper,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        ParseSubscriptionOptions $parseSubscriptionOptions
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->urlBuilder = $urlBuilder;
+        $this->parseSubscriptionOptions = $parseSubscriptionOptions;
     }
 
     /**
@@ -73,6 +86,7 @@ class SubscriptionOptions
     {
         $this->options = [];
         $this->orderItem = $orderItem;
+        $this->loadSubscriptionOption($orderItem);
 
         $this->addAmount();
         $this->addTimes();
@@ -95,7 +109,7 @@ class SubscriptionOptions
         );
     }
 
-    private function addAmount()
+    private function addAmount(): void
     {
         $this->options['amount'] = $this->mollieHelper->getAmountArray(
             $this->order->getOrderCurrencyCode(),
@@ -103,46 +117,43 @@ class SubscriptionOptions
         );
     }
 
-    private function addTimes()
+    private function addTimes(): void
     {
-        $product = $this->orderItem->getProduct();
-        $type = $product->getData('mollie_subscription_repetition_type');
-        if (!$type || $type == RepetitionType::INFINITE) {
+        if ($this->currentOption->getRepetitionType() == RepetitionType::INFINITE) {
             return;
         }
 
-        $this->options['times'] = $product->getData('mollie_subscription_repetition_amount');
+        $this->options['times'] = (int)$this->currentOption->getRepetitionAmount();
     }
 
-    private function addInterval()
+    private function addInterval(): void
     {
-        $product = $this->orderItem->getProduct();
-        $intervalType = $product->getData('mollie_subscription_interval_type');
-        $intervalAmount = (int)$product->getData('mollie_subscription_interval_amount');
+        $intervalType = $this->currentOption->getIntervalType();
+        $intervalAmount = $this->currentOption->getIntervalAmount();
 
-        $this->options['interval'] = $intervalAmount . ' ' . $intervalType;
+        $this->options['interval'] = (int)$intervalAmount . ' ' . $intervalType;
     }
 
-    private function addDescription()
+    private function addDescription(): void
     {
         $product = $this->orderItem->getProduct();
 
         $this->options['description'] = $product->getName() . ' - ' . $this->getIntervalDescription();
     }
 
-    private function addMetadata()
+    private function addMetadata(): void
     {
         $product = $this->orderItem->getProduct();
 
         $this->options['metadata'] = ['sku' => $product->getSku()];
     }
 
-    private function addWebhookUrl()
+    private function addWebhookUrl(): void
     {
         $this->options['webhookUrl'] = $this->urlBuilder->getUrl('mollie-subscriptions/api/webhook');
     }
 
-    private function addStartDate()
+    private function addStartDate(): void
     {
         $now = new \DateTimeImmutable();
 
@@ -159,9 +170,8 @@ class SubscriptionOptions
      */
     private function getDateInterval(): string
     {
-        $product = $this->orderItem->getProduct();
-        $interval = $product->getData('mollie_subscription_interval_type');
-        $intervalAmount = (int)$product->getData('mollie_subscription_interval_amount');
+        $interval = $this->currentOption->getIntervalType();
+        $intervalAmount = (int)$this->currentOption->getIntervalAmount();
 
         if ($interval == IntervalType::DAYS) {
             return $intervalAmount . 'D';
@@ -174,11 +184,10 @@ class SubscriptionOptions
         return $intervalAmount . 'M';
     }
 
-    private function getIntervalDescription()
+    private function getIntervalDescription(): string
     {
-        $product = $this->orderItem->getProduct();
-        $intervalType = $product->getData('mollie_subscription_interval_type');
-        $intervalAmount = (int)$product->getData('mollie_subscription_interval_amount');
+        $intervalType = $this->currentOption->getIntervalType();
+        $intervalAmount = (int)$this->currentOption->getIntervalAmount();
 
         if ($intervalType == IntervalType::DAYS) {
             if ($intervalAmount == 1) {
@@ -205,5 +214,28 @@ class SubscriptionOptions
         }
 
         return '';
+    }
+
+    private function loadSubscriptionOption(OrderItemInterface $item): void
+    {
+        $mollieMetadata = $item->getBuyRequest()->getData('mollie_metadata');
+        if ($mollieMetadata === null) {
+            throw new \Exception('No Mollie Metadata present on order item');
+        }
+
+        if (!isset($mollieMetadata['recurring_metadata'], $mollieMetadata['recurring_metadata']['option_id'])) {
+            throw new \Exception('No recurring metadata or option_id present on order item');
+        }
+
+        $optionId = $mollieMetadata['recurring_metadata']['option_id'];
+        $options = $this->parseSubscriptionOptions->execute($item->getProduct());
+        foreach($options as $option) {
+            if ($option->getIdentifier() == $optionId) {
+                $this->currentOption = $option;
+                return;
+            }
+        }
+
+        throw new \Exception(sprintf('No option with ID %s available', $optionId));
     }
 }

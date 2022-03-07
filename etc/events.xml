@@ -6,7 +6,7 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="catalog_product_save_after">
-        <observer name="mollie_subscriptions_update_subscription_product_price" instance="Mollie\Subscriptions\Observer\CatalogProductSaveAfter\UpdateSubscriptionProduct"/>
+        <observer name="mollie_subscriptions_update_subscription_product_price" instance="Mollie\Subscriptions\Observer\CatalogProductSaveAfter\UpdateSubscriptionProduct" />
     </event>
     <event name="mollie_process_transaction_end">
         <observer name="mollie_create_subscription" instance="Mollie\Subscriptions\Observer\MollieProcessTransactionEnd\CreateSubscriptions" />
@@ -15,6 +15,9 @@
         <observer name="mollie_subscriptions_force_customer_login" instance="Mollie\Subscriptions\Observer\CheckoutAllowGuest\ForceCustomerLoginWhenSubscriptionItemInCart" />
     </event>
     <event name="view_block_abstract_to_html_after">
-        <observer name="mollie_change_add_to_cart_text" instance="Mollie\Subscriptions\Observer\ViewBlockAbstractToHtmlAfter\ChangeAddToCartText"/>
+        <observer name="mollie_change_add_to_cart_text" instance="Mollie\Subscriptions\Observer\ViewBlockAbstractToHtmlAfter\ChangeAddToCartText" />
+    </event>
+    <event name="checkout_cart_product_add_before">
+        <observer name="mollie_subscription_check_add_to_cart" instance="Mollie\Subscriptions\Observer\CheckoutCartProductAddBefore\PreventAddingSubscriptionProductsToCartWhenNoSubscriptionIsSelected" />
     </event>
 </config>

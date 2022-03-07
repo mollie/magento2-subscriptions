@@ -10,7 +10,7 @@
             <argument name="modifiers" xsi:type="array">
                 <item name="mollie-field-array" xsi:type="array">
                     <item name="class" xsi:type="string">Mollie\Subscriptions\Form\Modifier\SubscriptionProducts</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="sortOrder" xsi:type="number">25</item>
                 </item>
             </argument>
         </arguments>

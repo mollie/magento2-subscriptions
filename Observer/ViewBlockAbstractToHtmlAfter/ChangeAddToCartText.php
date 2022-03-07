@@ -10,6 +10,7 @@ use Magento\Catalog\Block\Product\View;
 use Magento\Framework\DomDocument\DomDocumentFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Mollie\Subscriptions\Block\Frontend\Product\View\SubscriptionOptions;
 use Mollie\Subscriptions\Config;
 
 class ChangeAddToCartText implements ObserverInterface
@@ -52,17 +53,28 @@ class ChangeAddToCartText implements ObserverInterface
         $document->preserveWhiteSpace = false;
         $document->formatOutput = true;
 
-        $document->loadHTML($html, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+        if (!$document->loadHTML($html, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED)) {
+            return;
+        }
 
+        /** @var \DOMElement $button */
         $button = $document->getElementById('product-addtocart-button');
         if (!$button) {
             return;
         }
 
-        $text = $this->config->getAddToCartText();
-        $button->setAttribute('title', ($text));
+        $subscriptionOptionsBlock = $block->getLayout()->createBlock(SubscriptionOptions::class)->toHtml();
+        $newHtml = $this->domDocumentFactory->create();
+        $newHtml->preserveWhiteSpace = false;
+        $newHtml->formatOutput = true;
+        $newHtml->loadHTML($subscriptionOptionsBlock, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
 
-        $button->childNodes->item(1)->textContent = $block->escapeHtml($text);
+        // Import our HTML before the regular "add to cart button".
+        $imported = $document->importNode($newHtml->documentElement, true);
+        $button->parentNode->insertBefore($imported, $button);
+
+        // Remove the button
+        $button->parentNode->removeChild($button);
 
         $transport->setData('html', $document->saveHTML());
     }

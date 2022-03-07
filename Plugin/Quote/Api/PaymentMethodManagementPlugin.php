@@ -7,7 +7,6 @@
 namespace Mollie\Subscriptions\Plugin\Quote\Api;
 
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\PaymentMethodInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Subscriptions\Service\Cart\CartContainsSubscriptionProduct;
 
@@ -52,7 +51,7 @@ class PaymentMethodManagementPlugin
             return $result;
         }
 
-        return array_filter($result, function (PaymentMethodInterface $method) {
+        return array_filter($result, function ($method) {
             return in_array($method->getCode(), static::ALLOWED_METHODS);
         });
     }

@@ -150,6 +150,8 @@ class SubscriptionAttributes implements DataPatchInterface
                 ]
             );
         }
+
+        return $this;
     }
 
     public static function getDependencies()

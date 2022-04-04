@@ -1,0 +1,47 @@
+<div class="admin__control-table-wrapper">
+    <table class="admin__control-table">
+        <thead>
+            <tr>
+                <th data-bind="i18n: 'Title'"></th>
+                <th data-bind="i18n: 'Repeat Every'"></th>
+                <th data-bind="i18n: 'Type'"></th>
+                <th data-bind="i18n: 'Repeat Times'"></th>
+                <th data-bind="i18n: 'Repeat Type'"></th>
+                <th class="col-actions" data-bind="i18n: 'Actions'"></th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td colspan="999" class="col-actions-add">
+                    <button class="action-add" title="Add" type="button" data-bind="click: add">
+                        <span data-bind="i18n: 'Add Subscription type'"></span>
+                    </button>
+                </td>
+            </tr>
+        </tfoot>
+        <tbody data-bind="foreach: rows">
+            <tr>
+                <td><input class="admin__control-text" type="text" data-bind="value: title" /></td>
+                <td><input class="admin__control-text" type="text" data-bind="value: interval_amount" /></td>
+                <td>
+                    <select class="admin__control-select" data-bind="value: interval_type, foreach: $parent.interval_types">
+                        <option data-bind="value: value, text: label"></option>
+                    </select>
+                </td>
+
+                <td><input class="admin__control-text" type="text" data-bind="value: repetition_amount" /></td>
+                <td>
+                    <select class="admin__control-select" data-bind="value: repetition_type, foreach: $parent.repetition_types">
+                        <option data-bind="value: value, text: label"></option>
+                    </select>
+                </td>
+
+                <td class="col-actions">
+                    <button type="button" class="action-delete" data-bind="click: $parent.remove.bind($parent)">
+                        <span data-bind="i18n: 'Delete'"></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

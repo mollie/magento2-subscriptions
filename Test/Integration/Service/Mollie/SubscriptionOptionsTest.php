@@ -6,9 +6,10 @@
 
 namespace Mollie\Subscriptions\Test\Integration\Service\Mollie;
 
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Config\Source\IntervalType;
-use Mollie\Subscriptions\Config\Source\RepetitionType;
 use Mollie\Subscriptions\DTO\SubscriptionOption;
 use Mollie\Subscriptions\Service\Mollie\SubscriptionOptions;
 
@@ -21,10 +22,11 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items)->getProduct();
 
-        $item->setData('mollie_subscription_product', 1);
-        $item->setData('mollie_subscription_repetition_type', RepetitionType::INFINITE);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-infinite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -43,11 +45,11 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items)->getProduct();
 
-        $item->setData('mollie_subscription_product', 1);
-        $item->setData('mollie_subscription_repetition_amount', 10);
-        $item->setData('mollie_subscription_repetition_type', RepetitionType::TIMES);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-finite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -68,11 +70,20 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items)->getProduct();
 
-        $item->setData('mollie_subscription_product', 1);
-        $item->setData('mollie_subscription_interval_amount', $input['amount']);
-        $item->setData('mollie_subscription_interval_type', $input['type']);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'custom');
+        $this->setTheSubscriptionOnTheProduct(
+            $orderItem->getProduct(),
+            '{"identifier":"custom",' .
+            '"title":"A new custom subscription",' .
+            '"interval_amount":"' . $input['amount'] . '",' .
+            '"interval_type":"' . $input['type'] . '",' .
+            '"repetition_amount":"10",' .
+            '"repetition_type":"times"' .
+            '}'
+        );
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -93,11 +104,20 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items)->getProduct();
 
-        $item->setData('mollie_subscription_product', 1);
-        $item->setData('mollie_subscription_interval_amount', $input['amount']);
-        $item->setData('mollie_subscription_interval_type', $input['type']);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'custom');
+        $this->setTheSubscriptionOnTheProduct(
+            $orderItem->getProduct(),
+            '{"identifier":"custom",' .
+            '"title":"A new custom subscription",' .
+            '"interval_amount":"' . $input['amount'] . '",' .
+            '"interval_type":"' . $input['type'] . '",' .
+            '"repetition_amount":"10",' .
+            '"repetition_type":"times"' .
+            '}'
+        );
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -117,12 +137,14 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items)->getProduct();
 
-        $item->setData('sku', 'example-sku');
-        $item->setData('mollie_subscription_product', 1);
-        $item->setData('mollie_subscription_interval_amount', 5);
-        $item->setData('mollie_subscription_interval_type', IntervalType::MONTHS);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-finite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
+
+        $orderItem->getProduct()->setData('sku', 'example-sku');
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -143,11 +165,13 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items);
 
-//        $item->setRowTtotalInclTax(999.98);
-        $item->setData('row_total_incl_tax', '999.98');
-        $item->getProduct()->setData('mollie_subscription_product', 1);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $orderItem->setData('row_total_incl_tax', '999.98');
+
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-finite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -168,11 +192,11 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items)->getProduct();
 
-        $item->setData('mollie_subscription_product', 1);
-        $item->setData('mollie_subscription_interval_amount', 5);
-        $item->setData('mollie_subscription_interval_type', IntervalType::MONTHS);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-finite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -196,11 +220,20 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
-        $item = array_shift($items)->getProduct();
 
-        $item->setData('mollie_subscription_product', 1);
-        $item->setData('mollie_subscription_interval_amount', $input['amount']);
-        $item->setData('mollie_subscription_interval_type', $input['type']);
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'custom');
+        $this->setTheSubscriptionOnTheProduct(
+            $orderItem->getProduct(),
+            '{"identifier":"custom",' .
+            '"title":"A new custom subscription",' .
+            '"interval_amount":"' . $input['amount'] . '",' .
+            '"interval_type":"' . $input['type'] . '",' .
+            '"repetition_amount":"10",' .
+            '"repetition_type":"times"' .
+            '}'
+        );
 
         /** @var SubscriptionOptions $instance */
         $instance = $this->objectManager->create(SubscriptionOptions::class);
@@ -251,5 +284,33 @@ class SubscriptionOptionsTest extends IntegrationTestCase
             'multiple months' => [['amount' => 3, 'type' => IntervalType::MONTHS], $now->add(new \DateInterval('P3M'))],
             'float months' => [['amount' => '3.0000', 'type' => IntervalType::MONTHS], $now->add(new \DateInterval('P3M'))],
         ];
+    }
+
+    private function setTheSubscriptionOnTheProduct(ProductInterface $product, string $customSubscription = null): void
+    {
+        $product->setData('mollie_subscription_product', 1);
+
+        $product->setData(
+            'mollie_subscription_table',
+            '[' .
+            '{"identifier":"weekly-infinite","title":"A new product every week","interval_amount":"1","interval_type":"weeks","repetition_amount":"","repetition_type":"infinite"},' .
+            '{"identifier":"bi-monthly-infinite","title":"A new product every other month","interval_amount":"2","interval_type":"months","repetition_type":"infinite"},' .
+            '{"identifier":"weekly-finite","title":"A new product every week","interval_amount":"1","interval_type":"weeks","repetition_amount":"10","repetition_type":"times"}' .
+            ($customSubscription ? ',' . $customSubscription : '') .
+            ']'
+        );
+    }
+
+    private function setOptionIdOnOrderItem(OrderItemInterface $orderItem, string $optionId): void
+    {
+        $orderItem->setData('product_options', [
+            'info_buyRequest' => [
+                'mollie_metadata' => [
+                    'recurring_metadata' => [
+                        'option_id' => $optionId,
+                    ]
+                ]
+            ]
+        ]);
     }
 }

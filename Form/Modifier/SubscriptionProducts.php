@@ -10,6 +10,8 @@ use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Subscriptions\Config\Source\IntervalType;
+use Mollie\Subscriptions\Config\Source\RepetitionType;
 
 class SubscriptionProducts extends AbstractModifier
 {
@@ -18,13 +20,27 @@ class SubscriptionProducts extends AbstractModifier
      */
     private $arrayManager;
 
+    /**
+     * @var IntervalType
+     */
+    private $intervalType;
+
+    /**
+     * @var RepetitionType
+     */
+    private $repetitionType;
+
     public function __construct(
-        ArrayManager $arrayManager
+        ArrayManager $arrayManager,
+        IntervalType $intervalType,
+        RepetitionType $repetitionType
     ) {
         $this->arrayManager = $arrayManager;
+        $this->intervalType = $intervalType;
+        $this->repetitionType = $repetitionType;
     }
 
-    public function modifyMeta(array $meta)
+    public function modifyMeta(array $meta): array
     {
         $repetitionAmountField = 'mollie_subscription_repetition_amount';
         $repetitionTypeField = 'mollie_subscription_repetition_type';
@@ -41,7 +57,17 @@ class SubscriptionProducts extends AbstractModifier
             $repetitionTypeField
         );
 
-        return $meta;
+        $subscriptionTable = $this->arrayManager->findPath('mollie_subscription_table', $meta, null, 'children');
+
+        return $this->arrayManager->merge(
+            $subscriptionTable . self::META_CONFIG_PATH,
+            $meta,
+            [
+                'component' => 'Mollie_Subscriptions/js/product/input/subscription-table',
+                'interval_types' => $this->intervalType->getAllOptions(),
+                'repetition_types' => $this->repetitionType->getAllOptions(),
+            ]
+        );
     }
 
     public function mergeToGroup(array $meta, $field1, $field2): array
@@ -77,7 +103,7 @@ class SubscriptionProducts extends AbstractModifier
     /**
      * {@inheritdoc}
      */
-    public function modifyData(array $data)
+    public function modifyData(array $data): array
     {
         return $data;
     }

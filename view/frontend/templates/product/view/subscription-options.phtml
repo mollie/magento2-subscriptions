@@ -1,0 +1,25 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Mollie\Subscriptions\Block\Frontend\Product\View\SubscriptionOptions $block */
+?>
+<div class="mollie-subscription-options">
+    <input type="hidden" name="purchase" value="subscription" /><br>
+    <input type="hidden" id="mollie_subscription_option" name="recurring_metadata[option_id]" />
+
+    <?php foreach ($block->getOptions() as $option): ?>
+        <button
+            onclick="document.getElementById('mollie_subscription_option').value = '<?= $option->getIdentifier(); ?>'"
+            type="submit"
+            class="action primary tocart product-addtocart-button select-subscription"
+            value="<?= $option->getIdentifier(); ?>"
+            title="<?= $option->getTitle() ?>"
+        ><?= $option->getTitle(); ?></button>
+    <?php endforeach; ?>
+
+    <?php /** Instant purchase should be hidden when subscriptions are active */ ?>
+    <style>#instant-purchase {display: none;}</style>
+</div>

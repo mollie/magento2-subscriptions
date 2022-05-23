@@ -35,6 +35,12 @@
             <config_path>mollie_subscriptions/general/shipping_method</config_path>
             <comment>This method is used when recurring orders are created.</comment>
         </field>
+        <field id="allow_one_time_purchase" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Allow one-time purchase for products?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/general/allow_one_time_purchases</config_path>
+            <comment>Note: This can be changed on a per-product level</comment>
+        </field>
     </group>
 
     <group id="prepayment_reminder" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"

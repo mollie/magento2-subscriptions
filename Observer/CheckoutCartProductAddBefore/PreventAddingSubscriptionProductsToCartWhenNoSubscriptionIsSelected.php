@@ -12,10 +12,6 @@ use Magento\Framework\Exception\LocalizedException;
 
 class PreventAddingSubscriptionProductsToCartWhenNoSubscriptionIsSelected implements ObserverInterface
 {
-    public function __construct()
-    {
-    }
-
     public function execute(Observer $observer)
     {
         $product = $observer->getData('product');

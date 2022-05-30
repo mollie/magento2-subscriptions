@@ -7,8 +7,21 @@
 /** @var \Mollie\Subscriptions\Block\Frontend\Product\View\SubscriptionOptions $block */
 ?>
 <div class="mollie-subscription-options">
-    <input type="hidden" name="purchase" value="subscription" /><br>
+    <input type="hidden" id="mollie_subscription_purchase" name="purchase" value="subscription" /><br>
     <input type="hidden" id="mollie_subscription_option" name="recurring_metadata[option_id]" />
+
+    <?php if ($block->allowOneTimePurchase()): ?>
+        <button
+            onclick="
+                document.getElementById('mollie_subscription_option').value = 'onetimepurchase';
+                document.getElementById('mollie_subscription_purchase').value = 'onetime';
+            "
+            type="submit"
+            class="action primary tocart product-addtocart-button select-subscription"
+            value="onetimepurchase"
+            title="<?= __('One Time Purchase') ?>"
+        ><?= __('One Time Purchase'); ?></button>
+    <?php endif; ?>
 
     <?php foreach ($block->getOptions() as $option): ?>
         <button

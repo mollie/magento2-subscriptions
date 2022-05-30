@@ -29,6 +29,7 @@ class Config
     const XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER = 'mollie_subscriptions/prepayment_reminder/days_before_reminder';
     const XML_PATH_PREPAYMENT_REMINDER_ENABLED = 'mollie_subscriptions/prepayment_reminder/enabled';
     const XML_PATH_PREPAYMENT_REMINDER_TEMPLATE = 'mollie_subscriptions/prepayment_reminder/template';
+    const XML_PATH_ALLOW_ONE_TIME_PURCHASE = 'mollie_subscriptions/general/allow_one_time_purchases';
     const MODULE_SUPPORT_LINK = 'https://www.magmodules.eu/help/%s';
 
     /**
@@ -225,5 +226,15 @@ class Config
     public function daysBeforePrepaymentReminder($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
     {
         return $this->getStoreValue(static::XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function allowOneTimePurchase($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_ALLOW_ONE_TIME_PURCHASE, $storeId, $scope);
     }
 }

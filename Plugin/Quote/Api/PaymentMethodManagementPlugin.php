@@ -7,7 +7,6 @@
 namespace Mollie\Subscriptions\Plugin\Quote\Api;
 
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\PaymentMethodInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Subscriptions\Service\Cart\CartContainsSubscriptionProduct;
 
@@ -17,6 +16,7 @@ class PaymentMethodManagementPlugin
         'mollie_methods_bancontact',
         'mollie_methods_belfius',
         'mollie_methods_creditcard',
+        'mollie_methods_creditcard_vault',
         'mollie_methods_eps',
         'mollie_methods_giropay',
         'mollie_methods_ideal',

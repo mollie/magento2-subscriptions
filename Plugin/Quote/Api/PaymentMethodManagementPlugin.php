@@ -17,6 +17,7 @@ class PaymentMethodManagementPlugin
         'mollie_methods_bancontact',
         'mollie_methods_belfius',
         'mollie_methods_creditcard',
+        'mollie_methods_creditcard_vault',
         'mollie_methods_eps',
         'mollie_methods_giropay',
         'mollie_methods_ideal',

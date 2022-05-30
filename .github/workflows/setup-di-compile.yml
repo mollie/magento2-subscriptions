@@ -16,7 +16,7 @@ jobs:
 
       # Public repository
       - uses: actions/checkout@v2
-        if: "contains(github.repository, 'mollie/magento2')"
+        if: "!contains(github.repository, 'magmodules')"
         with:
           repository: mollie/magento2
           path: mollie-base

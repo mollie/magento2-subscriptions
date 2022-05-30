@@ -49,9 +49,9 @@ class DebugLogger extends Logger
     public function addLog(string $type, $data)
     {
         if (is_array($data) || is_object($data)) {
-            $this->addDebug($type . ': ' . $this->json->serialize($data));
+            $this->addRecord(Logger::DEBUG, $type . ': ' . $this->json->serialize($data));
         } else {
-            $this->addDebug($type . ': ' . $data);
+            $this->addRecord(Logger::DEBUG, $type . ': ' . $data);
         }
     }
 }

@@ -50,9 +50,9 @@ class ErrorLogger extends Logger
     public function addLog($type, $data)
     {
         if (is_array($data) || is_object($data)) {
-            $this->addError($type . ': ' . $this->json->serialize($data));
+            $this->addRecord(Logger::ERROR, $type . ': ' . $this->json->serialize($data));
         } else {
-            $this->addEmergency($type . ': ' . $data);
+            $this->addRecord(Logger::EMERGENCY, $type . ': ' . $data);
         }
     }
 }

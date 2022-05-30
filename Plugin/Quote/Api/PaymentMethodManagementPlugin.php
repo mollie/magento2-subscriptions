@@ -7,7 +7,6 @@
 namespace Mollie\Subscriptions\Plugin\Quote\Api;
 
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\PaymentMethodInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Subscriptions\Service\Cart\CartContainsSubscriptionProduct;
 

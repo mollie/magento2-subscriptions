@@ -10,10 +10,8 @@ use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Boolean;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Field;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Config\Source\IntervalType;
 use Mollie\Subscriptions\Config\Source\RepetitionType;
@@ -47,22 +45,34 @@ class SubscriptionProducts extends AbstractModifier
      */
     private $locator;
 
+    /**
+     * @var string[]
+     */
+    private $supportedProductTypeIds;
+
     public function __construct(
         Config $config,
         ArrayManager $arrayManager,
         IntervalType $intervalType,
         RepetitionType $repetitionType,
-        LocatorInterface $locator
+        LocatorInterface $locator,
+        array $supportedProductTypeIds
     ) {
         $this->config = $config;
         $this->arrayManager = $arrayManager;
         $this->intervalType = $intervalType;
         $this->repetitionType = $repetitionType;
         $this->locator = $locator;
+        $this->supportedProductTypeIds = $supportedProductTypeIds;
     }
 
     public function modifyMeta(array $meta): array
     {
+        if (!in_array($this->locator->getProduct()->getTypeId(), $this->supportedProductTypeIds)) {
+            unset($meta['mollie']);
+            return $meta;
+        }
+
         $repetitionAmountField = 'mollie_subscription_repetition_amount';
         $repetitionTypeField = 'mollie_subscription_repetition_type';
 

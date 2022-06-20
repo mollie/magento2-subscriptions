@@ -15,4 +15,13 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <type name="Mollie\Subscriptions\Form\Modifier\SubscriptionProducts">
+        <arguments>
+            <argument name="supportedProductTypeIds" xsi:type="array">
+                <item name="simple" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_SIMPLE</item>
+                <item name="virtual" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

@@ -111,9 +111,14 @@ class SubscriptionOptions
 
     private function addAmount(): void
     {
+        $rowTotal = $this->orderItem->getRowTotalInclTax();
+        if (!$rowTotal && $this->orderItem->getParentItem()) {
+            $rowTotal = $this->orderItem->getParentItem()->getRowTotalInclTax();
+        }
+
         $this->options['amount'] = $this->mollieHelper->getAmountArray(
             $this->order->getOrderCurrencyCode(),
-            $this->orderItem->getRowTotalInclTax()
+            $rowTotal
         );
     }
 

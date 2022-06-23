@@ -1,0 +1,111 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\$extensionAttributes of method Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductInterface\\:\\:setExtensionAttributes\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductExtensionInterface\\.$#"
+			count: 1
+			path: Api/Data/SubscriptionToProductInterface.php
+
+		-
+			message: "#^Variable \\$scope on left side of \\?\\? is never defined\\.$#"
+			count: 1
+			path: Config.php
+
+		-
+			message: "#^Parameter \\$addressFactory of method Mollie\\\\Subscriptions\\\\Controller\\\\Api\\\\Webhook\\:\\:__construct\\(\\) has invalid type Magento\\\\Quote\\\\Api\\\\Data\\\\AddressInterfaceFactory\\.$#"
+			count: 1
+			path: Controller/Api/Webhook.php
+
+		-
+			message: "#^Parameter \\$subscriptionToProductFactory of method Mollie\\\\Subscriptions\\\\Controller\\\\Index\\\\Restart\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductInterfaceFactory\\.$#"
+			count: 1
+			path: Controller/Index/Restart.php
+
+		-
+			message: "#^Parameter \\$searchCriteriaBuilderFactory of method Mollie\\\\Subscriptions\\\\Cron\\\\SendPrePaymentReminderEmailCron\\:\\:__construct\\(\\) has invalid type Magento\\\\Framework\\\\Api\\\\SearchCriteriaBuilderFactory\\.$#"
+			count: 1
+			path: Cron/SendPrePaymentReminderEmailCron.php
+
+		-
+			message: "#^Parameter \\$extensionAttributes of method Mollie\\\\Subscriptions\\\\Model\\\\Data\\\\SubscriptionToProduct\\:\\:setExtensionAttributes\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductExtensionInterface\\.$#"
+			count: 1
+			path: Model/Data/SubscriptionToProduct.php
+
+		-
+			message: "#^Parameter \\$customerFactory of method Mollie\\\\Subscriptions\\\\Model\\\\MollieSubscriptionsListing\\:\\:__construct\\(\\) has invalid type Magento\\\\Customer\\\\Api\\\\Data\\\\CustomerInterfaceFactory\\.$#"
+			count: 1
+			path: Model/MollieSubscriptionsListing.php
+
+		-
+			message: "#^Parameter \\$searchCriteriaBuilderFactory of method Mollie\\\\Subscriptions\\\\Model\\\\MollieSubscriptionsListing\\:\\:__construct\\(\\) has invalid type Magento\\\\Framework\\\\Api\\\\SearchCriteriaBuilderFactory\\.$#"
+			count: 1
+			path: Model/MollieSubscriptionsListing.php
+
+		-
+			message: "#^Parameter \\$subscriptionToProductDataFactory of method Mollie\\\\Subscriptions\\\\Model\\\\SubscriptionToProduct\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductInterfaceFactory\\.$#"
+			count: 1
+			path: Model/SubscriptionToProduct.php
+
+		-
+			message: "#^Parameter \\$dataSubscriptionToProductFactory of method Mollie\\\\Subscriptions\\\\Model\\\\SubscriptionToProductRepository\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductInterfaceFactory\\.$#"
+			count: 1
+			path: Model/SubscriptionToProductRepository.php
+
+		-
+			message: "#^Parameter \\$searchResultsFactory of method Mollie\\\\Subscriptions\\\\Model\\\\SubscriptionToProductRepository\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductSearchResultsInterfaceFactory\\.$#"
+			count: 1
+			path: Model/SubscriptionToProductRepository.php
+
+		-
+			message: "#^Parameter \\$subscriptionToProductCollectionFactory of method Mollie\\\\Subscriptions\\\\Model\\\\SubscriptionToProductRepository\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Model\\\\ResourceModel\\\\SubscriptionToProduct\\\\CollectionFactory\\.$#"
+			count: 1
+			path: Model/SubscriptionToProductRepository.php
+
+		-
+			message: "#^Parameter \\$subscriptionToProductFactory of method Mollie\\\\Subscriptions\\\\Model\\\\SubscriptionToProductRepository\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Model\\\\SubscriptionToProductFactory\\.$#"
+			count: 1
+			path: Model/SubscriptionToProductRepository.php
+
+		-
+			message: "#^Parameter \\$subscriptionToProductFactory of method Mollie\\\\Subscriptions\\\\Observer\\\\MollieProcessTransactionEnd\\\\CreateSubscriptions\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\Api\\\\Data\\\\SubscriptionToProductInterfaceFactory\\.$#"
+			count: 1
+			path: Observer/MollieProcessTransactionEnd/CreateSubscriptions.php
+
+		-
+			message: "#^Parameter \\$productSubscriptionOptionFactory of method Mollie\\\\Subscriptions\\\\Service\\\\Mollie\\\\ParseSubscriptionOptions\\:\\:__construct\\(\\) has invalid type Mollie\\\\Subscriptions\\\\DTO\\\\ProductSubscriptionOptionFactory\\.$#"
+			count: 1
+			path: Service/Mollie/ParseSubscriptionOptions.php
+
+		-
+			message: "#^Parameter \\$scheduleCollectionFactory of method Mollie\\\\Subscriptions\\\\Service\\\\Test\\\\Cron\\:\\:__construct\\(\\) has invalid type Magento\\\\Cron\\\\Model\\\\ResourceModel\\\\Schedule\\\\CollectionFactory\\.$#"
+			count: 1
+			path: Service/Test/Cron.php
+
+		-
+			message: "#^Parameter \\$eavSetupFactory of method Mollie\\\\Subscriptions\\\\Setup\\\\Patch\\\\Data\\\\AddAllowOneTimePurchase\\:\\:__construct\\(\\) has invalid type Magento\\\\Eav\\\\Setup\\\\EavSetupFactory\\.$#"
+			count: 1
+			path: Setup/Patch/Data/AddAllowOneTimePurchase.php
+
+		-
+			message: "#^Parameter \\$eavSetupFactory of method Mollie\\\\Subscriptions\\\\Setup\\\\Patch\\\\Data\\\\AddSubscriptionsTable\\:\\:__construct\\(\\) has invalid type Magento\\\\Eav\\\\Setup\\\\EavSetupFactory\\.$#"
+			count: 1
+			path: Setup/Patch/Data/AddSubscriptionsTable.php
+
+		-
+			message: "#^Parameter \\$collectionFactory of method Mollie\\\\Subscriptions\\\\Setup\\\\Patch\\\\Data\\\\ConvertToSubscriptionsTable\\:\\:__construct\\(\\) has invalid type Magento\\\\Catalog\\\\Model\\\\ResourceModel\\\\Product\\\\CollectionFactory\\.$#"
+			count: 1
+			path: Setup/Patch/Data/ConvertToSubscriptionsTable.php
+
+		-
+			message: "#^Parameter \\$eavSetupFactory of method Mollie\\\\Subscriptions\\\\Setup\\\\Patch\\\\Data\\\\DeleteObsoleteAttributes\\:\\:__construct\\(\\) has invalid type Magento\\\\Eav\\\\Setup\\\\EavSetupFactory\\.$#"
+			count: 1
+			path: Setup/Patch/Data/DeleteObsoleteAttributes.php
+
+		-
+			message: "#^Parameter \\$eavSetupFactory of method Mollie\\\\Subscriptions\\\\Setup\\\\Patch\\\\Data\\\\SubscriptionAttributes\\:\\:__construct\\(\\) has invalid type Magento\\\\Eav\\\\Setup\\\\EavSetupFactory\\.$#"
+			count: 1
+			path: Setup/Patch/Data/SubscriptionAttributes.php
+
+		-
+			message: "#^File ends with a trailing whitespace\\. This may cause problems when running the code in the web browser\\. Remove the closing \\?\\> mark or remove the whitespace\\.$#"
+			count: 1
+			path: view/adminhtml/templates/system/config/button/debug.phtml

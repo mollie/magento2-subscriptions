@@ -13,3 +13,4 @@ jobs:
           --volume $(pwd)/:/app/workdir
           michielgerritsen/magento-coding-standard:latest
           --severity=10
+          -s

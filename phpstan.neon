@@ -1,3 +1,6 @@
+includes:
+	- phpstan-baseline.neon
+
 parameters:
     reportUnmatchedIgnoredErrors: false
     level: 1
@@ -7,5 +10,6 @@ parameters:
     fileExtensions:
         - php
         - phtml
-    excludes_analyse:
-        - Test/*
+    excludePaths:
+        analyseAndScan:
+            - Test/*

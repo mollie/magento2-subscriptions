@@ -42,9 +42,17 @@ define([
                 return;
             }
 
+            var hasDefault = false;
             _.each(json, function (row) {
+                var isDefault = false;
+                if (typeof row.isDefault !== 'undefined') {
+                    hasDefault = true;
+                    isDefault = row.isDefault;
+                }
+
                 this.addRow(
                     row.identifier,
+                    isDefault,
                     row.title,
                     row.interval_amount,
                     row.interval_type,
@@ -56,12 +64,17 @@ define([
             if (!this.rows().length) {
                 this.add();
             }
+
+            if (!hasDefault) {
+                this.rows()[0].isDefault(true);
+            }
         },
 
         updateValue: function () {
             var rows = this.rows().map( function (row) {
                 return {
                     identifier: row.identifier,
+                    isDefault: row.isDefault(),
                     title: row.title(),
                     interval_amount: row.interval_amount(),
                     interval_type: row.interval_type(),
@@ -93,8 +106,15 @@ define([
             this.rows.remove(row);
         },
 
-        addRow: function (identifier, title, interval_amount, interval_type, repetition_amount, repetition_type) {
+        setDefault(identifier) {
+            this.rows().forEach(function (row) {
+                row.isDefault(row.identifier === identifier);
+            })
+        },
+
+        addRow: function (identifier, isDefault, title, interval_amount, interval_type, repetition_amount, repetition_type) {
             var titleObservable = ko.observable(title);
+            var isDefaultObservable = ko.observable(isDefault || false);
             var intervalAmountObservable = ko.observable(interval_amount);
             var intervalTypeObservable = ko.observable(interval_type);
             var repetitionAmountObservable = ko.observable(repetition_amount);
@@ -106,8 +126,17 @@ define([
             repetitionAmountObservable.subscribe(function () { this.updateValue() }.bind(this));
             repetitionTypeObservable.subscribe(function () { this.updateValue() }.bind(this));
 
+            isDefaultObservable.subscribe(function (value) {
+                if (value === true) {
+                    this.setDefault(identifier);
+                }
+
+                this.updateValue();
+            }.bind(this));
+
             this.rows.push({
                 identifier: identifier,
+                isDefault: isDefaultObservable,
                 title: titleObservable,
                 interval_amount: intervalAmountObservable,
                 interval_type: intervalTypeObservable,

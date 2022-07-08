@@ -2,6 +2,7 @@
     <table class="admin__control-table">
         <thead>
             <tr>
+                <th data-bind="i18n: 'Default'"></th>
                 <th data-bind="i18n: 'Title'"></th>
                 <th data-bind="i18n: 'Repeat Every'"></th>
                 <th data-bind="i18n: 'Type'"></th>
@@ -21,6 +22,7 @@
         </tfoot>
         <tbody data-bind="foreach: rows">
             <tr>
+                <td><input class="radio" type="radio" data-bind="value: true, checked: isDefault"></td>
                 <td><input class="admin__control-text" type="text" data-bind="value: title" /></td>
                 <td><input class="admin__control-text" type="text" data-bind="value: interval_amount" /></td>
                 <td>

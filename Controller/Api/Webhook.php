@@ -12,22 +12,27 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Api\Data\CartInterface;
-use Magento\Quote\Api\GuestCartRepositoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
+use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Config;
 
-class Webhook extends Action
+class Webhook extends Action implements CsrfAwareActionInterface
 {
     /**
      * @var Config
@@ -79,6 +84,11 @@ class Webhook extends Action
      */
     private $orderRepository;
 
+    /**
+     * @var MollieLogger
+     */
+    private $mollieLogger;
+
     public function __construct(
         Context $context,
         Config $config,
@@ -90,10 +100,11 @@ class Webhook extends Action
         CustomerRepositoryInterface $customerRepository,
         AddressInterfaceFactory $addressFactory,
         AddressRepositoryInterface $addressRepository,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        MollieLogger $mollieLogger
     ) {
         parent::__construct($context);
-        
+
         $this->config = $config;
         $this->mollie = $mollie;
         $this->mollieCustomerRepository = $mollieCustomerRepository;
@@ -104,6 +115,7 @@ class Webhook extends Action
         $this->addressFactory = $addressFactory;
         $this->addressRepository = $addressRepository;
         $this->orderRepository = $orderRepository;
+        $this->mollieLogger = $mollieLogger;
     }
 
     public function execute()
@@ -117,29 +129,38 @@ class Webhook extends Action
             return $this->returnOkResponse();
         }
 
-        $api = $this->mollie->getMollieApi();
-        $mollieOrder = $api->payments->get($id);
+        try {
+            $api = $this->mollie->getMollieApi();
+            $mollieOrder = $api->payments->get($id);
 
-        $customerId = $this->mollieCustomerRepository->getByMollieCustomerId($mollieOrder->customerId)->getCustomerId();
-        $customer = $this->customerRepository->getById($customerId);
+            $customerId = $this->mollieCustomerRepository->getByMollieCustomerId($mollieOrder->customerId)->getCustomerId();
+            $customer = $this->customerRepository->getById($customerId);
 
-        $cart = $this->getCart($customer);
-        $this->addProduct($api, $mollieOrder, $cart);
+            $cart = $this->getCart($customer);
+            $this->addProduct($api, $mollieOrder, $cart);
 
-        $cart->setBillingAddress($this->formatAddress($this->addressRepository->getById($customer->getDefaultBilling())));
-        $this->setShippingAddress($customer, $cart);
+            $cart->setBillingAddress($this->formatAddress($this->addressRepository->getById($customer->getDefaultBilling())));
+            $this->setShippingAddress($customer, $cart);
 
-        $cart->getPayment()->addData(['method' => 'mollie_methods_' . $mollieOrder->method]);
+            $cart->getPayment()->addData(['method' => 'mollie_methods_' . $mollieOrder->method]);
 
-        $cart->collectTotals();
-        $this->cartRepository->save($cart);
+            $cart->collectTotals();
+            $this->cartRepository->save($cart);
 
-        $order = $this->cartManagement->submit($cart);
-        $order->setMollieTransactionId($mollieOrder->id);
-        $this->orderRepository->save($order);
+            $order = $this->cartManagement->submit($cart);
+            $order->setMollieTransactionId($mollieOrder->id);
+            $this->orderRepository->save($order);
 
-        $this->mollie->processTransaction($order->getId(), 'webhook');
-        return $this->returnOkResponse();
+            $this->mollie->processTransaction($order->getId(), 'webhook');
+            return $this->returnOkResponse();
+        } catch (ApiException $exception) {
+            $this->mollieLogger->addInfoLog('ApiException occured while checking transaction', [
+                'id' => $id,
+                'exception' => $exception->__toString()
+            ]);
+
+            throw new NotFoundException(__('Please check the Mollie logs for more information'));
+        }
     }
 
     private function formatAddress(\Magento\Customer\Api\Data\AddressInterface $customerAddress): AddressInterface
@@ -200,5 +221,15 @@ class Webhook extends Action
         $result->setHeader('content-type', 'text/plain');
         $result->setContents('OK');
         return $result;
+    }
+
+    public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
+    {
+        return null;
+    }
+
+    public function validateForCsrf(RequestInterface $request): ?bool
+    {
+        return true;
     }
 }

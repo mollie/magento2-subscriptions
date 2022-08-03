@@ -92,7 +92,7 @@ class SubscriptionToProduct extends AbstractExtensibleObject implements Subscrip
      * Get store_id
      * @return int|null
      */
-    public function getStoreId(): int
+    public function getStoreId(): ?int
     {
         return $this->_get(self::STORE_ID);
     }

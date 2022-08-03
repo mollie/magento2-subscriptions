@@ -29,6 +29,18 @@ class Config
     const XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER = 'mollie_subscriptions/prepayment_reminder/days_before_reminder';
     const XML_PATH_PREPAYMENT_REMINDER_ENABLED = 'mollie_subscriptions/prepayment_reminder/enabled';
     const XML_PATH_PREPAYMENT_REMINDER_TEMPLATE = 'mollie_subscriptions/prepayment_reminder/template';
+    const XML_PATH_EMAILS_ENABLE_ADMIN_NOTIFICATION = 'mollie_subscriptions/emails/enable_admin_notification';
+    const XML_PATH_EMAILS_ADMIN_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_notification_template';
+    const XML_PATH_EMAILS_ENABLE_CUSTOMER_NOTIFICATION = 'mollie_subscriptions/emails/enable_customer_notification';
+    const XML_PATH_EMAILS_CUSTOMER_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/customer_notification_template';
+    const XML_PATH_EMAILS_ENABLE_ADMIN_RESTART_NOTIFICATION = 'mollie_subscriptions/emails/enable_admin_restart_notification';
+    const XML_PATH_EMAILS_ADMIN_RESTART_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_restart_notification_template';
+    const XML_PATH_EMAILS_ENABLE_CUSTOMER_RESTART_NOTIFICATION = 'mollie_subscriptions/emails/enable_customer_restart_notification';
+    const XML_PATH_EMAILS_CUSTOMER_RESTART_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/customer_restart_notification_template';
+    const XML_PATH_EMAILS_ENABLE_ADMIN_CANCEL_NOTIFICATION = 'mollie_subscriptions/emails/enable_admin_cancel_notification';
+    const XML_PATH_EMAILS_ADMIN_CANCEL_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_cancel_notification_template';
+    const XML_PATH_EMAILS_ENABLE_CUSTOMER_CANCEL_NOTIFICATION = 'mollie_subscriptions/emails/enable_customer_cancel_notification';
+    const XML_PATH_EMAILS_CUSTOMER_CANCEL_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/customer_cancel_notification_template';
     const XML_PATH_ALLOW_ONE_TIME_PURCHASE = 'mollie_subscriptions/general/allow_one_time_purchases';
     const MODULE_SUPPORT_LINK = 'https://www.magmodules.eu/help/%s';
 
@@ -147,20 +159,6 @@ class Config
      * @param int|null $storeId
      * @return bool
      */
-    public function isDebugMode(int $storeId = null): bool
-    {
-        $scope = $scope ?? ScopeInterface::SCOPE_STORE;
-        return $this->getFlag(
-            self::XML_PATH_DEBUG,
-            $storeId,
-            $scope
-        );
-    }
-
-    /**
-     * @param int|null $storeId
-     * @return bool
-     */
     public function isEnabled(int $storeId = null): bool
     {
         return $this->getFlag(self::XML_PATH_EXTENSION_ENABLE, $storeId);
@@ -201,9 +199,9 @@ class Config
     /**
      * @param null|int|string $storeId
      * @param string $scope
-     * @return bool|null
+     * @return bool
      */
-    public function isPrepaymentReminderEnabled($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?bool
+    public function isPrepaymentReminderEnabled($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
     {
         return $this->getFlag(static::XML_PATH_PREPAYMENT_REMINDER_ENABLED, $storeId, $scope);
     }
@@ -231,10 +229,130 @@ class Config
     /**
      * @param null|int|string $storeId
      * @param string $scope
-     * @return string|null
+     * @return bool
      */
     public function allowOneTimePurchase($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
     {
         return $this->getFlag(static::XML_PATH_ALLOW_ONE_TIME_PURCHASE, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function enableAdminNotificationEmail($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_ADMIN_NOTIFICATION, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function getAdminNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_EMAILS_ADMIN_NOTIFICATION_TEMPLATE, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function enableCustomerNotificationEmail($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_CUSTOMER_NOTIFICATION, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function getCustomerNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_EMAILS_CUSTOMER_NOTIFICATION_TEMPLATE, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function enableAdminRestartNotificationEmail($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_ADMIN_RESTART_NOTIFICATION, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function getAdminRestartNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_EMAILS_ADMIN_RESTART_NOTIFICATION_TEMPLATE, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function enableCustomerRestartNotificationEmail($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_CUSTOMER_RESTART_NOTIFICATION, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function getCustomerRestartNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_EMAILS_CUSTOMER_RESTART_NOTIFICATION_TEMPLATE, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function enableAdminCancelNotificationEmail($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_ADMIN_CANCEL_NOTIFICATION, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function getAdminCancelNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_EMAILS_ADMIN_CANCEL_NOTIFICATION_TEMPLATE, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function enableCustomerCancelNotificationEmail($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_CUSTOMER_CANCEL_NOTIFICATION, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function getCustomerCancelNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_EMAILS_CUSTOMER_CANCEL_NOTIFICATION_TEMPLATE, $storeId, $scope);
     }
 }

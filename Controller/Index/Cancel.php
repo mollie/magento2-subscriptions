@@ -16,6 +16,7 @@ use Magento\Framework\Event\ManagerInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
+use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
 
 class Cancel extends Action implements HttpPostActionInterface
 {
@@ -49,6 +50,16 @@ class Cancel extends Action implements HttpPostActionInterface
      */
     private $eventManager;
 
+    /**
+     * @var SendNotificationEmail
+     */
+    private $sendAdminCancelNotificationEmail;
+
+    /**
+     * @var SendNotificationEmail
+     */
+    private $sendCustomerCancelNotificationEmail;
+
     public function __construct(
         Context $context,
         Config $config,
@@ -56,7 +67,9 @@ class Cancel extends Action implements HttpPostActionInterface
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         CurrentCustomer $currentCustomer,
         Session $customerSession,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        SendNotificationEmail $sendAdminCancelNotificationEmail,
+        SendNotificationEmail $sendCustomerCancelNotificationEmail
     ) {
         parent::__construct($context);
         $this->config = $config;
@@ -65,6 +78,8 @@ class Cancel extends Action implements HttpPostActionInterface
         $this->currentCustomer = $currentCustomer;
         $this->customerSession = $customerSession;
         $this->eventManager = $eventManager;
+        $this->sendAdminCancelNotificationEmail = $sendAdminCancelNotificationEmail;
+        $this->sendCustomerCancelNotificationEmail = $sendCustomerCancelNotificationEmail;
     }
 
     public function dispatch(RequestInterface $request)
@@ -85,7 +100,11 @@ class Cancel extends Action implements HttpPostActionInterface
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
 
         try {
+            $model = $this->subscriptionToProductRepository->getBySubscriptionId($subscriptionId);
             $api->subscriptions->cancelForId($extensionAttributes->getMollieCustomerId(), $subscriptionId);
+
+            $this->sendAdminCancelNotificationEmail->execute($model);
+            $this->sendCustomerCancelNotificationEmail->execute($model);
         } catch (\Exception $exception) {
             $this->messageManager->addErrorMessage(__('Unable to cancel subscription'));
             $this->config->addToLog('error', [

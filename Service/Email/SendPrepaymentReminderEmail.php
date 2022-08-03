@@ -30,7 +30,7 @@ class SendPrepaymentReminderEmail
     private $identityContainer;
 
     /**
-     * @var SendPrepaymentReminderEmailVariables
+     * @var SubscriptionToProductEmailVariables
      */
     private $emailVariables;
 
@@ -38,7 +38,7 @@ class SendPrepaymentReminderEmail
         Config $config,
         TransportBuilder $transportBuilder,
         IdentityInterface $identityContainer,
-        SendPrepaymentReminderEmailVariables $emailVariables
+        SubscriptionToProductEmailVariables $emailVariables
     ) {
         $this->config = $config;
         $this->transportBuilder = $transportBuilder;

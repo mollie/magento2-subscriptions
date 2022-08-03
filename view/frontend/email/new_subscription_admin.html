@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
+<!--@subject {{trans "New subscription"}} @-->
+<!--@vars {
+"var customer_name": "Customer name",
+"var customer_email": "Customer email",
+"var subscription_id": "Subscription ID",
+"var subscription_description": "Subscription description",
+"var subscription_nextPaymentDate": "Next payment date",
+"var subscription_amount": "Subscription amount",
+"var product": "The subscription product object"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<p class="greeting">{{trans "Hello,"}}</p>
+
+<p>{{trans "The customer %customerName has started a new subscription with the description %description and ID %subscription_id." customerName=$customer_name description=$subscription_description subscription_id=$subscription_id}}</p>
+
+<p>{{trans "Thanks again,"}}</p>
+
+<p>{{trans "%store_name" store_name=$store.frontend_name |raw}}</p>
+
+{{template config_path="design/email/footer_template"}}

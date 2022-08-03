@@ -21,6 +21,7 @@ use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterfaceFactory;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
+use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
 
 class Restart extends Action implements HttpPostActionInterface
 {
@@ -69,6 +70,16 @@ class Restart extends Action implements HttpPostActionInterface
      */
     private $product;
 
+    /**
+     * @var SendNotificationEmail
+     */
+    private $sendAdminRestartNotificationEmail;
+
+    /**
+     * @var SendNotificationEmail
+     */
+    private $sendCustomerRestartNotificationEmail;
+
     public function __construct(
         Context $context,
         Config $config,
@@ -79,7 +90,9 @@ class Restart extends Action implements HttpPostActionInterface
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         StoreManagerInterface $storeManager,
         ManagerInterface $eventManager,
-        Product $product
+        Product $product,
+        SendNotificationEmail $sendAdminRestartNotificationEmail,
+        SendNotificationEmail $sendCustomerRestartNotificationEmail
     ) {
         parent::__construct($context);
         $this->config = $config;
@@ -91,6 +104,8 @@ class Restart extends Action implements HttpPostActionInterface
         $this->storeManager = $storeManager;
         $this->eventManager = $eventManager;
         $this->product = $product;
+        $this->sendAdminRestartNotificationEmail = $sendAdminRestartNotificationEmail;
+        $this->sendCustomerRestartNotificationEmail = $sendCustomerRestartNotificationEmail;
     }
 
     public function dispatch(RequestInterface $request)
@@ -141,7 +156,6 @@ class Restart extends Action implements HttpPostActionInterface
             return $this->_redirect('*/*/index');
         }
 
-
         $this->messageManager->addSuccessMessage('The subscription has been restarted successfully');
 
         return $this->_redirect('*/*/index');
@@ -175,5 +189,8 @@ class Restart extends Action implements HttpPostActionInterface
 
         $this->eventManager->dispatch('mollie_subscription_created', ['subscription' => $model]);
         $this->eventManager->dispatch('mollie_subscription_restarted', ['subscription' => $model]);
+
+        $this->sendAdminRestartNotificationEmail->execute($model);
+        $this->sendCustomerRestartNotificationEmail->execute($model);
     }
 }

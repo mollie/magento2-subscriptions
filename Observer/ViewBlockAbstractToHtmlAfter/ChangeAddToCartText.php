@@ -11,7 +11,7 @@ use Magento\Framework\DomDocument\DomDocumentFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Mollie\Subscriptions\Block\Frontend\Product\View\SubscriptionOptions;
-use Mollie\Subscriptions\Config;
+use Mollie\Payment\Config;
 
 class ChangeAddToCartText implements ObserverInterface
 {
@@ -53,7 +53,18 @@ class ChangeAddToCartText implements ObserverInterface
         $document->preserveWhiteSpace = false;
         $document->formatOutput = true;
 
-        if (!$document->loadHTML($html, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED)) {
+        try {
+            if (!$document->loadHTML($html, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED)) {
+                return;
+            }
+        } catch (\Throwable $exception) {
+            $this->config->addToLog(
+                'error',
+                __('Exception while adding the subscription buttons:') .
+                PHP_EOL .
+                (string)$exception
+            );
+
             return;
         }
 

@@ -18,6 +18,7 @@ use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterfaceFactory;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\DTO\SubscriptionOption;
+use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
 use Mollie\Subscriptions\Service\Mollie\SubscriptionOptions;
 use Mollie\Subscriptions\Service\Order\OrderContainsSubscriptionProduct;
 
@@ -68,6 +69,16 @@ class CreateSubscriptions implements ObserverInterface
      */
     private $eventManager;
 
+    /**
+     * @var SendNotificationEmail
+     */
+    private $sendAdminNotificationEmail;
+
+    /**
+     * @var SendNotificationEmail
+     */
+    private $sendCustomerNotificationEmail;
+
     public function __construct(
         Config $config,
         Mollie $mollieModel,
@@ -76,7 +87,9 @@ class CreateSubscriptions implements ObserverInterface
         SubscriptionToProductInterfaceFactory $subscriptionToProductFactory,
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         OrderRepositoryInterface $orderRepository,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        SendNotificationEmail $sendAdminNotificationEmail,
+        SendNotificationEmail $sendCustomerNotificationEmail
     ) {
         $this->config = $config;
         $this->mollieModel = $mollieModel;
@@ -86,6 +99,8 @@ class CreateSubscriptions implements ObserverInterface
         $this->subscriptionToProductRepository = $subscriptionToProductRepository;
         $this->eventManager = $eventManager;
         $this->orderRepository = $orderRepository;
+        $this->sendAdminNotificationEmail = $sendAdminNotificationEmail;
+        $this->sendCustomerNotificationEmail = $sendCustomerNotificationEmail;
     }
 
     public function execute(Observer $observer)
@@ -137,5 +152,8 @@ class CreateSubscriptions implements ObserverInterface
         $model = $this->subscriptionToProductRepository->save($model);
 
         $this->eventManager->dispatch('mollie_subscription_created', ['subscription' => $model]);
+
+        $this->sendAdminNotificationEmail->execute($model);
+        $this->sendCustomerNotificationEmail->execute($model);
     }
 }

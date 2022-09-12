@@ -15,9 +15,13 @@
 
 <p class="greeting">{{trans "Dear %name," name=$customer_name}}</p>
 
-<p>{{trans "Good news! We are getting your %product_name subscription ready for %nextPaymentDate, this e-mail is just to inform you that the payment with an amount of %amount_value is going to be captured on this date as well. For any changes, you can log in to your account on %store_name and pause or cancel the subscription at any time." product_name=$product.getName() nextPaymentDate=$subscription_nextPaymentDate amount_value=$subscription_amount store_name=$store.frontend_name}}</p>
+<p>{{trans "We are very excited to get your %product_name subscription ready for %nextPaymentDate!" product_name=$product.getName() nextPaymentDate=$subscription_nextPaymentDate amount_value=$subscription_amount store_name=$store.frontend_name}}</p>
 
-<p>{{trans "Thanks again,"}}</p>
+<p>{{trans "This email is a reminder that a subscription fee of %amount_value will be charged on the same date." product_name=$product.getName() nextPaymentDate=$subscription_nextPaymentDate amount_value=$subscription_amount store_name=$store.frontend_name}}</p>
+
+<p>{{trans "If you would like to pause or cancel your subscription or make any other changes, you can always do so by logging into your %store_name account." product_name=$product.getName() nextPaymentDate=$subscription_nextPaymentDate amount_value=$subscription_amount store_name=$store.frontend_name}}</p>
+
+<p>{{trans "All our best,"}}</p>
 
 <p>{{trans "%store_name" store_name=$store.frontend_name |raw}}</p>
 

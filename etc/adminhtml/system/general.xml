@@ -69,4 +69,93 @@
             </depends>
         </field>
     </group>
+
+    <group id="emails" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+           showInStore="1">
+        <label>Emails</label>
+        <field id="enable_admin_notification" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Send admin email on new subscription?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/emails/enable_admin_notification</config_path>
+        </field>
+        <field id="admin_notification_template" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Subscription notification template for admin</label>
+            <config_path>mollie_subscriptions/emails/admin_notification_template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enable_admin_notification">1</field>
+            </depends>
+        </field>
+        <field id="enable_customer_notification" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Send customer email on new subscription?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/emails/enable_customer_notification</config_path>
+        </field>
+        <field id="customer_notification_template" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Subscription notification template for customer</label>
+            <config_path>mollie_subscriptions/emails/customer_notification_template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enable_customer_notification">1</field>
+            </depends>
+        </field>
+        <field id="enable_admin_restart_notification" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Send admin email on restart of a subscription?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/emails/enable_admin_restart_notification</config_path>
+        </field>
+        <field id="admin_restart_notification_template" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Subscription notification template for admin</label>
+            <config_path>mollie_subscriptions/emails/admin_restart_notification_template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enable_admin_restart_notification">1</field>
+            </depends>
+        </field>
+        <field id="enable_customer_restart_notification" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Send customer email on restart of a subscription?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/emails/enable_customer_restart_notification</config_path>
+        </field>
+        <field id="customer_restart_notification_template" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Restart subscription notification template for customer</label>
+            <config_path>mollie_subscriptions/emails/customer_restart_notification_template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enable_customer_restart_notification">1</field>
+            </depends>
+        </field>
+        <field id="enable_admin_cancel_notification" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Send admin email on subscription cancel?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/emails/enable_admin_cancel_notification</config_path>
+        </field>
+        <field id="admin_cancel_notification_template" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Cancel subscription notification template for admin</label>
+            <config_path>mollie_subscriptions/emails/admin_cancel_notification_template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enable_admin_cancel_notification">1</field>
+            </depends>
+        </field>
+        <field id="enable_customer_cancel_notification" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Send customer email on subscription cancel?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/emails/enable_customer_cancel_notification</config_path>
+        </field>
+        <field id="customer_cancel_notification_template" translate="label comment" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Cancel subscription notification template for customer</label>
+            <config_path>mollie_subscriptions/emails/customer_cancel_notification_template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enable_customer_cancel_notification">1</field>
+            </depends>
+        </field>
+    </group>
 </include>

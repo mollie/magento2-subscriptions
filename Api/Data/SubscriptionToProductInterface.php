@@ -75,7 +75,7 @@ interface SubscriptionToProductInterface extends ExtensibleDataInterface
      * Get store_id
      * @return int|null
      */
-    public function getStoreId(): int;
+    public function getStoreId(): ?int;
 
     /**
      * Set store_id

@@ -13,7 +13,7 @@ use Mollie\Api\Resources\Customer;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 
-class SendPrepaymentReminderEmailVariables
+class SubscriptionToProductEmailVariables
 {
     /**
      * @var Mollie
@@ -80,6 +80,7 @@ class SendPrepaymentReminderEmailVariables
         );
 
         return [
+            'subscription_id' => $subscriptionToProduct->getSubscriptionId(),
             'subscription_description' => $subscription->description,
             'subscription_nextPaymentDate' => $subscription->nextPaymentDate,
             'subscription_amount' => $amount,

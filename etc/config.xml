@@ -10,7 +10,7 @@
     <default>
         <mollie_subscriptions>
             <general>
-                <version>v1.3.1</version>
+                <version>v1.4.0</version>
                 <enable>0</enable>
                 <debug>0</debug>
                 <add_to_cart_text>Subscribe</add_to_cart_text>
@@ -20,6 +20,20 @@
                 <template>mollie_subscriptions_pre_payment_reminder_template</template>
                 <days_before_reminder>3</days_before_reminder>
             </prepayment_reminder>
+            <emails>
+                <enable_admin_notification>0</enable_admin_notification>
+                <admin_notification_template>Mollie_Subscriptions_emails_admin_notification_template</admin_notification_template>
+                <enable_customer_notification>0</enable_customer_notification>
+                <customer_notification_template>Mollie_Subscriptions_emails_customer_notification_template</customer_notification_template>
+                <enable_admin_restart_notification>0</enable_admin_restart_notification>
+                <admin_restart_notification_template>Mollie_Subscriptions_emails_admin_restart_notification_template</admin_restart_notification_template>
+                <enable_customer_restart_notification>0</enable_customer_restart_notification>
+                <customer_restart_notification_template>Mollie_Subscriptions_emails_customer_restart_notification_template</customer_restart_notification_template>
+                <enable_admin_cancel_notification>0</enable_admin_cancel_notification>
+                <admin_cancel_notification_template>Mollie_Subscriptions_emails_admin_cancel_notification_template</admin_cancel_notification_template>
+                <enable_customer_cancel_notification>0</enable_customer_cancel_notification>
+                <customer_cancel_notification_template>Mollie_Subscriptions_emails_customer_cancel_notification_template</customer_cancel_notification_template>
+            </emails>
         </mollie_subscriptions>
     </default>
 </config>

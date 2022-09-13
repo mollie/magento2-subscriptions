@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
     <template id="Mollie_Subscriptions_prepayment_reminder_template" label="Mollie Subscriptions Pre-payment Reminder" file="pre_payment_reminder.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
+    <template id="Mollie_Subscriptions_emails_admin_notification_template" label="Mollie Subscriptions admin notification email" file="new_subscription_admin.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
+    <template id="Mollie_Subscriptions_emails_customer_notification_template" label="Mollie Subscriptions customer notification email" file="new_subscription_customer.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
+    <template id="Mollie_Subscriptions_emails_admin_restart_notification_template" label="Mollie Subscriptions admin restart email" file="restart_subscription_admin.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
+    <template id="Mollie_Subscriptions_emails_customer_restart_notification_template" label="Mollie Subscriptions customer notification email" file="restart_subscription_customer.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
+    <template id="Mollie_Subscriptions_emails_admin_cancel_notification_template" label="Mollie Subscriptions admin cancel email" file="cancel_subscription_admin.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
+    <template id="Mollie_Subscriptions_emails_customer_cancel_notification_template" label="Mollie Subscriptions customer notification email" file="cancel_subscription_customer.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
 </config>

@@ -34,6 +34,14 @@ interface SubscriptionToProductRepositoryInterface
     public function get($subscriptionToProductId);
 
     /**
+     * Retrieve subscription_to_product
+     * @param string $subscriptionId
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
+     */
+    public function getBySubscriptionId(string $subscriptionId);
+
+    /**
      * Retrieve subscription_to_product with a price update
      * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException

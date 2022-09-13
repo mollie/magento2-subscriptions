@@ -109,9 +109,9 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
             [],
             \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface::class
         );
-        
+
         $subscriptionToProductModel = $this->subscriptionToProductFactory->create()->setData($subscriptionToProductData);
-        
+
         try {
             $this->resource->save($subscriptionToProductModel);
         } catch (\Exception $exception) {
@@ -139,6 +139,18 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
         $this->resource->load($subscriptionToProduct, $subscriptionToProductId);
         if (!$subscriptionToProduct->getId()) {
             throw new NoSuchEntityException(__('subscription_to_product with id "%1" does not exist.', $subscriptionToProductId));
+        }
+        return $subscriptionToProduct->getDataModel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBySubscriptionId(string $subscriptionId) {
+        $subscriptionToProduct = $this->subscriptionToProductFactory->create();
+        $this->resource->load($subscriptionToProduct, $subscriptionId, 'subscription_id');
+        if (!$subscriptionToProduct->getId()) {
+            throw new NoSuchEntityException(__('subscription_to_product with id "%1" does not exist.', $subscriptionId));
         }
         return $subscriptionToProduct->getDataModel();
     }
@@ -173,22 +185,22 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
         \Magento\Framework\Api\SearchCriteriaInterface $criteria
     ) {
         $collection = $this->subscriptionToProductCollectionFactory->create();
-        
+
         $this->extensionAttributesJoinProcessor->process(
             $collection,
             \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface::class
         );
-        
+
         $this->collectionProcessor->process($criteria, $collection);
-        
+
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
-        
+
         $items = [];
         foreach ($collection as $model) {
             $items[] = $model->getDataModel();
         }
-        
+
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
         return $searchResults;

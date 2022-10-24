@@ -51,7 +51,7 @@ class SubscriptionAttributes implements DataPatchInterface
                     'is_visible_in_grid' => false,
                     'is_filterable_in_grid' => false,
                     'visible' => true,
-                    'visible_on_front' => true,
+                    'visible_on_front' => false,
                     'frontend' => '',
                     'class' => '',
                     'source' => Status::class,

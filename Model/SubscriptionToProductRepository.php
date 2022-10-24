@@ -14,6 +14,7 @@ use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Reflection\DataObjectProcessor;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterfaceFactory;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductSearchResultsInterface;
@@ -109,9 +110,9 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
             [],
             \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface::class
         );
-        
+
         $subscriptionToProductModel = $this->subscriptionToProductFactory->create()->setData($subscriptionToProductData);
-        
+
         try {
             $this->resource->save($subscriptionToProductModel);
         } catch (\Exception $exception) {
@@ -173,22 +174,22 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
         \Magento\Framework\Api\SearchCriteriaInterface $criteria
     ) {
         $collection = $this->subscriptionToProductCollectionFactory->create();
-        
+
         $this->extensionAttributesJoinProcessor->process(
             $collection,
             \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface::class
         );
-        
+
         $this->collectionProcessor->process($criteria, $collection);
-        
+
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
-        
+
         $items = [];
         foreach ($collection as $model) {
             $items[] = $model->getDataModel();
         }
-        
+
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
         return $searchResults;
@@ -216,6 +217,31 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
         return $searchResults;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByCustomerIdAndProductId(string $mollieCustomerId, int $productId) {
+        $collection = $this->subscriptionToProductCollectionFactory->create();
+        $collection->addFieldToFilter('customer_id', $mollieCustomerId);
+        $collection->addFieldToFilter('product_id', $productId);
+        $collection->setPageSize(1);
+
+        $this->extensionAttributesJoinProcessor->process(
+            $collection,
+            \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface::class
+        );
+
+        if (!$collection->count()) {
+            throw new NotFoundException(__(
+                'Subscription for customer %1 and product %2 not found',
+                $mollieCustomerId,
+                $productId
+            ));
+        }
+
+        return $collection->getFirstItem();
     }
 
     /**

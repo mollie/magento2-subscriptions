@@ -4,7 +4,6 @@ namespace Mollie\Subscriptions\Test\Integration\CheckoutCartProductAddBefore;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Customer\Model\Customer;
-use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Exception\LocalizedException;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -16,7 +15,7 @@ class PreventDuplicateSubscriptionsTest extends IntegrationTestCase
 {
     public function testDoesNothingWhenNotASubscriptionProduct(): void
     {
-        $fake = $this->objectManager->get(CustomerAlreadyHasSubscriptionToProductFake::class);
+        $fake = $this->objectManager->create(CustomerAlreadyHasSubscriptionToProductFake::class);
         $fake->shouldNotBeCalled();
         $this->objectManager->addSharedInstance($fake, CustomerAlreadyHasSubscriptionToProduct::class);
 
@@ -31,7 +30,7 @@ class PreventDuplicateSubscriptionsTest extends IntegrationTestCase
 
     public function testDoesNothingWhenNotLoggedIn(): void
     {
-        $fake = $this->objectManager->get(CustomerAlreadyHasSubscriptionToProductFake::class);
+        $fake = $this->objectManager->create(CustomerAlreadyHasSubscriptionToProductFake::class);
         $fake->shouldNotBeCalled();
         $this->objectManager->addSharedInstance($fake, CustomerAlreadyHasSubscriptionToProduct::class);
 
@@ -61,7 +60,7 @@ class PreventDuplicateSubscriptionsTest extends IntegrationTestCase
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('You already have a subscription to this product.');
 
-        $fake = $this->objectManager->get(CustomerAlreadyHasSubscriptionToProductFake::class);
+        $fake = $this->objectManager->create(CustomerAlreadyHasSubscriptionToProductFake::class);
         $fake->alwaysReturnsTrue();
         $this->objectManager->addSharedInstance($fake, CustomerAlreadyHasSubscriptionToProduct::class);
 

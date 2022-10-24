@@ -32,12 +32,10 @@ class PreventDuplicateSubscriptions implements ObserverInterface
     {
         $product = $observer->getData('product');
         if (!$product->getData('mollie_subscription_product')) {
-            throw new \Exception('No mollie subscription product');
             return;
         }
 
         if (!$this->session->isLoggedIn()) {
-            throw new \Exception('Not logged in');
             return;
         }
 

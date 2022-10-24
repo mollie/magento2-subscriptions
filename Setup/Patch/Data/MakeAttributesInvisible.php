@@ -40,6 +40,8 @@ class MakeAttributesInvisible implements DataPatchInterface
                 $this->productAttributeRepository->save($attribute);
             }
         }
+
+        return $this;
     }
 
     public static function getDependencies()

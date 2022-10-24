@@ -67,6 +67,15 @@ interface SubscriptionToProductRepositoryInterface
     public function getByProductId(int $productId);
 
     /**
+     * Retrieve subscription_to_product matching the $customerId and $productId.
+     * @param string $mollieCustomerId
+     * @param int $productId
+     * @throws \Magento\Framework\Exception\NotFoundException
+     *@return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
+     */
+    public function getByCustomerIdAndProductId(string $mollieCustomerId, int $productId);
+
+    /**
      * Delete subscription_to_product
      * @param \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface $subscriptionToProduct
      * @return bool true on success

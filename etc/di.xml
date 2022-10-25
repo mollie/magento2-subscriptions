@@ -164,4 +164,10 @@
             <argument name="sendCustomerCancelNotificationEmail" xsi:type="object">Mollie\Subscriptions\Service\Email\SendCustomerCancelNotificationEmail</argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Subscriptions\Observer\CheckoutCartProductAddBefore\PreventDuplicateSubscriptions">
+        <arguments>
+            <argument name="session" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 </config>

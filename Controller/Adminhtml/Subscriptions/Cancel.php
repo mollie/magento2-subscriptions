@@ -56,6 +56,8 @@ class Cancel extends Action
 
         try {
             $api->subscriptions->cancelForId($customerId, $subscriptionId);
+            $model = $this->subscriptionToProductRepository->getBySubscriptionId($subscriptionId);
+            $this->eventManager->dispatch('mollie_subscription_after_cancelled', ['model' => $model]);
         } catch (\Exception $exception) {
             $this->messageManager->addErrorMessage(__('Unable to cancel subscription: %1', $exception->getMessage()));
 

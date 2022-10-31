@@ -105,6 +105,7 @@ class Cancel extends Action implements HttpPostActionInterface
 
             $this->sendAdminCancelNotificationEmail->execute($model);
             $this->sendCustomerCancelNotificationEmail->execute($model);
+            $this->eventManager->dispatch('mollie_subscription_after_cancelled', ['model' => $model]);
         } catch (\Exception $exception) {
             $this->messageManager->addErrorMessage(__('Unable to cancel subscription'));
             $this->config->addToLog('error', [

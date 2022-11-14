@@ -186,8 +186,6 @@ class Restart extends Action implements HttpPostActionInterface
         $model->setNextPaymentDate($subscription->nextPaymentDate);
 
         $model = $this->subscriptionToProductRepository->save($model);
-
-        $this->eventManager->dispatch('mollie_subscription_created', ['subscription' => $model]);
         $this->eventManager->dispatch('mollie_subscription_restarted', ['subscription' => $model]);
 
         $this->sendAdminRestartNotificationEmail->execute($model);

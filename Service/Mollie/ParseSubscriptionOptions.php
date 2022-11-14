@@ -38,6 +38,10 @@ class ParseSubscriptionOptions
     public function execute(ProductInterface $product): array
     {
         $table = $product->getData('mollie_subscription_table');
+        if ($table === null) {
+            return [];
+        }
+
         $json = $this->serializer->unserialize($table);
 
         return array_map( function ($option) {

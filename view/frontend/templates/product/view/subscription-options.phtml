@@ -4,10 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+/** @var \Magento\Framework\Escaper $escaper */
 /** @var \Mollie\Subscriptions\Block\Frontend\Product\View\SubscriptionOptions $block */
 ?>
 <div class="mollie-subscription-options">
-    <input type="hidden" id="mollie_subscription_purchase" name="purchase" value="subscription" /><br>
+    <input type="hidden" id="mollie_subscription_purchase" name="purchase" value="subscription" />
     <input type="hidden" id="mollie_subscription_option" name="recurring_metadata[option_id]" />
 
     <?php if ($block->allowOneTimePurchase()): ?>
@@ -25,12 +26,12 @@
 
     <?php foreach ($block->getOptions() as $option): ?>
         <button
-            onclick="document.getElementById('mollie_subscription_option').value = '<?= $option->getIdentifier(); ?>'"
+            onclick="document.getElementById('mollie_subscription_option').value = '<?= $escaper->escapeJs($option->getIdentifier()); ?>'"
             type="submit"
             class="action primary tocart product-addtocart-button select-subscription"
-            value="<?= $option->getIdentifier(); ?>"
-            title="<?= $option->getTitle() ?>"
-        ><?= $option->getTitle(); ?></button>
+            value="<?= $escaper->escapeHtmlAttr($option->getIdentifier()); ?>"
+            title="<?= $escaper->escapeHtmlAttr($option->getTitle()) ?>"
+        <?= $escaper->escapeHtml($option->getTitle()); ?>
     <?php endforeach; ?>
 
     <?php /** Instant purchase should be hidden when subscriptions are active */ ?>

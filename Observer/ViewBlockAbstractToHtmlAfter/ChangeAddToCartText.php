@@ -6,10 +6,12 @@
 
 namespace Mollie\Subscriptions\Observer\ViewBlockAbstractToHtmlAfter;
 
-use Magento\Catalog\Block\Product\View;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\DomDocument\DomDocumentFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Element\Template;
 use Mollie\Subscriptions\Block\Frontend\Product\View\SubscriptionOptions;
 use Mollie\Payment\Config;
 
@@ -25,24 +27,31 @@ class ChangeAddToCartText implements ObserverInterface
      */
     private $config;
 
+    /**
+     * @var Registry
+     */
+    private $registry;
+
     public function __construct(
         Config $config,
-        DomDocumentFactory $domDocumentFactory
+        DomDocumentFactory $domDocumentFactory,
+        Registry $registry
     ) {
         $this->domDocumentFactory = $domDocumentFactory;
         $this->config = $config;
+        $this->registry = $registry;
     }
 
     public function execute(Observer $observer)
     {
         $block = $observer->getData('block');
-        if (!$block instanceof View ||
+        if (!$block instanceof Template ||
             !in_array($block->getNameInLayout(), ['product.info.addtocart', 'product.info.addtocart.bundle'])
         ) {
             return;
         }
 
-        if (!$block->getProduct()->getData('mollie_subscription_product')) {
+        if (!$this->getProduct() || !$this->getProduct()->getData('mollie_subscription_product')) {
             return;
         }
 
@@ -54,7 +63,11 @@ class ChangeAddToCartText implements ObserverInterface
         $document->formatOutput = true;
 
         try {
-            if (!$document->loadHTML($html, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED)) {
+            libxml_use_internal_errors(true);
+            $load = $document->loadHTML($html, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+            libxml_clear_errors();
+
+            if (!$load) {
                 return;
             }
         } catch (\Throwable $exception) {
@@ -88,5 +101,10 @@ class ChangeAddToCartText implements ObserverInterface
         $button->parentNode->removeChild($button);
 
         $transport->setData('html', $document->saveHTML());
+    }
+
+    public function getProduct(): ?ProductInterface
+    {
+        return $this->registry->registry('product');
     }
 }

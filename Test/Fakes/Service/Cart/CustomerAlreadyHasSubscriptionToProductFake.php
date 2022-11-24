@@ -3,6 +3,7 @@
 namespace Mollie\Subscriptions\Test\Fakes\Service\Cart;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Customer;
 use Mollie\Subscriptions\Service\Cart\CustomerAlreadyHasSubscriptionToProduct;
 
@@ -33,7 +34,7 @@ class CustomerAlreadyHasSubscriptionToProductFake extends CustomerAlreadyHasSubs
         $this->shouldNotBeCalled = true;
     }
 
-    public function execute(Customer $customer, ProductInterface $product): bool
+    public function execute(CustomerInterface $customer, ProductInterface $product): bool
     {
         if ($this->shouldNotBeCalled) {
             throw new \Exception('This method should not be called');

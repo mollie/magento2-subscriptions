@@ -4,7 +4,7 @@ namespace Mollie\Subscriptions\Service\Cart;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Model\Customer;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Exception\NotFoundException;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 
@@ -28,7 +28,7 @@ class CustomerAlreadyHasSubscriptionToProduct
         $this->customerRepository = $customerRepository;
     }
 
-    public function execute(Customer $customer, ProductInterface $product): bool
+    public function execute(CustomerInterface $customer, ProductInterface $product): bool
     {
         try {
             $customerData = $this->customerRepository->getById($customer->getId());

@@ -21,7 +21,6 @@ use Magento\Store\Model\StoreManagerInterface;
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Subscriptions';
-    const XML_PATH_ADD_TO_CART_TEXT = 'mollie_subscriptions/general/add_to_cart_text';
     const XML_PATH_EXTENSION_VERSION = 'mollie_subscriptions/general/version';
     const XML_PATH_EXTENSION_ENABLE = 'mollie_subscriptions/general/enable';
     const XML_PATH_EXTENSION_SHIPPING_METHOD = 'mollie_subscriptions/general/shipping_method';
@@ -184,16 +183,6 @@ class Config
             self::MODULE_SUPPORT_LINK,
             $this->getExtensionCode()
         );
-    }
-
-    /**
-     * @param null|int|string $storeId
-     * @param string $scope
-     * @return string|null
-     */
-    public function getAddToCartText($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
-    {
-        return $this->getStoreValue(static::XML_PATH_ADD_TO_CART_TEXT, $storeId, $scope);
     }
 
     /**

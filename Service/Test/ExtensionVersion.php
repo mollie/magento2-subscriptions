@@ -131,7 +131,11 @@ class ExtensionVersion
         $versions = array_keys($data);
         $latest = reset($versions);
 
-        if (version_compare($latest, $extensionVersion) < self::EXPECTED) {
+        if ($extensionVersion[0] == 'v') {
+            $extensionVersion = substr($extensionVersion, 1);
+        }
+
+        if (version_compare($latest, $extensionVersion) == self::EXPECTED) {
             $result['result_msg'] = self::SUCCESS_MSG;
             $result +=
                 [

@@ -31,7 +31,9 @@
             class="action primary tocart product-addtocart-button select-subscription"
             value="<?= $escaper->escapeHtmlAttr($option->getIdentifier()); ?>"
             title="<?= $escaper->escapeHtmlAttr($option->getTitle()) ?>"
-        <?= $escaper->escapeHtml($option->getTitle()); ?>
+            >
+            <?= $escaper->escapeHtml($option->getTitle()); ?>
+        </button>
     <?php endforeach; ?>
 
     <?php /** Instant purchase should be hidden when subscriptions are active */ ?>

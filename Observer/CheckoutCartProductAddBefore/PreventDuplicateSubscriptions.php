@@ -39,7 +39,8 @@ class PreventDuplicateSubscriptions implements ObserverInterface
             return;
         }
 
-        if ($this->customerAlreadyHasSubscriptionToProduct->execute($this->session->getCustomer(), $product)) {
+        $customer = $this->session->getCustomer();
+        if ($this->customerAlreadyHasSubscriptionToProduct->execute($customer->getDataModel(), $product)) {
             throw new LocalizedException(__('You already have a subscription to this product.'));
         }
     }

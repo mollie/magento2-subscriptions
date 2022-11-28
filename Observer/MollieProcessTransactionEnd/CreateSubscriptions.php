@@ -11,6 +11,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
@@ -107,6 +108,12 @@ class CreateSubscriptions implements ObserverInterface
     {
         /** @var OrderInterface $order */
         $order = $observer->getData('order');
+
+        // Order not paid, so skipping.
+        if ($order->getState() !== Order::STATE_PROCESSING) {
+            return;
+        }
+
         if ($order->getPayment()->getAdditionalInformation('subscription_created') ||
             !$this->orderContainsSubscriptionProduct->check($order)) {
             return;

@@ -21,13 +21,6 @@
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>mollie_subscriptions/general/enable</config_path>
         </field>
-        <field id="add_to_cart_text" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Add to cart button text</label>
-            <config_path>mollie_subscriptions/general/add_to_cart_text</config_path>
-            <depends>
-                <field id="enabled">1</field>
-            </depends>
-        </field>
         <field id="shipping_method" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Shipping method</label>

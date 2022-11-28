@@ -1,16 +1,17 @@
 <?php
 
-namespace Mollie\Subscriptions\Observer\CustomerLogin;
+namespace Mollie\Subscriptions\Plugin\Checkout\Model;
 
+use Magento\Checkout\Model\Session;
 use Magento\Customer\Model\Customer;
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Api\Data\CartItemInterface;
 use Mollie\Subscriptions\Service\Cart\CustomerAlreadyHasSubscriptionToProduct;
 
-class PreventDuplicateSubscriptionProductsInCart implements ObserverInterface
+class PreventDuplicateSubscriptionProductsInCart
 {
     /**
      * @var CartInterface
@@ -42,20 +43,17 @@ class PreventDuplicateSubscriptionProductsInCart implements ObserverInterface
         $this->customerAlreadyHasSubscriptionToProduct = $customerAlreadyHasSubscriptionToProduct;
     }
 
-    public function execute(Observer $observer)
+    public function afterLoadCustomerQuote(Session $subject, Session $result): Session
     {
-        /** @var Customer $customer */
-        $customer = $observer->getData('customer');
-
-        $cart = $this->cartRepository->getForCustomer($customer->getId());
+        $cart = $subject->getQuote();
         $items = $cart->getItems();
         if (!$items) {
-            return;
+            return $result;
         }
 
         $this->itemRemoved = false;
         foreach ($items as $item) {
-            if ($this->customerAlreadyHasSubscriptionToProduct->execute($customer, $item->getProduct())) {
+            if ($this->customerAlreadyHasSubscriptionToProduct->execute($cart->getCustomer(), $item->getProduct())) {
                 $this->removeItem($item, $cart);
                 $this->itemRemoved = true;
             }
@@ -64,14 +62,16 @@ class PreventDuplicateSubscriptionProductsInCart implements ObserverInterface
         if ($this->itemRemoved) {
             $this->cartRepository->save($cart);
         }
+
+        return $result;
     }
 
     /**
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
+     * @param CartItemInterface $item
      * @param CartInterface $cart
      * @return void
      */
-    public function removeItem(\Magento\Quote\Api\Data\CartItemInterface $item, CartInterface $cart): void
+    public function removeItem(CartItemInterface $item, CartInterface $cart): void
     {
         $productName = $item->getProduct()->getName();
         $cart->removeItem($item->getItemId());

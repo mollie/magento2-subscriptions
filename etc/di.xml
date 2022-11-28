@@ -170,4 +170,8 @@
             <argument name="session" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Checkout\Model\Session">
+        <plugin name="mollie_subscriptions_check_for_duplicates_in_cart" type="Mollie\Subscriptions\Plugin\Checkout\Model\PreventDuplicateSubscriptionProductsInCart" />
+    </type>
 </config>

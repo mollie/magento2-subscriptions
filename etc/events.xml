@@ -21,7 +21,4 @@
         <observer name="mollie_subscription_check_add_to_cart" instance="Mollie\Subscriptions\Observer\CheckoutCartProductAddBefore\PreventAddingSubscriptionProductsToCartWhenNoSubscriptionIsSelected" />
         <observer name="mollie_subscription_prevent_duplicate_subscription" instance="Mollie\Subscriptions\Observer\CheckoutCartProductAddBefore\PreventDuplicateSubscriptions" />
     </event>
-    <event name="customer_login">
-        <observer name="mollie_subscription_prevent_duplicate_subscription_products_in_cart" instance="Mollie\Subscriptions\Observer\CustomerLogin\PreventDuplicateSubscriptionProductsInCart" />
-    </event>
 </config>

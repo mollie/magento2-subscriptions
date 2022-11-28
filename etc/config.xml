@@ -13,7 +13,6 @@
                 <version>v1.6.0</version>
                 <enable>0</enable>
                 <debug>0</debug>
-                <add_to_cart_text>Subscribe</add_to_cart_text>
             </general>
             <prepayment_reminder>
                 <enabled>0</enabled>

@@ -40,6 +40,7 @@ class Config
     const XML_PATH_EMAILS_ADMIN_CANCEL_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_cancel_notification_template';
     const XML_PATH_EMAILS_ENABLE_CUSTOMER_CANCEL_NOTIFICATION = 'mollie_subscriptions/emails/enable_customer_cancel_notification';
     const XML_PATH_EMAILS_CUSTOMER_CANCEL_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/customer_cancel_notification_template';
+    const XML_PATH_DISABLE_NEW_ORDER_CONFIRMATION = 'mollie_subscriptions/emails/disable_new_order_confirmation';
     const XML_PATH_ALLOW_ONE_TIME_PURCHASE = 'mollie_subscriptions/general/allow_one_time_purchases';
     const MODULE_SUPPORT_LINK = 'https://www.magmodules.eu/help/%s';
 
@@ -343,5 +344,15 @@ class Config
     public function getCustomerCancelNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
     {
         return $this->getStoreValue(static::XML_PATH_EMAILS_CUSTOMER_CANCEL_NOTIFICATION_TEMPLATE, $storeId, $scope);
+    }
+
+    /**
+     * @param $storeId
+     * @param $scope
+     * @return bool
+     */
+    public function disableNewOrderConfirmation($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_ADMIN_CANCEL_NOTIFICATION, $storeId, $scope);
     }
 }

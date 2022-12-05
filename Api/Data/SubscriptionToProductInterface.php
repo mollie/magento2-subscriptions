@@ -18,6 +18,7 @@ interface SubscriptionToProductInterface extends ExtensibleDataInterface
     const STORE_ID = 'store_id';
     const HAS_PRICE_UPDATE = 'has_price_update';
     const NEXT_PAYMENT_DATE = 'next_payment_date';
+    const LAST_REMINDER_DATE = 'last_reminder_date';
 
     /**
      * Get entity_id
@@ -109,6 +110,19 @@ interface SubscriptionToProductInterface extends ExtensibleDataInterface
      * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
      */
     public function setNextPaymentDate(string $nextPaymentDate);
+
+    /**
+     * Get last_reminder_date
+     * @return string|null
+     */
+    public function getLastReminderDate(): ?string;
+
+    /**
+     * Set last_reminder_date
+     * @param string|null $lastReminderDate
+     * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
+     */
+    public function setLastReminderDate(?string $lastReminderDate);
 
     /**
      * Retrieve existing extension attributes object or create a new one.

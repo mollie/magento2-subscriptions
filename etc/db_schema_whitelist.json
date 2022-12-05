@@ -7,7 +7,8 @@
       "product_id": true,
       "store_id": true,
       "has_price_update": true,
-      "next_payment_date": true
+      "next_payment_date": true,
+      "last_reminder_date": true
     },
     "constaint": {
       "PRIMARY": true

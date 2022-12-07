@@ -146,6 +146,25 @@ class SubscriptionToProduct extends AbstractExtensibleObject implements Subscrip
     }
 
     /**
+     * Get last_reminder_date
+     * @return string|null
+     */
+    public function getLastReminderDate(): ?string
+    {
+        return $this->_get(self::LAST_REMINDER_DATE);
+    }
+
+    /**
+     * Set last_reminder_date
+     * @param string|null $lastReminderDate
+     * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
+     */
+    public function setLastReminderDate(?string $lastReminderDate)
+    {
+        return $this->setData(self::LAST_REMINDER_DATE, $lastReminderDate);
+    }
+
+    /**
      * Retrieve existing extension attributes object or create a new one.
      * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductExtensionInterface|\Magento\Framework\Api\ExtensionAttributesInterface|null
      */

@@ -20,6 +20,7 @@
                 <days_before_reminder>3</days_before_reminder>
             </prepayment_reminder>
             <emails>
+                <disable_new_order_confirmation>0</disable_new_order_confirmation>
                 <enable_admin_notification>0</enable_admin_notification>
                 <admin_notification_template>Mollie_Subscriptions_emails_admin_notification_template</admin_notification_template>
                 <enable_customer_notification>0</enable_customer_notification>

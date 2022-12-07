@@ -4,9 +4,19 @@
  * See COPYING.txt for license details.
  */
 
+/** @var \Magento\Framework\Escaper $escaper */
 /** @var \Mollie\Subscriptions\Block\Frontend\Customer\Account\ActiveSubscriptions $block */
+
+$subscriptions = $block->getSubscriptions();
 ?>
 
+<?php if (!$subscriptions): ?>
+    <div class="message info empty">
+        <span>
+            <?= $escaper->escapeHtml(__('You have no active subscriptions.')) ?>
+        </span>
+    </div>
+<?php else: ?>
 <div class="table-wrapper orders-history">
     <table class="data table table-order-items history" id="my-orders-table">
         <caption class="table-caption"><?= $block->escapeHtml(__('Orders')) ?></caption>
@@ -22,7 +32,7 @@
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($block->getSubscriptions() as $subscription): ?>
+        <?php foreach ($subscriptions as $subscription): ?>
             <tr>
                 <td data-th="<?= $block->escapeHtml(__('ID')) ?>" class="col id"><?= $block->escapeHtml($subscription->getId()) ?></td>
                 <td data-th="<?= $block->escapeHtml(__('Date')) ?>" class="col date"><?= /* @noEscape */ $block->formatDate($subscription->getCreatedAt()) ?></td>
@@ -57,3 +67,4 @@
         </tbody>
     </table>
 </div>
+<?php endif; ?>

@@ -13,6 +13,7 @@
         <column name="has_price_update" xsi:type="int" comment="has_price_update" nullable="false" default="0"/>
         <column name="store_id" xsi:type="int" comment="store_id" nullable="false"/>
         <column name="next_payment_date" xsi:type="date" comment="Next payment date" nullable="false"/>
+        <column name="last_reminder_date" xsi:type="date" comment="Last reminder email date" nullable="true"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>

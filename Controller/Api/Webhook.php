@@ -30,6 +30,7 @@ use Mollie\Api\Resources\Subscription;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
 
 class Webhook extends Action implements CsrfAwareActionInterface
@@ -89,6 +90,11 @@ class Webhook extends Action implements CsrfAwareActionInterface
      */
     private $mollieLogger;
 
+    /**
+     * @var SendOrderEmails
+     */
+    private $sendOrderEmails;
+
     public function __construct(
         Context $context,
         Config $config,
@@ -101,7 +107,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         AddressInterfaceFactory $addressFactory,
         AddressRepositoryInterface $addressRepository,
         OrderRepositoryInterface $orderRepository,
-        MollieLogger $mollieLogger
+        MollieLogger $mollieLogger,
+        SendOrderEmails $sendOrderEmails
     ) {
         parent::__construct($context);
 
@@ -116,10 +123,15 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->addressRepository = $addressRepository;
         $this->orderRepository = $orderRepository;
         $this->mollieLogger = $mollieLogger;
+        $this->sendOrderEmails = $sendOrderEmails;
     }
 
     public function execute()
     {
+        if ($this->config->disableNewOrderConfirmation()) {
+            $this->sendOrderEmails->disableOrderConfirmationSending();
+        }
+
         $id = $this->getRequest()->getParam('id');
         if ($orders = $this->mollie->getOrderIdsByTransactionId($id)) {
             foreach ($orders as $orderId) {

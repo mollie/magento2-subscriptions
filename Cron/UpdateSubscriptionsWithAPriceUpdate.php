@@ -94,12 +94,25 @@ class UpdateSubscriptionsWithAPriceUpdate
         return $api;
     }
 
-    private function updateSubscription(SubscriptionToProductInterface $item)
+    private function updateSubscription(SubscriptionToProductInterface $item): void
     {
         $price = $this->productRepository->getById($item->getProductId())->getPrice();
         $api = $this->getApiForStore($item->getStoreId());
 
         $subscription = $api->subscriptions->getForId($item->getCustomerId(), $item->getSubscriptionId());
+
+        if ($subscription->status == 'canceled') {
+            $this->subscriptionToProductRepository->delete($item);
+
+            $this->config->addToLog('success', __(
+                'Subscription "%1" canceled, deleted database record with ID "%2"',
+                $subscription->id,
+                $item->getEntityId()
+            ));
+
+            return;
+        }
+
         $subscription->amount = $this->mollieHelper->getAmountArray(
             $subscription->amount->currency,
             $this->priceCurrency->convert($price, $item->getStoreId(), $subscription->amount->currency)

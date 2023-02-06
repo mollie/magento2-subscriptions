@@ -143,27 +143,29 @@ class Webhook extends Action implements CsrfAwareActionInterface
 
         try {
             $api = $this->mollie->getMollieApi();
-            $mollieOrder = $api->payments->get($id);
+            $molliePayment = $api->payments->get($id);
+            $subscription = $api->subscriptions->getForId($molliePayment->customerId, $molliePayment->subscriptionId);
 
-            $customerId = $this->mollieCustomerRepository->getByMollieCustomerId($mollieOrder->customerId)->getCustomerId();
+            $customerId = $this->mollieCustomerRepository->getByMollieCustomerId($molliePayment->customerId)->getCustomerId();
             $customer = $this->customerRepository->getById($customerId);
 
             $cart = $this->getCart($customer);
-            $this->addProduct($api, $mollieOrder, $cart);
+            $this->addProduct($api, $molliePayment, $cart);
 
             $cart->setBillingAddress($this->formatAddress($this->addressRepository->getById($customer->getDefaultBilling())));
             $this->setShippingAddress($customer, $cart);
 
-            $cart->getPayment()->addData(['method' => 'mollie_methods_' . $mollieOrder->method]);
+            $cart->getPayment()->addData(['method' => 'mollie_methods_' . $molliePayment->method]);
 
             $cart->collectTotals();
             $this->cartRepository->save($cart);
 
             $order = $this->cartManagement->submit($cart);
-            $order->setMollieTransactionId($mollieOrder->id);
+            $order->setMollieTransactionId($molliePayment->id);
+            $order->getPayment()->setAdditionalInformation('subscription_created', $subscription->createdAt);
             $this->orderRepository->save($order);
 
-            $this->mollie->processTransaction($order->getId(), 'webhook');
+            $this->mollie->processTransactionForOrder($order, 'webhook');
             return $this->returnOkResponse();
         } catch (ApiException $exception) {
             $this->mollieLogger->addInfoLog('ApiException occured while checking transaction', [

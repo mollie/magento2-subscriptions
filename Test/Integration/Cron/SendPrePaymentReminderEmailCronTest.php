@@ -7,6 +7,7 @@ use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Cron\SendPrePaymentReminderEmailCron;
 use Mollie\Subscriptions\Service\Email\SendPrepaymentReminderEmail;
+use Mollie\Subscriptions\Service\Mollie\CheckIfSubscriptionIsActive;
 
 class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
 {
@@ -19,6 +20,9 @@ class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
         $spy = $this->any();
         $sendPrepaymentReminderEmailMock = $this->createMock(SendPrepaymentReminderEmail::class);
         $sendPrepaymentReminderEmailMock->expects($spy)->method('execute');
+
+        $checkIfSubscriptionIsActiveMock = $this->createMock(CheckIfSubscriptionIsActive::class);
+        $checkIfSubscriptionIsActiveMock->method('execute')->willReturn(true);
 
         /** @var SubscriptionToProductInterface $model */
         $model = $this->objectManager->create(SubscriptionToProductInterface::class);
@@ -34,6 +38,7 @@ class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
         /** @var SendPrePaymentReminderEmailCron $instance */
         $instance = $this->objectManager->create(SendPrePaymentReminderEmailCron::class, [
             'sendPrepaymentReminderEmail' => $sendPrepaymentReminderEmailMock,
+            'checkIfSubscriptionIsActive' => $checkIfSubscriptionIsActiveMock,
         ]);
 
         $instance->execute();
@@ -53,6 +58,9 @@ class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
         $sendPrepaymentReminderEmailMock = $this->createMock(SendPrepaymentReminderEmail::class);
         $sendPrepaymentReminderEmailMock->expects($spy)->method('execute');
 
+        $checkIfSubscriptionIsActiveMock = $this->createMock(CheckIfSubscriptionIsActive::class);
+        $checkIfSubscriptionIsActiveMock->method('execute')->willReturn(true);
+
         /** @var SubscriptionToProductInterface $model */
         $model = $this->objectManager->create(SubscriptionToProductInterface::class);
         $model->setCustomerId('cst_fakenumber');
@@ -67,6 +75,7 @@ class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
         /** @var SendPrePaymentReminderEmailCron $instance */
         $instance = $this->objectManager->create(SendPrePaymentReminderEmailCron::class, [
             'sendPrepaymentReminderEmail' => $sendPrepaymentReminderEmailMock,
+            'checkIfSubscriptionIsActive' => $checkIfSubscriptionIsActiveMock,
         ]);
 
         $instance->execute();
@@ -86,6 +95,9 @@ class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
         $sendPrepaymentReminderEmailMock = $this->createMock(SendPrepaymentReminderEmail::class);
         $sendPrepaymentReminderEmailMock->expects($spy)->method('execute');
 
+        $checkIfSubscriptionIsActiveMock = $this->createMock(CheckIfSubscriptionIsActive::class);
+        $checkIfSubscriptionIsActiveMock->method('execute')->willReturn(true);
+
         /** @var SubscriptionToProductInterface $model */
         $model = $this->objectManager->create(SubscriptionToProductInterface::class);
         $model->setCustomerId('cst_fakenumber');
@@ -100,6 +112,42 @@ class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
         /** @var SendPrePaymentReminderEmailCron $instance */
         $instance = $this->objectManager->create(SendPrePaymentReminderEmailCron::class, [
             'sendPrepaymentReminderEmail' => $sendPrepaymentReminderEmailMock,
+            'checkIfSubscriptionIsActive' => $checkIfSubscriptionIsActiveMock,
+        ]);
+
+        $instance->execute();
+
+        $this->assertEquals(0, $spy->getInvocationCount());
+    }
+
+    /**
+     * @magentoDbIsolation enabled
+     * @magentoConfigFixture default_store mollie_subscriptions/prepayment_reminder/enabled 1
+     */
+    public function testIfTheSubscriptionIsNotActiveTheEmailWillNotBeSent(): void
+    {
+        $spy = $this->any();
+        $sendPrepaymentReminderEmailMock = $this->createMock(SendPrepaymentReminderEmail::class);
+        $sendPrepaymentReminderEmailMock->expects($spy)->method('execute');
+
+        $checkIfSubscriptionIsActiveMock = $this->createMock(CheckIfSubscriptionIsActive::class);
+        $checkIfSubscriptionIsActiveMock->method('execute')->willReturn(false);
+
+        /** @var SubscriptionToProductInterface $model */
+        $model = $this->objectManager->create(SubscriptionToProductInterface::class);
+        $model->setCustomerId('cst_fakenumber');
+        $model->setSubscriptionId('sub_fakesubscription');
+        $model->setProductId(1);
+        $model->setStoreId(1);
+
+        $model->setLastReminderDate(null);
+
+        $this->objectManager->get(SubscriptionToProductRepositoryInterface::class)->save($model);
+
+        /** @var SendPrePaymentReminderEmailCron $instance */
+        $instance = $this->objectManager->create(SendPrePaymentReminderEmailCron::class, [
+            'sendPrepaymentReminderEmail' => $sendPrepaymentReminderEmailMock,
+            'checkIfSubscriptionIsActive' => $checkIfSubscriptionIsActiveMock,
         ]);
 
         $instance->execute();

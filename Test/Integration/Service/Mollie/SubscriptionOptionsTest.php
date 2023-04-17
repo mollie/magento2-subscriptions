@@ -207,6 +207,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertInstanceOf(SubscriptionOption::class, $subscription);
         $this->assertArrayHasKey('webhookUrl', $subscription->toArray());
         $this->assertStringContainsString('api/webhook', $subscription->toArray()['webhookUrl']);
+        $this->assertStringContainsString('___store/default', $subscription->toArray()['webhookUrl']);
     }
 
     /**

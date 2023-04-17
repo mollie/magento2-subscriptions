@@ -9,6 +9,7 @@ namespace Mollie\Subscriptions\Service\Mollie;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Subscriptions\Config\Source\IntervalType;
 use Mollie\Subscriptions\Config\Source\RepetitionType;
@@ -51,15 +52,21 @@ class SubscriptionOptions
      * @var ProductSubscriptionOption
      */
     private $currentOption;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     public function __construct(
         General $mollieHelper,
         UrlInterface $urlBuilder,
-        ParseSubscriptionOptions $parseSubscriptionOptions
+        ParseSubscriptionOptions $parseSubscriptionOptions,
+        StoreManagerInterface $storeManager
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->urlBuilder = $urlBuilder;
         $this->parseSubscriptionOptions = $parseSubscriptionOptions;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -155,7 +162,10 @@ class SubscriptionOptions
 
     private function addWebhookUrl(): void
     {
-        $this->options['webhookUrl'] = $this->urlBuilder->getUrl('mollie-subscriptions/api/webhook');
+        $this->options['webhookUrl'] = $this->urlBuilder->getUrl(
+            'mollie-subscriptions/api/webhook',
+            ['___store' => $this->storeManager->getStore($this->order->getStoreId())->getCode()]
+        );
     }
 
     private function addStartDate(): void

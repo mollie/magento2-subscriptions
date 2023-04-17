@@ -140,7 +140,10 @@ class Restart extends Action implements HttpPostActionInterface
                 'interval' => $canceledSubscription->interval,
                 'description' => $canceledSubscription->description,
                 'metadata' => $this->getMetadata($canceledSubscription),
-                'webhookUrl' => $this->_url->getUrl('mollie-subscriptions/api/webhook'),
+                'webhookUrl' => $this->_url->getUrl(
+                    'mollie-subscriptions/api/webhook',
+                    ['___store' => $this->storeManager->getStore()->getCode()],
+                ),
             ]);
 
             $this->saveSubscriptionResult($subscription);

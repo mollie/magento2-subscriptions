@@ -52,14 +52,21 @@ class SubscriptionOptions
      */
     private $currentOption;
 
+    /**
+     * @var GetShippingCostForOrderItem
+     */
+    private $getShippingCostForOrderItem;
+
     public function __construct(
         General $mollieHelper,
         UrlInterface $urlBuilder,
-        ParseSubscriptionOptions $parseSubscriptionOptions
+        ParseSubscriptionOptions $parseSubscriptionOptions,
+        GetShippingCostForOrderItem $getShippingCostForOrderItem
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->urlBuilder = $urlBuilder;
         $this->parseSubscriptionOptions = $parseSubscriptionOptions;
+        $this->getShippingCostForOrderItem = $getShippingCostForOrderItem;
     }
 
     /**
@@ -89,6 +96,7 @@ class SubscriptionOptions
         $this->loadSubscriptionOption($orderItem);
 
         $this->addAmount();
+        $this->addShippingCost();
         $this->addTimes();
         $this->addInterval();
         $this->addDescription();
@@ -96,10 +104,15 @@ class SubscriptionOptions
         $this->addWebhookUrl();
         $this->addStartDate();
 
+        $amount = $this->mollieHelper->getAmountArray(
+            $this->order->getOrderCurrencyCode(),
+            $this->options['amount']
+        );
+
         return new SubscriptionOption(
             $orderItem->getProductId(),
             $this->order->getStoreId(),
-            $this->options['amount'] ?? [],
+            $amount,
             $this->options['interval'] ?? '',
             $this->options['description'] ?? '',
             $this->options['metadata'] ?? [],
@@ -116,10 +129,13 @@ class SubscriptionOptions
             $rowTotal = $this->orderItem->getParentItem()->getRowTotalInclTax();
         }
 
-        $this->options['amount'] = $this->mollieHelper->getAmountArray(
-            $this->order->getOrderCurrencyCode(),
-            $rowTotal
-        );
+        $this->options['amount'] = $rowTotal;
+    }
+
+    private function addShippingCost(): void
+    {
+        $shippingCost = $this->getShippingCostForOrderItem->execute($this->orderItem);
+        $this->options['amount'] += $shippingCost;
     }
 
     private function addTimes(): void

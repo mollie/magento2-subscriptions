@@ -182,7 +182,8 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertInstanceOf(SubscriptionOption::class, $subscription);
         $this->assertArrayHasKey('amount', $subscription->toArray());
         $this->assertArrayHasKey('value', $subscription->toArray()['amount']);
-        $this->assertEquals('999.98', $subscription->toArray()['amount']['value']);
+        // 999.98 + 5.00 for the shipping
+        $this->assertEquals('1004.98', $subscription->toArray()['amount']['value']);
     }
 
     /**

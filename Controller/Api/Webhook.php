@@ -32,6 +32,7 @@ use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
+use Mollie\Subscriptions\Service\Mollie\RetryUsingOtherStoreViews;
 
 class Webhook extends Action implements CsrfAwareActionInterface
 {
@@ -95,6 +96,16 @@ class Webhook extends Action implements CsrfAwareActionInterface
      */
     private $sendOrderEmails;
 
+    /**
+     * @var RetryUsingOtherStoreViews
+     */
+    private $retryUsingOtherStoreViews;
+
+    /**
+     * @var MollieApiClient
+     */
+    private $api;
+
     public function __construct(
         Context $context,
         Config $config,
@@ -108,7 +119,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         AddressRepositoryInterface $addressRepository,
         OrderRepositoryInterface $orderRepository,
         MollieLogger $mollieLogger,
-        SendOrderEmails $sendOrderEmails
+        SendOrderEmails $sendOrderEmails,
+        RetryUsingOtherStoreViews $retryUsingOtherStoreViews
     ) {
         parent::__construct($context);
 
@@ -124,6 +136,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->orderRepository = $orderRepository;
         $this->mollieLogger = $mollieLogger;
         $this->sendOrderEmails = $sendOrderEmails;
+        $this->retryUsingOtherStoreViews = $retryUsingOtherStoreViews;
     }
 
     public function execute()
@@ -133,6 +146,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
         }
 
         $id = $this->getRequest()->getParam('id');
+        if (!$id) {
+            throw new NotFoundException(__('No id provided'));
+        }
+
         if ($orders = $this->mollie->getOrderIdsByTransactionId($id)) {
             foreach ($orders as $orderId) {
                 $this->mollie->processTransaction($orderId, 'webhook');
@@ -142,15 +159,14 @@ class Webhook extends Action implements CsrfAwareActionInterface
         }
 
         try {
-            $api = $this->mollie->getMollieApi();
-            $molliePayment = $api->payments->get($id);
-            $subscription = $api->subscriptions->getForId($molliePayment->customerId, $molliePayment->subscriptionId);
+            $molliePayment = $this->getPayment($id);
+            $subscription = $this->api->subscriptions->getForId($molliePayment->customerId, $molliePayment->subscriptionId);
 
             $customerId = $this->mollieCustomerRepository->getByMollieCustomerId($molliePayment->customerId)->getCustomerId();
             $customer = $this->customerRepository->getById($customerId);
 
             $cart = $this->getCart($customer);
-            $this->addProduct($api, $molliePayment, $cart);
+            $this->addProduct($molliePayment, $cart);
 
             $cart->setBillingAddress($this->formatAddress($this->addressRepository->getById($customer->getDefaultBilling())));
             $this->setShippingAddress($customer, $cart);
@@ -197,10 +213,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
         return $address;
     }
 
-    private function addProduct(MollieApiClient $api, Payment $mollieOrder, CartInterface $cart)
+    private function addProduct(Payment $mollieOrder, CartInterface $cart)
     {
         /** @var Subscription $subscription */
-        $subscription = $api->performHttpCallToFullUrl(MollieApiClient::HTTP_GET, $mollieOrder->_links->subscription->href);
+        $subscription = $this->performHttpCallToFullUrl(MollieApiClient::HTTP_GET, $mollieOrder->_links->subscription->href);
         $sku = $subscription->metadata->sku;
         $product = $this->productRepository->get($sku);
 
@@ -235,6 +251,22 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $result->setHeader('content-type', 'text/plain');
         $result->setContents('OK');
         return $result;
+    }
+
+    public function getPayment(string $id): Payment
+    {
+        try {
+            $this->api = $this->mollie->getMollieApi();
+
+            return $this->api->payments->get($id);
+        } catch (ApiException $exception) {
+            // If the store view is not set, try to get the payment using other store views
+            if (!$this->getRequest()->getParam('___store')) {
+                return $this->retryUsingOtherStoreViews->execute($id);
+            }
+
+            throw $exception;
+        }
     }
 
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException

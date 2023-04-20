@@ -18,6 +18,7 @@
                 <enabled>0</enabled>
                 <template>mollie_subscriptions_pre_payment_reminder_template</template>
                 <days_before_reminder>3</days_before_reminder>
+                <cron_expr>0 1 * * *</cron_expr>
             </prepayment_reminder>
             <emails>
                 <disable_new_order_confirmation>0</disable_new_order_confirmation>

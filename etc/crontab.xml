@@ -10,7 +10,7 @@
             <schedule>*/4 1 * * *</schedule>
         </job>
         <job instance="Mollie\Subscriptions\Cron\SendPrePaymentReminderEmailCron" method="execute" name="mollie_subscriptions_send_prepayment_reminders">
-            <schedule>*/5 10 * * *</schedule>
+            <config_path>crontab/default/jobs/mollie_subscriptions_cron/schedule/cron_expr</config_path>
         </job>
     </group>
 </config>

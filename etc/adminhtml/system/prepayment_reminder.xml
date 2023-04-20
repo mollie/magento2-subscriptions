@@ -24,10 +24,29 @@
                 <field id="enabled">1</field>
             </depends>
         </field>
+        <field id="send_bcc_to" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Send BCC to</label>
+            <config_path>mollie_subscriptions/prepayment_reminder/send_bcc_to</config_path>
+            <comment><![CDATA[<strong>Optional</strong> Comma separated list of emailaddresses. Leave empty to disable.]]></comment>
+            <validate>validate-email</validate>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
         <field id="days_before_reminder" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Days before reminder</label>
             <config_path>mollie_subscriptions/prepayment_reminder/days_before_reminder</config_path>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="cron_expr" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="0"
+               showInStore="0">
+            <label>Cron time</label>
+            <config_path>mollie_subscriptions/prepayment_reminder/cron_expr</config_path>
+            <source_model>Mollie\Subscriptions\Model\Adminhtml\Source\CronTimes</source_model>
+            <backend_model>Mollie\Subscriptions\Model\Adminhtml\Backend\SaveCronValue</backend_model>
             <depends>
                 <field id="enabled">1</field>
             </depends>

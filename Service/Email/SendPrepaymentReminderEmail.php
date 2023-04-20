@@ -59,6 +59,10 @@ class SendPrepaymentReminderEmail
         $customer = $this->emailVariables->getMollieCustomer($subscriptionToProduct);
         $builder->addTo($customer->email, $customer->name);
 
+        if ($bcc = $this->config->prepaymentSendBccTo($storeId)) {
+            $builder->addBcc(explode(',', $bcc));
+        }
+
         $transport = $builder->getTransport();
         $transport->sendMessage();
     }

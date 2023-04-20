@@ -9,6 +9,7 @@ namespace Mollie\Subscriptions\Cron;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\FilterGroupBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Mollie\Payment\Config as MollieConfig;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Email\SendPrepaymentReminderEmail;
@@ -16,6 +17,11 @@ use Mollie\Subscriptions\Service\Mollie\CheckIfSubscriptionIsActive;
 
 class SendPrePaymentReminderEmailCron
 {
+    /**
+     * @var MollieConfig
+     */
+    private $mollieConfig;
+
     /**
      * @var Config
      */
@@ -52,6 +58,7 @@ class SendPrePaymentReminderEmailCron
     private $filterGroupBuilder;
 
     public function __construct(
+        MollieConfig $mollieConfig,
         Config $config,
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
@@ -60,6 +67,7 @@ class SendPrePaymentReminderEmailCron
         FilterBuilder $filterBuilder,
         FilterGroupBuilder $filterGroupBuilder
     ) {
+        $this->mollieConfig = $mollieConfig;
         $this->config = $config;
         $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->subscriptionToProductRepository = $subscriptionToProductRepository;
@@ -106,6 +114,14 @@ class SendPrePaymentReminderEmailCron
             if (!$this->checkIfSubscriptionIsActive->execute($subscription)) {
                 continue;
             }
+
+            $this->mollieConfig->addToLog(
+                'info',
+                sprintf(
+                    'Sending prepayment reminder email for subscription "%s"',
+                    $subscription->getEntityId()
+                )
+            );
 
             $this->sendPrepaymentReminderEmail->execute($subscription);
 

@@ -10,7 +10,6 @@ namespace Mollie\Subscriptions;
 use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -28,6 +27,7 @@ class Config
     const XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER = 'mollie_subscriptions/prepayment_reminder/days_before_reminder';
     const XML_PATH_PREPAYMENT_REMINDER_ENABLED = 'mollie_subscriptions/prepayment_reminder/enabled';
     const XML_PATH_PREPAYMENT_REMINDER_TEMPLATE = 'mollie_subscriptions/prepayment_reminder/template';
+    const XML_PATH_PREPAYMENT_REMINDER_SEND_BCC_TO = 'mollie_subscriptions/prepayment_reminder/send_bcc_to';
     const XML_PATH_EMAILS_ENABLE_ADMIN_NOTIFICATION = 'mollie_subscriptions/emails/enable_admin_notification';
     const XML_PATH_EMAILS_ADMIN_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_notification_template';
     const XML_PATH_EMAILS_ENABLE_CUSTOMER_NOTIFICATION = 'mollie_subscriptions/emails/enable_customer_notification';
@@ -59,21 +59,14 @@ class Config
      */
     private $metadata;
 
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
     public function __construct(
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
-        ProductMetadataInterface $metadata,
-        EncryptorInterface $encryptor
+        ProductMetadataInterface $metadata
     ) {
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
         $this->metadata = $metadata;
-        $this->encryptor = $encryptor;
     }
 
     /**
@@ -214,6 +207,16 @@ class Config
     public function daysBeforePrepaymentReminder($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
     {
         return $this->getStoreValue(static::XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function prepaymentSendBccTo($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_PREPAYMENT_REMINDER_SEND_BCC_TO, $storeId, $scope);
     }
 
     /**

@@ -216,7 +216,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
     private function addProduct(Payment $mollieOrder, CartInterface $cart)
     {
         /** @var Subscription $subscription */
-        $subscription = $this->performHttpCallToFullUrl(MollieApiClient::HTTP_GET, $mollieOrder->_links->subscription->href);
+        $subscription = $this->api->performHttpCallToFullUrl(MollieApiClient::HTTP_GET, $mollieOrder->_links->subscription->href);
         $sku = $subscription->metadata->sku;
         $product = $this->productRepository->get($sku);
 

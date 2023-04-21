@@ -26,13 +26,13 @@
 
     <?php foreach ($block->getOptions() as $option): ?>
         <button
-            onclick="document.getElementById('mollie_subscription_option').value = '<?= $escaper->escapeJs($option->getIdentifier()); ?>'"
+            onclick="document.getElementById('mollie_subscription_option').value = '<?= $block->escapeJs($option->getIdentifier()); ?>'"
             type="submit"
             class="action primary tocart product-addtocart-button select-subscription"
-            value="<?= $escaper->escapeHtmlAttr($option->getIdentifier()); ?>"
-            title="<?= $escaper->escapeHtmlAttr($option->getTitle()) ?>"
+            value="<?= $block->escapeHtmlAttr($option->getIdentifier()); ?>"
+            title="<?= $block->escapeHtmlAttr($option->getTitle()) ?>"
             >
-            <?= $escaper->escapeHtml($option->getTitle()); ?>
+            <?= $block->escapeHtml($option->getTitle()); ?>
         </button>
     <?php endforeach; ?>
 

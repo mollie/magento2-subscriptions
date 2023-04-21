@@ -9,6 +9,7 @@ namespace Mollie\Subscriptions\Service\Mollie;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Subscriptions\Config\Source\IntervalType;
 use Mollie\Subscriptions\Config\Source\RepetitionType;
@@ -51,15 +52,28 @@ class SubscriptionOptions
      * @var ProductSubscriptionOption
      */
     private $currentOption;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var GetShippingCostForOrderItem
+     */
+    private $getShippingCostForOrderItem;
 
     public function __construct(
         General $mollieHelper,
         UrlInterface $urlBuilder,
-        ParseSubscriptionOptions $parseSubscriptionOptions
+        ParseSubscriptionOptions $parseSubscriptionOptions,
+        GetShippingCostForOrderItem $getShippingCostForOrderItem,
+        StoreManagerInterface $storeManager
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->urlBuilder = $urlBuilder;
         $this->parseSubscriptionOptions = $parseSubscriptionOptions;
+        $this->getShippingCostForOrderItem = $getShippingCostForOrderItem;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -89,6 +103,7 @@ class SubscriptionOptions
         $this->loadSubscriptionOption($orderItem);
 
         $this->addAmount();
+        $this->addShippingCost();
         $this->addTimes();
         $this->addInterval();
         $this->addDescription();
@@ -96,10 +111,15 @@ class SubscriptionOptions
         $this->addWebhookUrl();
         $this->addStartDate();
 
+        $amount = $this->mollieHelper->getAmountArray(
+            $this->order->getOrderCurrencyCode(),
+            $this->options['amount']
+        );
+
         return new SubscriptionOption(
             $orderItem->getProductId(),
             $this->order->getStoreId(),
-            $this->options['amount'] ?? [],
+            $amount,
             $this->options['interval'] ?? '',
             $this->options['description'] ?? '',
             $this->options['metadata'] ?? [],
@@ -116,10 +136,13 @@ class SubscriptionOptions
             $rowTotal = $this->orderItem->getParentItem()->getRowTotalInclTax();
         }
 
-        $this->options['amount'] = $this->mollieHelper->getAmountArray(
-            $this->order->getOrderCurrencyCode(),
-            $rowTotal
-        );
+        $this->options['amount'] = $rowTotal;
+    }
+
+    private function addShippingCost(): void
+    {
+        $shippingCost = $this->getShippingCostForOrderItem->execute($this->orderItem);
+        $this->options['amount'] += $shippingCost;
     }
 
     private function addTimes(): void
@@ -155,7 +178,10 @@ class SubscriptionOptions
 
     private function addWebhookUrl(): void
     {
-        $this->options['webhookUrl'] = $this->urlBuilder->getUrl('mollie-subscriptions/api/webhook');
+        $this->options['webhookUrl'] = $this->urlBuilder->getUrl(
+            'mollie-subscriptions/api/webhook',
+            ['___store' => $this->storeManager->getStore($this->order->getStoreId())->getCode()]
+        );
     }
 
     private function addStartDate(): void

@@ -28,7 +28,6 @@ class GetShippingCostForOrderItem
     private $config;
 
     public function __construct(
-        // @phpstan-ignore-next-line Not sure why this fails
         RateRequestFactory $rateRequestFactory,
         RateCollectorInterfaceFactory $rateCollectorFactory,
         Config $config

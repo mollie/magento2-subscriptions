@@ -141,7 +141,7 @@ class SubscriptionOptions
 
     private function addShippingCost(): void
     {
-        $shippingCost = $this->getShippingCostForOrderItem->execute($this->orderItem);
+        $shippingCost = $this->getShippingCostForOrderItem->execute($this->order, $this->orderItem);
         $this->options['amount'] += $shippingCost;
     }
 

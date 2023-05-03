@@ -3,9 +3,11 @@
 namespace Mollie\Subscriptions\Service\Mollie;
 
 use Magento\Framework\DataObject;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\Address\RateCollectorInterfaceFactory;
 use Magento\Quote\Model\Quote\Address\RateRequestFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\Method;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Shipping\Model\Rate\CarrierResult;
 use Mollie\Subscriptions\Config;
@@ -27,18 +29,31 @@ class GetShippingCostForOrderItem
      */
     private $config;
 
+    /**
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
+
+    /**
+     * @var OrderInterface
+     */
+    private $order;
+
     public function __construct(
         RateRequestFactory $rateRequestFactory,
         RateCollectorInterfaceFactory $rateCollectorFactory,
+        CartRepositoryInterface $cartRepository,
         Config $config
     ) {
         $this->rateRequestFactory = $rateRequestFactory;
         $this->rateCollectorFactory = $rateCollectorFactory;
+        $this->cartRepository = $cartRepository;
         $this->config = $config;
     }
 
-    public function execute(OrderItemInterface $orderItem): float
+    public function execute(OrderInterface $order, OrderItemInterface $orderItem): float
     {
+        $this->order = $order;
         $result = $this->getCarrierResult($orderItem);
 
         if ($price = $this->getRateByCarrier($result)) {
@@ -77,13 +92,20 @@ class GetShippingCostForOrderItem
     {
         $request = $this->rateRequestFactory->create();
 
-        // Some shipping methods need this (Yes, I'm looking at you, TableRates)
-        $orderItem->setAddress(new DataObject());
+        // Some shipping methods need this (Yes, I'm looking at you, TableRates and Amasty)
+        $address = $this->order->getShippingAddress();
+
+        if ($this->order->getQuoteId()) {
+            $quote = $this->cartRepository->get($this->order->getQuoteId());
+            $address->setQuote($quote);
+        }
+
+        $orderItem->setAddress($address);
 
         $request->setAllItems([$orderItem]);
-        $request->setDestCountryId('US');
-        $request->setDestRegionId(0);
-        $request->setDestPostcode('90210');
+        $request->setDestCountryId($address->getCountryId());
+        $request->setDestRegionId($address->getRegionId());
+        $request->setDestPostcode($address->getPostcode());
 
         $product = $orderItem->getProduct();
         $request->setPackageValue($product->getFinalPrice());

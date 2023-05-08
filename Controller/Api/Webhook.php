@@ -30,6 +30,7 @@ use Mollie\Api\Resources\Subscription;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Mollie\RetryUsingOtherStoreViews;
@@ -105,6 +106,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var MollieApiClient
      */
     private $api;
+    /**
+     * @var ValidateMetadata
+     */
+    private $validateMetadata;
 
     public function __construct(
         Context $context,
@@ -120,7 +125,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         OrderRepositoryInterface $orderRepository,
         MollieLogger $mollieLogger,
         SendOrderEmails $sendOrderEmails,
-        RetryUsingOtherStoreViews $retryUsingOtherStoreViews
+        RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
+        ValidateMetadata $validateMetadata
     ) {
         parent::__construct($context);
 
@@ -137,6 +143,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->mollieLogger = $mollieLogger;
         $this->sendOrderEmails = $sendOrderEmails;
         $this->retryUsingOtherStoreViews = $retryUsingOtherStoreViews;
+        $this->validateMetadata = $validateMetadata;
     }
 
     public function execute()
@@ -149,6 +156,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
         if (!$id) {
             throw new NotFoundException(__('No id provided'));
         }
+
+        // The metadata is removed for recurring payments, which makes sense as we put the order ID in there,
+        // so we need to skip the validation
+        $this->validateMetadata->skipValidation();
 
         if ($orders = $this->mollie->getOrderIdsByTransactionId($id)) {
             foreach ($orders as $orderId) {

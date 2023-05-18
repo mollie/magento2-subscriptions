@@ -21,9 +21,9 @@ class SubscriptionToProductEmailVariables
     private $mollie;
 
     /**
-     * @var Customer|null
+     * @var Customer[]
      */
-    private $customer;
+    private $customers = [];
 
     /**
      * @var ProductRepositoryInterface
@@ -52,14 +52,17 @@ class SubscriptionToProductEmailVariables
 
     public function getMollieCustomer(SubscriptionToProductInterface $subscriptionToProduct): Customer
     {
-        if ($this->customer) {
-            return $this->customer;
+        $storeId = $subscriptionToProduct->getStoreId();
+        $customerId = $subscriptionToProduct->getCustomerId();
+        $key = $storeId . '-' . $customerId;
+        if (array_key_exists($key, $this->customers)) {
+            return $this->customers[$key];
         }
 
-        $api = $this->getApiForStore($subscriptionToProduct->getStoreId());
+        $api = $this->getApiForStore($storeId);
 
-        $this->customer = $api->customers->get($subscriptionToProduct->getCustomerId());
-        return $this->customer;
+        $this->customers[$key] = $api->customers->get($customerId);
+        return $this->customers[$key];
     }
 
     public function get(SubscriptionToProductInterface $subscriptionToProduct): array

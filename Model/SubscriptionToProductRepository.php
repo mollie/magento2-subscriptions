@@ -264,7 +264,7 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
     ) {
         try {
             $subscriptionToProductModel = $this->subscriptionToProductFactory->create();
-            $this->resource->load($subscriptionToProductModel, $subscriptionToProduct->getSubscriptionToProductId());
+            $this->resource->load($subscriptionToProductModel, $subscriptionToProduct->getEntityId());
             $this->resource->delete($subscriptionToProductModel);
         } catch (\Exception $exception) {
             throw new CouldNotDeleteException(__(

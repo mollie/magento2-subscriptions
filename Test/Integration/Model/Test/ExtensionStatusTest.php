@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Test\Integration\Model\Test;
 
-use Magento\Framework\App\ObjectManager;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Test\ExtensionStatus;

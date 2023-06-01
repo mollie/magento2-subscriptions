@@ -229,6 +229,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $address->setVatId($customerAddress->getVatId());
         $address->setSuffix($customerAddress->getSuffix());
         $address->setPrefix($customerAddress->getPrefix());
+        $address->setRegionId($customerAddress->getRegionId());
 
         return $address;
     }

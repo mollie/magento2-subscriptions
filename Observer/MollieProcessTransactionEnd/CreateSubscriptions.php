@@ -14,21 +14,21 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterfaceFactory;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\DTO\SubscriptionOption;
 use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 use Mollie\Subscriptions\Service\Mollie\SubscriptionOptions;
 use Mollie\Subscriptions\Service\Order\OrderContainsSubscriptionProduct;
 
 class CreateSubscriptions implements ObserverInterface
 {
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollieModel;
+    private $mollieSubscriptionApi;
 
     /**
      * @var OrderContainsSubscriptionProduct
@@ -82,7 +82,7 @@ class CreateSubscriptions implements ObserverInterface
 
     public function __construct(
         Config $config,
-        Mollie $mollieModel,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
         SubscriptionOptions $subscriptionOptions,
         SubscriptionToProductInterfaceFactory $subscriptionToProductFactory,
@@ -93,7 +93,7 @@ class CreateSubscriptions implements ObserverInterface
         SendNotificationEmail $sendCustomerNotificationEmail
     ) {
         $this->config = $config;
-        $this->mollieModel = $mollieModel;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
         $this->subscriptionOptions = $subscriptionOptions;
         $this->subscriptionToProductFactory = $subscriptionToProductFactory;
@@ -119,7 +119,7 @@ class CreateSubscriptions implements ObserverInterface
             return;
         }
 
-        $this->mollieApi = $this->mollieModel->getMollieApi($order->getStoreId());
+        $this->mollieApi = $this->mollieSubscriptionApi->loadByStore($order->getStoreId());
         $payment = $this->getPayment($order);
 
         $subscriptions = $this->subscriptionOptions->forOrder($order);

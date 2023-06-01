@@ -9,8 +9,8 @@ namespace Mollie\Subscriptions\Controller\Adminhtml\Subscriptions;
 use Magento\Backend\App\Action;
 use Magento\Framework\Event\ManagerInterface;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class Cancel extends Action
 {
@@ -20,9 +20,9 @@ class Cancel extends Action
     private $config;
 
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollie;
+    private $mollieSubscriptionApi;
 
     /**
      * @var SubscriptionToProductRepositoryInterface
@@ -37,20 +37,20 @@ class Cancel extends Action
     public function __construct(
         Action\Context $context,
         Config $config,
-        Mollie $mollie,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         ManagerInterface $eventManager
     ) {
         parent::__construct($context);
         $this->config = $config;
-        $this->mollie = $mollie;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->subscriptionToProductRepository = $subscriptionToProductRepository;
         $this->eventManager = $eventManager;
     }
 
     public function execute()
     {
-        $api = $this->mollie->getMollieApi($this->getRequest()->getParam('store_id'));
+        $api = $this->mollieSubscriptionApi->loadByStore($this->getRequest()->getParam('store_id'));
         $customerId = $this->getRequest()->getParam('customer_id');
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
 

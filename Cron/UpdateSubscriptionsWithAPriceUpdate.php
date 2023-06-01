@@ -11,9 +11,9 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class UpdateSubscriptionsWithAPriceUpdate
 {
@@ -23,9 +23,9 @@ class UpdateSubscriptionsWithAPriceUpdate
     private $config;
 
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollie;
+    private $mollieSubscriptionApi;
 
     /**
      * @var General
@@ -51,17 +51,17 @@ class UpdateSubscriptionsWithAPriceUpdate
 
     public function __construct(
         Config $config,
-        Mollie $mollie,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         General $mollieHelper,
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         ProductRepositoryInterface $productRepository,
         PriceCurrencyInterface $priceCurrency
     ) {
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->mollieHelper = $mollieHelper;
-        $this->productRepository = $productRepository;
-        $this->mollie = $mollie;
         $this->config = $config;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
+        $this->mollieHelper = $mollieHelper;
+        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
+        $this->productRepository = $productRepository;
         $this->priceCurrency = $priceCurrency;
     }
 
@@ -88,7 +88,7 @@ class UpdateSubscriptionsWithAPriceUpdate
             return $this->apis[$storeId];
         }
 
-        $api = $this->mollie->getMollieApi($storeId);
+        $api = $this->mollieSubscriptionApi->loadByStore($storeId);
         $this->apis[$storeId] = $api;
 
         return $api;

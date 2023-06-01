@@ -33,6 +33,7 @@ use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 use Mollie\Subscriptions\Service\Mollie\RetryUsingOtherStoreViews;
 
 class Webhook extends Action implements CsrfAwareActionInterface
@@ -46,6 +47,11 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var Mollie
      */
     private $mollie;
+
+    /**
+     * @var MollieSubscriptionApi
+     */
+    private $mollieSubscriptionApi;
 
     /**
      * @var MollieCustomerRepositoryInterface
@@ -106,6 +112,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var MollieApiClient
      */
     private $api;
+
     /**
      * @var ValidateMetadata
      */
@@ -115,6 +122,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         Context $context,
         Config $config,
         Mollie $mollie,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         MollieCustomerRepositoryInterface $mollieCustomerRepository,
         CartManagementInterface $cartManagement,
         CartRepositoryInterface $cartRepository,
@@ -132,6 +140,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
 
         $this->config = $config;
         $this->mollie = $mollie;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->mollieCustomerRepository = $mollieCustomerRepository;
         $this->cartManagement = $cartManagement;
         $this->cartRepository = $cartRepository;
@@ -267,7 +276,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
     public function getPayment(string $id): Payment
     {
         try {
-            $this->api = $this->mollie->getMollieApi();
+            $this->api = $this->mollieSubscriptionApi->loadByStore();
 
             return $this->api->payments->get($id);
         } catch (ApiException $exception) {

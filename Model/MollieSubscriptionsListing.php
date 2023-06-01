@@ -16,9 +16,9 @@ use Mollie\Api\Resources\Subscription;
 use Mollie\Api\Resources\SubscriptionCollection;
 use Mollie\Payment\Api\Data\MollieCustomerInterface;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\DTO\SubscriptionResponse;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class MollieSubscriptionsListing extends Listing
 {
@@ -28,9 +28,9 @@ class MollieSubscriptionsListing extends Listing
     private $config;
 
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollieModel;
+    private $mollieSubscriptionApi;
 
     /**
      * @var SearchCriteriaBuilderFactory
@@ -70,7 +70,7 @@ class MollieSubscriptionsListing extends Listing
     public function __construct(
         ContextInterface $context,
         Config $config,
-        Mollie $mollieModel,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         CustomerInterfaceFactory $customerFactory,
         CustomerRepositoryInterface $customerRepository,
@@ -79,7 +79,7 @@ class MollieSubscriptionsListing extends Listing
         array $data = []
     ) {
         parent::__construct($context, $components, $data);
-        $this->mollieModel = $mollieModel;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->customerFactory = $customerFactory;
         $this->customerRepository = $customerRepository;
@@ -90,7 +90,7 @@ class MollieSubscriptionsListing extends Listing
     public function getDataSourceData()
     {
         $storeId = $this->getContext()->getRequestParam('filters')['store_id'] ?? null;
-        $api = $this->mollieModel->getMollieApi($storeId);
+        $api = $this->mollieSubscriptionApi->loadByStore($storeId);
         $paging = $this->getContext()->getRequestParam('paging');
 
         $result = $api->subscriptions->page(

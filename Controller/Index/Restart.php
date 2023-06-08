@@ -17,11 +17,11 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\Resources\Subscription;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterfaceFactory;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class Restart extends Action implements HttpPostActionInterface
 {
@@ -31,9 +31,9 @@ class Restart extends Action implements HttpPostActionInterface
     private $config;
 
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollie;
+    private $mollieSubscriptionApi;
 
     /**
      * @var CurrentCustomer
@@ -83,7 +83,7 @@ class Restart extends Action implements HttpPostActionInterface
     public function __construct(
         Context $context,
         Config $config,
-        Mollie $mollie,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         CurrentCustomer $currentCustomer,
         Session $customerSession,
         SubscriptionToProductInterfaceFactory $subscriptionToProductFactory,
@@ -96,7 +96,7 @@ class Restart extends Action implements HttpPostActionInterface
     ) {
         parent::__construct($context);
         $this->config = $config;
-        $this->mollie = $mollie;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->currentCustomer = $currentCustomer;
         $this->customerSession = $customerSession;
         $this->subscriptionToProductFactory = $subscriptionToProductFactory;
@@ -122,7 +122,7 @@ class Restart extends Action implements HttpPostActionInterface
         $customer = $this->currentCustomer->getCustomer();
         $extensionAttributes = $customer->getExtensionAttributes();
 
-        $api = $this->mollie->getMollieApi();
+        $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
 
         $canceledSubscription = $api->subscriptions->getForId(

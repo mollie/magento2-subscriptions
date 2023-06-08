@@ -9,6 +9,7 @@ use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Service\Email\SubscriptionToProductEmailVariables;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class SubscriptionToProductEmailVariablesTest extends IntegrationTestCase
 {
@@ -39,12 +40,12 @@ class SubscriptionToProductEmailVariablesTest extends IntegrationTestCase
             }
         };
 
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('getMollieApi')->willReturn($client);
+        $mollieSubscriptionApiMock = $this->createMock(MollieSubscriptionApi::class);
+        $mollieSubscriptionApiMock->method('loadByStore')->willReturn($client);
 
         /** @var SubscriptionToProductEmailVariables $instance */
         $instance = $this->objectManager->create(SubscriptionToProductEmailVariables::class, [
-            'mollie' => $mollieMock,
+            'mollieSubscriptionApi' => $mollieSubscriptionApiMock,
         ]);
 
         $model1 = $this->objectManager->create(SubscriptionToProductInterface::class);

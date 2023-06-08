@@ -29,7 +29,9 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 use Mollie\Payment\Logger\MollieLogger;
+use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
@@ -118,6 +120,11 @@ class Webhook extends Action implements CsrfAwareActionInterface
      */
     private $validateMetadata;
 
+    /**
+     * @var LinkTransactionToOrder
+     */
+    private $linkTransactionToOrder;
+
     public function __construct(
         Context $context,
         Config $config,
@@ -134,7 +141,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         MollieLogger $mollieLogger,
         SendOrderEmails $sendOrderEmails,
         RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
-        ValidateMetadata $validateMetadata
+        ValidateMetadata $validateMetadata,
+        LinkTransactionToOrder $linkTransactionToOrder
     ) {
         parent::__construct($context);
 
@@ -153,6 +161,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->sendOrderEmails = $sendOrderEmails;
         $this->retryUsingOtherStoreViews = $retryUsingOtherStoreViews;
         $this->validateMetadata = $validateMetadata;
+        $this->linkTransactionToOrder = $linkTransactionToOrder;
     }
 
     public function execute()
@@ -172,7 +181,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
 
         if ($orders = $this->mollie->getOrderIdsByTransactionId($id)) {
             foreach ($orders as $orderId) {
-                $this->mollie->processTransaction($orderId, 'webhook');
+                $this->mollie->processTransaction($orderId, Payments::TRANSACTION_TYPE_SUBSCRIPTION);
             }
 
             return $this->returnOkResponse();
@@ -182,7 +191,14 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $molliePayment = $this->getPayment($id);
             $subscription = $this->api->subscriptions->getForId($molliePayment->customerId, $molliePayment->subscriptionId);
 
-            $customerId = $this->mollieCustomerRepository->getByMollieCustomerId($molliePayment->customerId)->getCustomerId();
+            $mollieCustomer = $this->mollieCustomerRepository->getByMollieCustomerId($molliePayment->customerId);
+            if (!$mollieCustomer) {
+                throw new \Exception(
+                    'Mollie customer with ID ' . $molliePayment->customerId . ' not found in database'
+                );
+            }
+
+            $customerId = $mollieCustomer->getCustomerId();
             $customer = $this->customerRepository->getById($customerId);
 
             $cart = $this->getCart($customer);
@@ -201,10 +217,12 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $order->getPayment()->setAdditionalInformation('subscription_created', $subscription->createdAt);
             $this->orderRepository->save($order);
 
-            $this->mollie->processTransactionForOrder($order, 'webhook');
+            $this->linkTransactionToOrder->execute($molliePayment->id, $order);
+
+            $this->mollie->processTransactionForOrder($order, Payments::TRANSACTION_TYPE_SUBSCRIPTION);
             return $this->returnOkResponse();
         } catch (ApiException $exception) {
-            $this->mollieLogger->addInfoLog('ApiException occured while checking transaction', [
+            $this->mollieLogger->addErrorLog('ApiException occured while checking transaction', [
                 'id' => $id,
                 'exception' => $exception->__toString()
             ]);
@@ -253,6 +271,20 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $shippingAddress->setCollectShippingRates(true);
         $shippingAddress->collectShippingRates();
         $shippingAddress->setShippingMethod($this->config->getShippingMethod());
+
+        // There are no rates available. Switch to the first available shipping method.
+        if ($shippingAddress->getShippingRateByCode($this->config->getShippingMethod()) === false &&
+            count($shippingAddress->getShippingRatesCollection()->getItems()) > 0
+        ) {
+            $newMethod = $shippingAddress->getShippingRatesCollection()->getFirstItem()->getCode();
+            $shippingAddress->setShippingMethod($newMethod);
+
+            $this->mollieLogger->addInfoLog(
+                'subscriptions',
+                'No rates available for ' . $this->config->getShippingMethod() .
+                ', switched to ' . $newMethod
+            );
+        }
     }
 
     private function getCart(CustomerInterface $customer): CartInterface

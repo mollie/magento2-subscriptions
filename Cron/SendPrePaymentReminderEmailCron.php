@@ -6,12 +6,10 @@
 
 namespace Mollie\Subscriptions\Cron;
 
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\Search\FilterGroupBuilder;
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Mollie\Payment\Config as MollieConfig;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Config;
+use Mollie\Subscriptions\Service\Email\RetrieveRecordsForPrePaymentReminder;
 use Mollie\Subscriptions\Service\Email\SendPrepaymentReminderEmail;
 use Mollie\Subscriptions\Service\Mollie\CheckIfSubscriptionIsActive;
 
@@ -26,11 +24,6 @@ class SendPrePaymentReminderEmailCron
      * @var Config
      */
     private $config;
-
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilderFactory;
 
     /**
      * @var SubscriptionToProductRepositoryInterface
@@ -48,64 +41,30 @@ class SendPrePaymentReminderEmailCron
     private $checkIfSubscriptionIsActive;
 
     /**
-     * @var FilterBuilder
+     * @var RetrieveRecordsForPrePaymentReminder
      */
-    private $filterBuilder;
-
-    /**
-     * @var FilterGroupBuilder
-     */
-    private $filterGroupBuilder;
+    private $retrieveRecordsForPrePaymentReminder;
 
     public function __construct(
         MollieConfig $mollieConfig,
         Config $config,
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         SendPrepaymentReminderEmail $sendPrepaymentReminderEmail,
         CheckIfSubscriptionIsActive $checkIfSubscriptionIsActive,
-        FilterBuilder $filterBuilder,
-        FilterGroupBuilder $filterGroupBuilder
+        RetrieveRecordsForPrePaymentReminder $retrieveRecordsForPrePaymentReminder
     ) {
         $this->mollieConfig = $mollieConfig;
         $this->config = $config;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->subscriptionToProductRepository = $subscriptionToProductRepository;
         $this->sendPrepaymentReminderEmail = $sendPrepaymentReminderEmail;
         $this->checkIfSubscriptionIsActive = $checkIfSubscriptionIsActive;
-        $this->filterBuilder = $filterBuilder;
-        $this->filterGroupBuilder = $filterGroupBuilder;
+        $this->retrieveRecordsForPrePaymentReminder = $retrieveRecordsForPrePaymentReminder;
     }
 
     public function execute()
     {
-        $today = (new \DateTime())->format('Y-m-d');
-
-        $interval = new \DateInterval('P' . $this->config->daysBeforePrepaymentReminder() . 'D');
-        $prepaymentDate = (new \DateTimeImmutable())->sub($interval);
-
-        $criteria = $this->searchCriteriaBuilderFactory->create();
-        $criteria->addFilter('next_payment_date', $prepaymentDate->format('Y-m-d'), 'eq');
-
-        $lastReminderDateNull = $this->filterBuilder
-            ->setField('last_reminder_date')
-            ->setConditionType('null')
-            ->create();
-
-        $lastReminderDateNotToday = $this->filterBuilder
-            ->setField('last_reminder_date')
-            ->setConditionType('neq')
-            ->setValue($today)
-            ->create();
-
-        $criteria->setFilterGroups([
-            $this->filterGroupBuilder
-                ->addFilter($lastReminderDateNull)
-                ->addFilter($lastReminderDateNotToday)
-                ->create()
-        ]);
-
-        $subscriptions = $this->subscriptionToProductRepository->getList($criteria->create());
+        $today = new \DateTimeImmutable();
+        $subscriptions = $this->retrieveRecordsForPrePaymentReminder->execute($today);
         foreach ($subscriptions->getItems() as $subscription) {
             if (!$this->config->isPrepaymentReminderEnabled($subscription->getStoreId())) {
                 continue;
@@ -125,7 +84,7 @@ class SendPrePaymentReminderEmailCron
 
             $this->sendPrepaymentReminderEmail->execute($subscription);
 
-            $subscription->setLastReminderDate($today);
+            $subscription->setLastReminderDate($today->format('Y-m-d'));
             $this->subscriptionToProductRepository->save($subscription);
         }
     }

@@ -12,13 +12,8 @@
 
     <preference for="Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface" type="Mollie\Subscriptions\Model\SubscriptionToProductRepository"/>
     <preference for="Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface" type="Mollie\Subscriptions\Model\Data\SubscriptionToProduct"/>
-    <preference for="Mollie\Subscriptions\Api\Data\SubscriptionToProductSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="Mollie\Subscriptions\Api\Data\SubscriptionToProductSearchResultsInterface" type="Mollie\Subscriptions\Model\SubscriptionToProductSearchResults"/>
 
-    <type name="Mollie\Subscriptions\Logger\Handler">
-        <arguments>
-            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
-        </arguments>
-    </type>
     <type name="Mollie\Subscriptions\Logger\ErrorLogger">
         <arguments>
             <argument name="name" xsi:type="string">MollieSubscriptionsError</argument>

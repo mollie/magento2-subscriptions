@@ -1,0 +1,136 @@
+"Check last 100 debug log records","Controleer de laatste 100 debug log records"
+"Check last 100 error log records","Controleer de laatste 100 foutlogboekrecords"
+"Run Self-test","Voer zelftest uit"
+"Check for latest versions","Controleer op laatste versies"
+"Please select","Selecteer alstublieft"
+Day(s),Dag(en)
+Week(s),Week(en)
+Month(s),Maand(en)
+Times,Keer
+Infinite,Oneindig
+Enabled,Ingeschakeld
+Disabled,Uitgeschakeld
+"Log is empty","Log is leeg"
+"Unable to cancel subscription: %1","Kan abonnement niet annuleren: %1"
+"Subscription with ID ""%1"" has been cancelled","Abonnement met ID ""%1"" is geannuleerd"
+"No id provided","Geen id verstrekt"
+"Please check the Mollie logs for more information","Controleer de Mollie-logs voor meer informatie"
+"Unable to cancel subscription","Kan abonnement niet annuleren"
+"My Subscriptions","Mijn Abonnementen"
+"We are unable to restart the subscription","We kunnen het abonnement niet opnieuw starten"
+"Unable to change the price for subscription ""%1""","Kan de prijs voor abonnement ""%1"" niet wijzigen"
+"Subscription ""%1"" canceled, deleted database record with ID ""%2""","Abonnement ""%1"" geannuleerd, database record met ID ""%2"" verwijderd"
+"Updated subscription ""%1"" to price ""%2""","Abonnement ""%1"" bijgewerkt naar prijs ""%2"""
+"Use Config Settings","Gebruik Config Instellingen"
+"Cron settings can't be saved","Cron-instellingen kunnen niet worden opgeslagen"
+"Could not save the subscriptionToProduct: %1","Kon de subscriptionToProduct niet opslaan: %1"
+"subscription_to_product with id ""%1"" does not exist.","subscription_to_product met id ""%1"" bestaat niet."
+"Subscription for customer %1 and product %2 not found","Abonnement voor klant %1 en product %2 niet gevonden"
+"Could not delete the subscription_to_product: %1","Kon de subscriptionToProduct niet verwijderen: %1"
+"Please select a subscription before adding the product to your cart.","Selecteer een abonnement voordat u het product aan uw winkelwagen toevoegt."
+"You already have a subscription to this product.","U heeft al een abonnement op dit product."
+"Exception while adding the subscription buttons:","Uitzondering bij het toevoegen van de abonnementsknoppen:"
+"You already have a subscription to ""%1"". This product has been removed from your cart.","U heeft al een abonnement op ""%1"". Dit product is uit uw winkelwagen verwijderd."
+"Subscription with ID ""%1"" is not active anymore, deleting record with ID ""%2""","Abonnement met ID ""%1"" is niet meer actief, record met ID ""%2"" verwijderen"
+"Payment with ID %1 not found in any store view","Betaling met ID %1 niet gevonden in enig winkeloverzicht"
+"Every day","Elke dag"
+"Every %1 days","Elke %1 dagen"
+"Every week","Elke week"
+"Every %1 weeks","Elke %1 weken"
+"Every month","Elke maand"
+"Every %1 months","Elke %1 maanden"
+"Every %1 %2","Elke %1 %2"
+Cancel,Annuleren
+Delete,Verwijderen
+"Are you sure you want to delete this record?","Weet u zeker dat u dit record wilt verwijderen?"
+"Manual & Support","Handleiding & Ondersteuning"
+"You have no active subscriptions.","U heeft geen actieve abonnementen."
+Orders,Bestellingen
+ID,ID
+Date,Datum
+Status,Status
+Description,Omschrijving
+Amount,Bedrag
+Action,Actie
+Total,Totaal
+Actions,Acties
+"Are you sure you want to delete the subscription with ID %1?","Weet u zeker dat u het abonnement met ID %1 wilt verwijderen?"
+Restart,Herstarten
+"One Time Purchase","Eenmalige Aankoop"
+Default,Standaard
+Title,Titel
+"Repeat Every","Herhaal Elke"
+Type,Type
+"Repeat Times","Herhaal Keer"
+"Repeat Type","Herhaal Type"
+"Add Subscription type","Voeg Abonnementstype toe"
+"Previous Page","Vorige Pagina"
+"Next Page","Volgende Pagina"
+"Subscription canceled","Abonnement geannuleerd"
+"Hello,","Hallo,"
+"The customer %customerName has canceled a subscription with the description %subscription_description and ID %subscription_id.","De klant %customerName heeft een abonnement geannuleerd met de beschrijving %subscription_description en ID %subscription_id."
+"Thanks again,","Nogmaals bedankt,"
+%store_name,%store_name
+"Dear %name,","Beste %name,"
+"We confirm that you canceled the subscription with ID %subscription_id.","We bevestigen dat u het abonnement met ID %subscription_id heeft geannuleerd."
+"New subscription","Nieuw abonnement"
+"The customer %customerName has started a new subscription with the description %description and ID %subscription_id.","De klant %customerName heeft een nieuw abonnement gestart met de beschrijving %description en ID %subscription_id."
+"Your new subscription","Uw nieuw abonnement"
+"Good news! We confirm your subscription to %product_name. The next order will be sent on its way to you on %nextPaymentDate.","Goed nieuws! We bevestigen uw abonnement op %product_name. De volgende bestelling wordt op %nextPaymentDate naar u verzonden."
+"Upcoming subscription renewal from %store_name","Aankomende abonnementsvernieuwing van %store_name"
+"We are very excited to get your %product_name subscription ready for %nextPaymentDate!","We zijn erg enthousiast om uw abonnement op %product_name klaar te maken voor %nextPaymentDate!"
+"This email is a reminder that a subscription fee of %amount_value will be charged on the same date.","Deze e-mail is een herinnering dat op dezelfde datum een abonnementsvergoeding van %amount_value in rekening wordt gebracht."
+"If you would like to pause or cancel your subscription or make any other changes, you can always do so by logging into your %store_name account.","Als u uw abonnement wilt pauzeren of annuleren of andere wijzigingen wilt aanbrengen, kunt u dat altijd doen door in te loggen op uw %store_name account."
+"All our best,","Al onze beste,"
+"Subscription restarted","Abonnement herstart"
+"The customer %customerName has re-started a subscription with the description %subscriptionDescription.","De klant %customerName heeft een abonnement herstart met de beschrijving %subscriptionDescription."
+"We confirm that you restarted the subscription on %product_name.","We bevestigen dat u het abonnement op %product_name hebt herstart."
+Passed,Geslaagd
+Failed,Mislukt
+"Great, you are using the latest version.","Geweldig, u gebruikt de nieuwste versie."
+"There is a new version available <span>(%1)</span> see <button type=""button"" id=""mollie-subscriptions-button_changelog"">changelog</button>.","Er is een nieuwe versie beschikbaar <span>(%1)</span> zie <button type=""button"" id=""mollie-subscriptions-button_changelog"">changelog</button>."
+"last 100 debug log lines","laatste 100 debug log regels"
+"download as .txt file","download als .txt bestand"
+ok,ok
+"last 100 error log records","laatste 100 foutlogboekrecords"
+Self-test,Zelftest
+"Show more.","Toon meer."
+"Show less.","Toon minder."
+"Not all payments methods are available when ordering subscription products.","Niet alle betaalmethoden zijn beschikbaar bij het bestellen van abonnementsproducten."
+"View active Mollie subscriptions","Bekijk actieve Mollie-abonnementen"
+"Mollie Subscriptions","Mollie Abonnementen"
+"View active subscriptions","Bekijk actieve abonnementen"
+Subscriptions,Abonnementen
+Branding,Branding
+"Debug & Logging","Debug & Logging"
+Logging,Loggen
+"Debug Mode","Debugmodus"
+Emails,Emails
+"Disable new order confirmation","Nieuwe bestelbevestiging uitschakelen"
+"Send admin email on new subscription?","Admin e-mail sturen bij nieuw abonnement?"
+"Subscription notification template for admin","Abonnementsmeldingssjabloon voor beheerder"
+"Send customer email on new subscription?","Klant e-mail sturen bij nieuw abonnement?"
+"Subscription notification template for customer","Abonnementsmeldingssjabloon voor klant"
+"Send admin email on restart of a subscription?","Beheerder e-mail sturen bij herstarten van een abonnement?"
+"Send customer email on restart of a subscription?","Klant e-mail sturen bij herstarten van een abonnement?"
+"Restart subscription notification template for customer","Herstart abonnement meldingssjabloon voor klant"
+"Send admin email on subscription cancel?","Beheerder e-mail sturen bij annulering van abonnement?"
+"Cancel subscription notification template for admin","Annuleer abonnement meldingssjabloon voor beheerder"
+"Send customer email on subscription cancel?","Klant e-mail sturen bij annulering van abonnement?"
+"Cancel subscription notification template for customer","Annuleer abonnement meldingssjabloon voor klant"
+General,Algemeen
+Version,Versie
+"Shipping method","Verzendmethode"
+"Allow one-time purchase for products?","Eenmalige aankoop voor producten toestaan?"
+"Pre-payment reminder email","Herinneringsemail voor vooruitbetaling"
+"Email template","E-mail sjabloon"
+"Send BCC to","Stuur BCC naar"
+"<strong>Optional</strong> Comma separated list of emailaddresses. Leave empty to disable.","<strong>Optioneel</strong> Lijst met e-mailadressen gescheiden door komma's. Laat leeg om uit te schakelen."
+"Days before reminder","Dagen voor herinnering"
+"Cron time","Cron tijd"
+"All Store Views","Alle winkelweergaven"
+"Store View","Winkelweergave"
+"First Payment Date","Eerste betalingsdatum"
+"Customer Name","Klantnaam"
+"Next Payment at","Volgende betaling op"
+"Pre-Payment Reminder","Herinnering voorafgaande betaling"

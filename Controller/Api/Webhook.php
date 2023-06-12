@@ -33,6 +33,7 @@ use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
+use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
@@ -125,6 +126,11 @@ class Webhook extends Action implements CsrfAwareActionInterface
      */
     private $linkTransactionToOrder;
 
+    /**
+     * @var OrderCommentHistory
+     */
+    private $orderCommentHistory;
+
     public function __construct(
         Context $context,
         Config $config,
@@ -142,7 +148,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         SendOrderEmails $sendOrderEmails,
         RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
         ValidateMetadata $validateMetadata,
-        LinkTransactionToOrder $linkTransactionToOrder
+        LinkTransactionToOrder $linkTransactionToOrder,
+        OrderCommentHistory $orderCommentHistory
     ) {
         parent::__construct($context);
 
@@ -162,6 +169,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->retryUsingOtherStoreViews = $retryUsingOtherStoreViews;
         $this->validateMetadata = $validateMetadata;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
+        $this->orderCommentHistory = $orderCommentHistory;
     }
 
     public function execute()
@@ -216,6 +224,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $order->setMollieTransactionId($molliePayment->id);
             $order->getPayment()->setAdditionalInformation('subscription_created', $subscription->createdAt);
             $this->orderRepository->save($order);
+
+            $this->orderCommentHistory->add($order, __('Order created by Mollie subscription %1', $molliePayment->id));
 
             $this->linkTransactionToOrder->execute($molliePayment->id, $order);
 

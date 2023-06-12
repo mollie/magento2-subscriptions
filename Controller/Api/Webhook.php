@@ -202,7 +202,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $customer = $this->customerRepository->getById($customerId);
 
             $cart = $this->getCart($customer);
-            $this->addProduct($molliePayment, $cart, $subscription['metadata']['quantity'] ?? 1);
+            $this->addProduct($molliePayment, $cart, $subscription->metadata->quantity ?? 1);
 
             $cart->setBillingAddress($this->formatAddress($this->addressRepository->getById($customer->getDefaultBilling())));
             $this->setShippingAddress($customer, $cart);

@@ -152,7 +152,7 @@ class WebhookTest extends ControllerTestCase
         return $list->getItems();
     }
 
-    public function getSubscription(): Subscription
+    private function getSubscription(): Subscription
     {
         /** @var Subscription $subscription */
         $subscription = $this->_objectManager->get(Subscription::class);
@@ -162,7 +162,7 @@ class WebhookTest extends ControllerTestCase
         return $subscription;
     }
 
-    public function getPayment(string $transactionId): Payment
+    private function getPayment(string $transactionId): Payment
     {
         $molliePaymentBuilder = $this->_objectManager->get(MolliePaymentBuilder::class);
         $molliePaymentBuilder->setMethod('ideal');
@@ -177,7 +177,7 @@ class WebhookTest extends ControllerTestCase
         return $payment;
     }
 
-    public function getApi(string $transactionId): MollieApiClient
+    private function getApi(string $transactionId): MollieApiClient
     {
         $subscription = $this->getSubscription();
 

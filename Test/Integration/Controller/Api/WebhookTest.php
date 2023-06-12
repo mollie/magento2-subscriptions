@@ -2,10 +2,10 @@
 
 namespace Mollie\Subscriptions\Test\Integration\Controller\Api;
 
-use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Encryption\Encryptor;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\Request;
 use Magento\TestFramework\TestCase\AbstractController as ControllerTestCase;
@@ -81,6 +81,37 @@ class WebhookTest extends ControllerTestCase
 
         $orders = $this->getOrderIdsByTransactionId($transactionId);
         $this->assertSame($ordersCount + 1, count($orders));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
+     */
+    public function testDoesNotCreateMultipleOrders(): void
+    {
+        $transactionId = 'tr_testtransaction';
+
+        $order = $this->loadOrderById('100000001');
+
+        $mollieSubscriptionApiMock = $this->createMock(MollieSubscriptionApi::class);
+        $mollieSubscriptionApiMock->expects($spy = $this->any())->method('loadByStore');
+
+        $this->_objectManager->addSharedInstance($mollieSubscriptionApiMock, MollieSubscriptionApi::class);
+
+        $mollieMock = $this->createMock(Mollie::class);
+        $mollieMock->method('processTransactionForOrder');
+        $mollieMock->method('getOrderIdsByTransactionId')->willReturn([$order]);
+        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
+
+        $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
+        $this->assertEquals(200, $this->getResponse()->getStatusCode());
+
+        $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
+        $this->assertEquals(200, $this->getResponse()->getStatusCode());
+
+        $this->assertEquals(0, $spy->getInvocationCount());
     }
 
     private function createMollieCustomer(): void
@@ -164,5 +195,16 @@ class WebhookTest extends ControllerTestCase
         $api->payments = $paymentEndpointMock;
         $api->subscriptions = $subscriptionsEndpointMock;
         return $api;
+    }
+
+    private function loadOrderById($orderId): OrderInterface
+    {
+        $repository = $this->_objectManager->get(OrderRepositoryInterface::class);
+        $builder = $this->_objectManager->create(SearchCriteriaBuilder::class);
+        $searchCriteria = $builder->addFilter('increment_id', $orderId, 'eq')->create();
+
+        $orderList = $repository->getList($searchCriteria)->getItems();
+
+        return array_shift($orderList);
     }
 }

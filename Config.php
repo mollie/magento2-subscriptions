@@ -356,6 +356,6 @@ class Config
      */
     public function disableNewOrderConfirmation($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
     {
-        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_ADMIN_CANCEL_NOTIFICATION, $storeId, $scope);
+        return $this->getFlag(static::XML_PATH_DISABLE_NEW_ORDER_CONFIRMATION, $storeId, $scope);
     }
 }

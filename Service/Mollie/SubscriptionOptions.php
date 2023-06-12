@@ -172,8 +172,10 @@ class SubscriptionOptions
     private function addMetadata(): void
     {
         $product = $this->orderItem->getProduct();
-
-        $this->options['metadata'] = ['sku' => $product->getSku()];
+        $this->options['metadata'] = [
+            'sku' => $product->getSku(),
+            'quantity' => $this->orderItem->getQtyOrdered(),
+        ];
     }
 
     private function addWebhookUrl(): void

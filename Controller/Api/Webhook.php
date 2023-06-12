@@ -177,7 +177,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $customer = $this->customerRepository->getById($customerId);
 
             $cart = $this->getCart($customer);
-            $this->addProduct($molliePayment, $cart);
+            $this->addProduct($molliePayment, $cart, $subscription['metadata']['quantity'] ?? 1);
 
             $cart->setBillingAddress($this->formatAddress($this->addressRepository->getById($customer->getDefaultBilling())));
             $this->setShippingAddress($customer, $cart);
@@ -224,14 +224,14 @@ class Webhook extends Action implements CsrfAwareActionInterface
         return $address;
     }
 
-    private function addProduct(Payment $mollieOrder, CartInterface $cart)
+    private function addProduct(Payment $mollieOrder, CartInterface $cart, float $quantity)
     {
         /** @var Subscription $subscription */
         $subscription = $this->api->performHttpCallToFullUrl(MollieApiClient::HTTP_GET, $mollieOrder->_links->subscription->href);
         $sku = $subscription->metadata->sku;
         $product = $this->productRepository->get($sku);
 
-        $cart->addProduct($product);
+        $cart->addProduct($product, $quantity);
     }
 
     private function setShippingAddress(CustomerInterface $customer, CartInterface $cart)

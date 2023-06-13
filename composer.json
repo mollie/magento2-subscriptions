@@ -9,7 +9,7 @@
     ],
     "require": {
         "magento/framework": ">=102.0.0",
-        "mollie/magento2": ">=2.25.0",
+        "mollie/magento2": ">=2.27.0",
         "beberlei/assert": "*",
         "ext-json": "*"
     },

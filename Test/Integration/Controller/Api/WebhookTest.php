@@ -35,8 +35,7 @@ class WebhookTest extends ControllerTestCase
         $paymentEndpointMock->method('get')->willThrowException(new ApiException('Invalid transaction (Test)'));
 
         /** @var Mollie $mollie */
-        $mollie = $this->_objectManager->get(Mollie::class);
-        $api = $mollie->getMollieApi();
+        $api = new MollieApiClient();
         $api->payments = $paymentEndpointMock;
 
         $mollieMock = $this->createMock(Mollie::class);

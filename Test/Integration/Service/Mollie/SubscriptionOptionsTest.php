@@ -212,6 +212,31 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     }
 
     /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testAddsTheQuantity()
+    {
+        $order = $this->loadOrder('100000001');
+        $items = $order->getItems();
+
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-finite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
+
+        $orderItem->setQtyOrdered(2);
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $this->assertCount(1, $result);
+        $subscription = $result[0];
+
+        $this->assertEquals(2, $subscription->toArray()['metadata']['quantity']);
+    }
+
+    /**
      * @dataProvider addsTheStartDate
      * @magentoDataFixture Magento/Sales/_files/order.php
      *

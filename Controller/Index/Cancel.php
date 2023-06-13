@@ -14,9 +14,9 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class Cancel extends Action implements HttpPostActionInterface
 {
@@ -26,9 +26,9 @@ class Cancel extends Action implements HttpPostActionInterface
     private $config;
 
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollie;
+    private $mollieSubscriptionApi;
 
     /**
      * @var SubscriptionToProductRepositoryInterface
@@ -63,7 +63,7 @@ class Cancel extends Action implements HttpPostActionInterface
     public function __construct(
         Context $context,
         Config $config,
-        Mollie $mollie,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         CurrentCustomer $currentCustomer,
         Session $customerSession,
@@ -73,7 +73,7 @@ class Cancel extends Action implements HttpPostActionInterface
     ) {
         parent::__construct($context);
         $this->config = $config;
-        $this->mollie = $mollie;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->subscriptionToProductRepository = $subscriptionToProductRepository;
         $this->currentCustomer = $currentCustomer;
         $this->customerSession = $customerSession;
@@ -96,7 +96,7 @@ class Cancel extends Action implements HttpPostActionInterface
         $customer = $this->currentCustomer->getCustomer();
         $extensionAttributes = $customer->getExtensionAttributes();
 
-        $api = $this->mollie->getMollieApi();
+        $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
 
         try {

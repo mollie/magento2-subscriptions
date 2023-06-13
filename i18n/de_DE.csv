@@ -1,0 +1,138 @@
+"Check last 100 debug log records","Überprüfen Sie die letzten 100 Debug-Protokolleinträge"
+"Check last 100 error log records","Überprüfen Sie die letzten 100 Fehlerprotokolleinträge"
+"Run Self-test","Selbsttest durchführen"
+"Check for latest versions","Nach neuesten Versionen suchen"
+"Please select","Bitte auswählen"
+Day(s),Tag(e)
+Week(s),Woche(n)
+Month(s),Monat(e)
+Times,Zeiten
+Infinite,Unendlich
+Enabled,Aktiviert
+Disabled,Deaktiviert
+"Log is empty","Protokoll ist leer"
+"Unable to cancel subscription: %1","Abonnement kann nicht gekündigt werden: %1"
+"Subscription with ID ""%1"" has been cancelled","Abonnement mit der ID ""%1"" wurde gekündigt"
+"No id provided","Keine ID angegeben"
+"Please check the Mollie logs for more information","Bitte überprüfen Sie die Mollie-Protokolle für weitere Informationen"
+"Unable to cancel subscription","Abonnement kann nicht gekündigt werden"
+"My Subscriptions","Meine Abonnements"
+"We are unable to restart the subscription","Wir können das Abonnement nicht neu starten"
+"Unable to change the price for subscription ""%1""","Preis für Abonnement ""%1"" kann nicht geändert werden"
+"Subscription ""%1"" canceled, deleted database record with ID ""%2""","Abonnement ""%1"" gekündigt, Datenbankeintrag mit ID ""%2"" gelöscht"
+"Updated subscription ""%1"" to price ""%2""","Abonnement ""%1"" auf Preis ""%2"" aktualisiert"
+"Use Config Settings","Konfigurationseinstellungen verwenden"
+"Cron settings can't be saved","Cron-Einstellungen können nicht gespeichert werden"
+"Could not save the subscriptionToProduct: %1","subscriptionToProduct: %1 konnte nicht gespeichert werden"
+"subscription_to_product with id ""%1"" does not exist.","subscription_to_product mit der ID ""%1"" existiert nicht."
+"Subscription for customer %1 and product %2 not found","Abonnement für Kunde %1 und Produkt %2 nicht gefunden"
+"Could not delete the subscription_to_product: %1","subscription_to_product: %1 konnte nicht gelöscht werden"
+"Please select a subscription before adding the product to your cart.","Bitte wählen Sie ein Abonnement aus, bevor Sie das Produkt in Ihren Warenkorb legen."
+"You already have a subscription to this product.","Sie haben bereits ein Abonnement für dieses Produkt."
+"Exception while adding the subscription buttons:","Ausnahme beim Hinzufügen der Abonnement-Schaltflächen:"
+"You already have a subscription to ""%1"". This product has been removed from your cart.","Sie haben bereits ein Abonnement für ""%1"". Dieses Produkt wurde aus Ihrem Warenkorb entfernt."
+"Subscription with ID ""%1"" is not active anymore, deleting record with ID ""%2""","Abonnement mit der ID ""%1"" ist nicht mehr aktiv, Eintrag mit der ID ""%2"" wird gelöscht"
+"Payment with ID %1 not found in any store view","Zahlung mit der ID %1 in keiner Shop-Ansicht gefunden"
+"Every day","Jeden Tag"
+"Every %1 days","Jeden %1 Tag(e)"
+"Every week","Jede Woche"
+"Every %1 weeks","Jede %1 Woche(n)"
+"Every month","Jeden Monat"
+"Every %1 months","Jeden %1 Monat(e)"
+"Every %1 %2","Jeden %1 %2"
+Cancel,Abbrechen
+Delete,Löschen
+"Are you sure you want to delete this record?","Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?"
+"Manual & Support","Handbuch & Support"
+"You have no active subscriptions.","Sie haben keine aktiven Abonnements."
+Orders,Bestellungen
+ID,ID
+Date,Datum
+Status,Status
+Description,Beschreibung
+Amount,Betrag
+Action,Aktion
+Total,Gesamt
+Actions,Aktionen
+"Are you sure you want to delete the subscription with ID %1?","Sind Sie sicher, dass Sie das Abonnement mit der ID %1 löschen möchten?"
+Restart,Neustart
+"One Time Purchase","Einmaliger Kauf"
+Default,Standard
+Title,Titel
+"Repeat Every","Wiederholen Jeden"
+Type,Typ
+"Repeat Times","Wiederholungszeiten"
+"Repeat Type","Wiederholungstyp"
+"Add Subscription type","Abonnementtyp hinzufügen"
+"Previous Page","Vorherige Seite"
+"Next Page","Nächste Seite"
+"Subscription canceled","Abonnement gekündigt"
+"Hello,","Hallo,"
+"The customer %customerName has canceled a subscription with the description %subscription_description and ID %subscription_id.","Der Kunde %customerName hat ein Abonnement mit der Beschreibung %subscription_description und der ID %subscription_id gekündigt."
+"Thanks again,","Nochmals vielen Dank,"
+%store_name,%store_name
+"Dear %name,","Sehr geehrter %name,"
+"We confirm that you canceled the subscription with ID %subscription_id.","Wir bestätigen, dass Sie das Abonnement mit der ID %subscription_id gekündigt haben."
+"New subscription","Neues Abonnement"
+"The customer %customerName has started a new subscription with the description %description and ID %subscription_id.","Der Kunde %customerName hat ein neues Abonnement mit der Beschreibung %description und der ID %subscription_id gestartet."
+"Your new subscription","Ihr neues Abonnement"
+"Good news! We confirm your subscription to %product_name. The next order will be sent on its way to you on %nextPaymentDate.","Gute Nachrichten! Wir bestätigen Ihr Abonnement für %product_name. Die nächste Bestellung wird Ihnen am %nextPaymentDate zugesandt."
+"Upcoming subscription renewal from %store_name","Bevorstehende Abonnementverlängerung von %store_name"
+"We are very excited to get your %product_name subscription ready for %nextPaymentDate!","Wir freuen uns sehr, Ihr Abonnement für %product_name für den %nextPaymentDate vorzubereiten!"
+"This email is a reminder that a subscription fee of %amount_value will be charged on the same date.","Diese E-Mail ist eine Erinnerung daran, dass am selben Datum eine Abonnementgebühr von %amount_value berechnet wird."
+"If you would like to pause or cancel your subscription or make any other changes, you can always do so by logging into your %store_name account.","Wenn Sie Ihr Abonnement pausieren oder kündigen oder andere Änderungen vornehmen möchten, können Sie dies jederzeit tun, indem Sie sich in Ihr %store_name Konto einloggen."
+"All our best,","Alles Gute,"
+"Subscription restarted","Abonnement neu gestartet"
+"The customer %customerName has re-started a subscription with the description %subscriptionDescription.","Der K
+
+unde %customerName hat ein Abonnement mit der Beschreibung %subscriptionDescription neu gestartet."
+"We confirm that you restarted the subscription on %product_name.","Wir bestätigen, dass Sie das Abonnement für %product_name neu gestartet haben."
+Passed,Bestanden
+Failed,Fehlgeschlagen
+"Great, you are using the latest version.","Großartig, Sie verwenden die neueste Version."
+"There is a new version available <span>(%1)</span> see <button type=""button"" id=""mollie-subscriptions-button_changelog"">changelog</button>.","Es ist eine neue Version verfügbar <span>(%1)</span> siehe <button type=""button"" id=""mollie-subscriptions-button_changelog"">Änderungsprotokoll</button>."
+"last 100 debug log lines","letzte 100 Debug-Protokollzeilen"
+"download as .txt file","als .txt-Datei herunterladen"
+ok,ok
+"last 100 error log records","letzte 100 Fehlerprotokolleinträge"
+Self-test,Selbsttest
+"Show more.","Mehr anzeigen."
+"Show less.","Weniger anzeigen."
+"Not all payments methods are available when ordering subscription products.","Nicht alle Zahlungsmethoden sind verfügbar, wenn Sie Abonnementprodukte bestellen."
+"View active Mollie subscriptions","Aktive Mollie-Abonnements anzeigen"
+"Mollie Subscriptions","Mollie Abonnements"
+"View active subscriptions","Aktive Abonnements anzeigen"
+Subscriptions,Abonnements
+Branding,Markenbildung
+"Debug & Logging","Debug & Protokollierung"
+Logging,Protokollierung
+"Debug Mode","Debug-Modus"
+Emails,E-Mails
+"Disable new order confirmation","Bestätigung für neue Bestellung deaktivieren"
+"Send admin email on new subscription?","Admin-E-Mail bei neuem Abonnement senden?"
+"Subscription notification template for admin","Abonnement-Benachrichtigungsvorlage für Admin"
+"Send customer email on new subscription?","Kunden-E-Mail bei neuem Abonnement senden?"
+"Subscription notification template for customer","Abonnement-Benachrichtigungsvorlage für Kunden"
+"Send admin email on restart of a subscription?","Admin-E-Mail bei Neustart eines Abonnements senden?"
+"Send customer email on restart of a subscription?","Kunden-E-Mail bei Neustart eines Abonnements senden?"
+"Restart subscription notification template for customer","Neustart-Abonnement-Benachrichtigungsvorlage für Kunden"
+"Send admin email on subscription cancel?","Admin-E-Mail bei Kündigung eines Abonnements senden?"
+"Cancel subscription notification template for admin","Abonnement-Kündigungsvorlage für Admin"
+"Send customer email on subscription cancel?","Kunden-E-Mail bei Kündigung eines Abonnements senden?"
+"Cancel subscription notification template for customer","Abonnement-Kündigungsvorlage für Kunden"
+General,Allgemein
+Version,Version
+"Shipping method","Versandmethode"
+"Allow one-time purchase for products?","Einmaligen Kauf für Produkte erlauben?"
+"Pre-payment reminder email","Vorauszahlungserinnerungs-E-Mail"
+"Email template","E-Mail-Vorlage"
+"Send BCC to","BCC senden an"
+"<strong>Optional</strong> Comma separated list of emailaddresses. Leave empty to disable.","<strong>Optional</strong> Kommagetrennte Liste von E-Mail-Adressen. Leer lassen, um zu deaktivieren."
+"Days before reminder","Tage vor Erinnerung"
+"Cron time","Cron-Zeit"
+"All Store Views","Alle Shop-Ansichten"
+"Store View","Shop-Ansicht"
+"First Payment Date","Erstes Zahlungsdatum"
+"Customer Name","Kundenname"
+"Next Payment at","Nächste Zahlung am"
+"Pre-Payment Reminder","Vorauszahlungserinnerung"

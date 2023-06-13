@@ -1,17 +1,136 @@
-"ok"                                                                                                                     ,"OK"
-"download as .txt file"                                                                                                  ,"DOWNLOAD AS .TXT FILE"
-"last 100 debug log lines"                                                                                               ,"Last 100 Debug Log Lines"
-"last 100 error log records"                                                                                             ,"Last 100 Error Log Records"
-"test passed"                                                                                                            ,"Test Passed"
-"test failed"                                                                                                            ,"Test Failed"
-"Great, you are using the latest version."                                                                               ,"Great, you are using the latest version."
-"There is a new version available <span>(%1)</span> see <button type='button' id='mollie-subscriptions-button_version'>changelog</button>.","There is a new version available <span>(%1)</span> see <button type='button' id='mollie-subscriptions-button_version'>changelog</button>."
-"Selftest"                                                                                                               ,"Selftest"
-"Changelog"                                                                                                              ,"Changelog"
+"Check last 100 debug log records","Check last 100 debug log records"
+"Check last 100 error log records","Check last 100 error log records"
+"Run Self-test","Run Self-test"
+"Check for latest versions","Check for latest versions"
+"Please select","Please select"
+Day(s),Day(s)
+Week(s),Week(s)
+Month(s),Month(s)
+Times,Times
+Infinite,Infinite
+Enabled,Enabled
+Disabled,Disabled
+"Log is empty","Log is empty"
+"Unable to cancel subscription: %1","Unable to cancel subscription: %1"
+"Subscription with ID ""%1"" has been cancelled","Subscription with ID ""%1"" has been cancelled"
+"No id provided","No id provided"
+"Please check the Mollie logs for more information","Please check the Mollie logs for more information"
+"Unable to cancel subscription","Unable to cancel subscription"
+"My Subscriptions","My Subscriptions"
+"We are unable to restart the subscription","We are unable to restart the subscription"
+"Unable to change the price for subscription ""%1""","Unable to change the price for subscription ""%1"""
+"Subscription ""%1"" canceled, deleted database record with ID ""%2""","Subscription ""%1"" canceled, deleted database record with ID ""%2"""
+"Updated subscription ""%1"" to price ""%2""","Updated subscription ""%1"" to price ""%2"""
+"Use Config Settings","Use Config Settings"
+"Cron settings can't be saved","Cron settings can't be saved"
+"Could not save the subscriptionToProduct: %1","Could not save the subscriptionToProduct: %1"
+"subscription_to_product with id ""%1"" does not exist.","subscription_to_product with id ""%1"" does not exist."
+"Subscription for customer %1 and product %2 not found","Subscription for customer %1 and product %2 not found"
+"Could not delete the subscription_to_product: %1","Could not delete the subscription_to_product: %1"
+"Please select a subscription before adding the product to your cart.","Please select a subscription before adding the product to your cart."
+"You already have a subscription to this product.","You already have a subscription to this product."
+"Exception while adding the subscription buttons:","Exception while adding the subscription buttons:"
+"You already have a subscription to ""%1"". This product has been removed from your cart.","You already have a subscription to ""%1"". This product has been removed from your cart."
+"Subscription with ID ""%1"" is not active anymore, deleting record with ID ""%2""","Subscription with ID ""%1"" is not active anymore, deleting record with ID ""%2"""
+"Payment with ID %1 not found in any store view","Payment with ID %1 not found in any store view"
+"Every day","Every day"
+"Every %1 days","Every %1 days"
+"Every week","Every week"
+"Every %1 weeks","Every %1 weeks"
+"Every month","Every month"
+"Every %1 months","Every %1 months"
+"Every %1 %2","Every %1 %2"
+Cancel,Cancel
+Delete,Delete
+"Are you sure you want to delete this record?","Are you sure you want to delete this record?"
+"Manual & Support","Manual & Support"
+"You have no active subscriptions.","You have no active subscriptions."
+Orders,Orders
+ID,ID
+Date,Date
+Status,Status
+Description,Description
+Amount,Amount
+Action,Action
+Total,Total
+Actions,Actions
+"Are you sure you want to delete the subscription with ID %1?","Are you sure you want to delete the subscription with ID %1?"
+Restart,Restart
+"One Time Purchase","One Time Purchase"
+Default,Default
+Title,Title
+"Repeat Every","Repeat Every"
+Type,Type
+"Repeat Times","Repeat Times"
+"Repeat Type","Repeat Type"
+"Add Subscription type","Add Subscription type"
+"Previous Page","Previous Page"
+"Next Page","Next Page"
+"Subscription canceled","Subscription canceled"
+"Hello,","Hello,"
+"The customer %customerName has canceled a subscription with the description %subscription_description and ID %subscription_id.","The customer %customerName has canceled a subscription with the description %subscription_description and ID %subscription_id."
+"Thanks again,","Thanks again,"
+%store_name,%store_name
+"Dear %name,","Dear %name,"
+"We confirm that you canceled the subscription with ID %subscription_id.","We confirm that you canceled the subscription with ID %subscription_id."
+"New subscription","New subscription"
+"The customer %customerName has started a new subscription with the description %description and ID %subscription_id.","The customer %customerName has started a new subscription with the description %description and ID %subscription_id."
+"Your new subscription","Your new subscription"
+"Good news! We confirm your subscription to %product_name. The next order will be sent on its way to you on %nextPaymentDate.","Good news! We confirm your subscription to %product_name. The next order will be sent on its way to you on %nextPaymentDate."
+"Upcoming subscription renewal from %store_name","Upcoming subscription renewal from %store_name"
+"We are very excited to get your %product_name subscription ready for %nextPaymentDate!","We are very excited to get your %product_name subscription ready for %nextPaymentDate!"
+"This email is a reminder that a subscription fee of %amount_value will be charged on the same date.","This email is a reminder that a subscription fee of %amount_value will be charged on the same date."
+"If you would like to pause or cancel your subscription or make any other changes, you can always do so by logging into your %store_name account.","If you would like to pause or cancel your subscription or make any other changes, you can always do so by logging into your %store_name account."
+"All our best,","All our best,"
+"Subscription restarted","Subscription restarted"
+"The customer %customerName has re-started a subscription with the description %subscriptionDescription.","The customer %customerName has re-started a subscription with the description %subscriptionDescription."
+"We confirm that you restarted the subscription on %product_name.","We confirm that you restarted the subscription on %product_name."
+Passed,Passed
+Failed,Failed
+"Great, you are using the latest version.","Great, you are using the latest version."
+"There is a new version available <span>(%1)</span> see <button type=""button"" id=""mollie-subscriptions-button_changelog"">changelog</button>.","There is a new version available <span>(%1)</span> see <button type=""button"" id=""mollie-subscriptions-button_changelog"">changelog</button>."
+"last 100 debug log lines","last 100 debug log lines"
+"download as .txt file","download as .txt file"
+ok,ok
+"last 100 error log records","last 100 error log records"
+Self-test,Self-test
 "Show more.","Show more."
 "Show less.","Show less."
-"Are you sure you want to delete the subscription with ID %1?","Are you sure you want to delete the subscription with ID %1?"
-"Subscription with ID "%1" has been cancelled","Subscription with ID "%1" has been cancelled"
-"My Subscriptions","My Subscriptions"
-"Restart","Restart"
-"The subscription has been restarted successfully","The subscription has been restarted successfully"
+"Not all payments methods are available when ordering subscription products.","Not all payments methods are available when ordering subscription products."
+"View active Mollie subscriptions","View active Mollie subscriptions"
+"Mollie Subscriptions","Mollie Subscriptions"
+"View active subscriptions","View active subscriptions"
+Subscriptions,Subscriptions
+Branding,Branding
+"Debug & Logging","Debug & Logging"
+Logging,Logging
+"Debug Mode","Debug Mode"
+Emails,Emails
+"Disable new order confirmation","Disable new order confirmation"
+"Send admin email on new subscription?","Send admin email on new subscription?"
+"Subscription notification template for admin","Subscription notification template for admin"
+"Send customer email on new subscription?","Send customer email on new subscription?"
+"Subscription notification template for customer","Subscription notification template for customer"
+"Send admin email on restart of a subscription?","Send admin email on restart of a subscription?"
+"Send customer email on restart of a subscription?","Send customer email on restart of a subscription?"
+"Restart subscription notification template for customer","Restart subscription notification template for customer"
+"Send admin email on subscription cancel?","Send admin email on subscription cancel?"
+"Cancel subscription notification template for admin","Cancel subscription notification template for admin"
+"Send customer email on subscription cancel?","Send customer email on subscription cancel?"
+"Cancel subscription notification template for customer","Cancel subscription notification template for customer"
+General,General
+Version,Version
+"Shipping method","Shipping method"
+"Allow one-time purchase for products?","Allow one-time purchase for products?"
+"Pre-payment reminder email","Pre-payment reminder email"
+"Email template","Email template"
+"Send BCC to","Send BCC to"
+"<strong>Optional</strong> Comma separated list of emailaddresses. Leave empty to disable.","<strong>Optional</strong> Comma separated list of emailaddresses. Leave empty to disable."
+"Days before reminder","Days before reminder"
+"Cron time","Cron time"
+"All Store Views","All Store Views"
+"Store View","Store View"
+"First Payment Date","First Payment Date"
+"Customer Name","Customer Name"
+"Next Payment at","Next Payment at"
+"Pre-Payment Reminder","Pre-Payment Reminder"

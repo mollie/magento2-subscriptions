@@ -10,15 +10,15 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class SubscriptionToProductEmailVariables
 {
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollie;
+    private $mollieSubscriptionApi;
 
     /**
      * @var Customer[]
@@ -41,11 +41,11 @@ class SubscriptionToProductEmailVariables
     private $apiToStore = [];
 
     public function __construct(
-        Mollie $mollie,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         ProductRepositoryInterface $productRepository,
         PriceCurrencyInterface $priceCurrency
     ) {
-        $this->mollie = $mollie;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->productRepository = $productRepository;
         $this->priceCurrency = $priceCurrency;
     }
@@ -99,7 +99,7 @@ class SubscriptionToProductEmailVariables
             return $this->apiToStore[$storeId];
         }
 
-        $this->apiToStore[$storeId] = $this->mollie->getMollieApi($storeId);
+        $this->apiToStore[$storeId] = $this->mollieSubscriptionApi->loadByStore($storeId);
         return $this->apiToStore[$storeId];
     }
 }

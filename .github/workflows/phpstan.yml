@@ -28,7 +28,7 @@ jobs:
       - name: Install Mollie and Mollie Subscription extensions and run setup:di:compile
         run: |
           docker exec magento-project-community-edition php bin/magento module:enable Mollie_Payment Mollie_Subscriptions
-          docker exec magento-project-community-edition php bin/magento setup:di:compile
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
       - name: Run PHPStan
         run: docker exec magento-project-community-edition /bin/bash -c "./vendor/bin/phpstan analyse --debug -c /data/extensions/mollie-magento2-subscriptions/phpstan.neon /data/extensions/mollie-magento2-subscriptions"

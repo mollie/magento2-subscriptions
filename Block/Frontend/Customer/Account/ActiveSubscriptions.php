@@ -9,8 +9,8 @@ namespace Mollie\Subscriptions\Block\Frontend\Customer\Account;
 use Magento\Customer\Helper\Session\CurrentCustomer;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Subscriptions\DTO\SubscriptionResponse;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class ActiveSubscriptions extends Template
 {
@@ -20,9 +20,9 @@ class ActiveSubscriptions extends Template
     private $currentCustomer;
 
     /**
-     * @var Mollie
+     * @var MollieSubscriptionApi
      */
-    private $mollie;
+    private $mollieSubscriptionApi;
 
     /**
      * @var PriceCurrencyInterface
@@ -37,21 +37,21 @@ class ActiveSubscriptions extends Template
     public function __construct(
         Template\Context $context,
         CurrentCustomer $currentCustomer,
-        Mollie $mollie,
+        MollieSubscriptionApi $mollieSubscriptionApi,
         PriceCurrencyInterface $priceCurrency,
         array $data = []
     ) {
         parent::__construct($context, $data);
 
         $this->currentCustomer = $currentCustomer;
-        $this->mollie = $mollie;
+        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->priceCurrency = $priceCurrency;
     }
 
     /**
      * @return SubscriptionResponse[]
      */
-    public function getSubscriptions()
+    public function getSubscriptions(): array
     {
         if ($this->subscriptions) {
             return $this->subscriptions;
@@ -63,7 +63,7 @@ class ActiveSubscriptions extends Template
             return [];
         }
 
-        $api = $this->mollie->getMollieApi();
+        $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
         $subscriptions = $api->subscriptions->listForId($extensionAttributes->getMollieCustomerId());
 
         $this->subscriptions = array_map(function ($subscription) use ($customer) {

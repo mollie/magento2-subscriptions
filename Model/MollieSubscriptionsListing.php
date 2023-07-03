@@ -93,9 +93,14 @@ class MollieSubscriptionsListing extends Listing
         $api = $this->mollieModel->getMollieApi($storeId);
         $paging = $this->getContext()->getRequestParam('paging');
 
+        $pageSize = $paging['pageSize'] ?? 20;
+        if ($pageSize > 250) {
+            $pageSize = 250;
+        }
+
         $result = $api->subscriptions->page(
             $this->getContext()->getRequestParam('offsetID'),
-            $paging['pageSize'] ?? 20
+            $pageSize
         );
 
         $this->preloadCustomers((array)$result);

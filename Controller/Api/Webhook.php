@@ -38,6 +38,7 @@ use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 use Mollie\Subscriptions\Service\Mollie\RetryUsingOtherStoreViews;
+use Mollie\Subscriptions\Service\Mollie\SendAdminNotification;
 
 class Webhook extends Action implements CsrfAwareActionInterface
 {
@@ -120,6 +121,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var ValidateMetadata
      */
     private $validateMetadata;
+    /**
+     * @var SendAdminNotification
+     */
+    private $sendAdminNotification;
 
     /**
      * @var LinkTransactionToOrder
@@ -149,7 +154,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
         ValidateMetadata $validateMetadata,
         LinkTransactionToOrder $linkTransactionToOrder,
-        OrderCommentHistory $orderCommentHistory
+        OrderCommentHistory $orderCommentHistory,
+        SendAdminNotification $sendAdminNotification
     ) {
         parent::__construct($context);
 
@@ -170,6 +176,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->validateMetadata = $validateMetadata;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
         $this->orderCommentHistory = $orderCommentHistory;
+        $this->sendAdminNotification = $sendAdminNotification;
     }
 
     public function execute()
@@ -230,9 +237,12 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $this->linkTransactionToOrder->execute($molliePayment->id, $order);
 
             $this->mollie->processTransactionForOrder($order, Payments::TRANSACTION_TYPE_SUBSCRIPTION);
+
             return $this->returnOkResponse();
-        } catch (ApiException $exception) {
-            $this->mollieLogger->addErrorLog('ApiException occured while checking transaction', [
+        } catch (\Throwable $exception) {
+            $this->sendAdminNotification->send($id, $exception);
+
+            $this->mollieLogger->addInfoLog('Error occurred while processing subscription', [
                 'id' => $id,
                 'exception' => $exception->__toString()
             ]);

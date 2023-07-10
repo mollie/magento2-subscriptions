@@ -273,6 +273,58 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertEquals($expected->format('Y-m-d'), $subscription->toArray()['startDate']);
     }
 
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @return void
+     */
+    public function testAddsTheBillingAddressId()
+    {
+        $order = $this->loadOrder('100000001');
+        $billingAddressId = $order->getBillingAddressId();
+
+        $items = $order->getItems();
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-infinite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $subscription = $result[0];
+        $this->assertArrayHasKey('metadata', $subscription->toArray());
+        $this->assertArrayHasKey('billingAddressId', $subscription->toArray()['metadata']);
+        $this->assertEquals($billingAddressId, $subscription->toArray()['metadata']['billingAddressId']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @return void
+     */
+    public function testAddsTheShippingAddressId()
+    {
+        $order = $this->loadOrder('100000001');
+        $shippingAddressId = $order->getShippingAddressId();
+
+        $items = $order->getItems();
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-infinite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $subscription = $result[0];
+        $this->assertArrayHasKey('metadata', $subscription->toArray());
+        $this->assertArrayHasKey('shippingAddressId', $subscription->toArray()['metadata']);
+        $this->assertEquals($shippingAddressId, $subscription->toArray()['metadata']['shippingAddressId']);
+    }
+
     public function includesTheCorrectIntervalProvider()
     {
         return [

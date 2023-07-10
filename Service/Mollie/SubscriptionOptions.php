@@ -175,6 +175,8 @@ class SubscriptionOptions
         $this->options['metadata'] = [
             'sku' => $product->getSku(),
             'quantity' => $this->orderItem->getQtyOrdered(),
+            'billingAddressId' => $this->order->getBillingAddressId(),
+            'shippingAddressId' => $this->order->getshippingAddressId(),
         ];
     }
 

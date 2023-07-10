@@ -20,6 +20,10 @@ use Magento\Store\Model\StoreManagerInterface;
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Subscriptions';
+    const XML_PATH_DEBUG_ERROR_EMAIL_TEMPLATE = 'mollie_subscriptions/debug/error_email_template';
+    const XML_PATH_DEBUG_ENABLE_ERROR_EMAILS = 'mollie_subscriptions/debug/enable_error_emails';
+    const XML_PATH_DEBUG_ERROR_SENDER_EMAIL = 'mollie_subscriptions/debug/error_sender_email';
+    const XML_PATH_DEBUG_ERROR_RECEIVER_EMAIL = 'mollie_subscriptions/debug/error_receiver_email';
     const XML_PATH_EXTENSION_VERSION = 'mollie_subscriptions/general/version';
     const XML_PATH_EXTENSION_ENABLE = 'mollie_subscriptions/general/enable';
     const XML_PATH_EXTENSION_SHIPPING_METHOD = 'mollie_subscriptions/general/shipping_method';
@@ -158,6 +162,36 @@ class Config
     }
 
     /**
+     * @param int $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function isErrorEmailEnabled(int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(self::XML_PATH_DEBUG_ENABLE_ERROR_EMAILS, $storeId, $scope);
+    }
+
+    /**
+     * @param int|null $storeId
+     * @param string $scope
+     * @return string
+     */
+    public function errorEmailSender(int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): string
+    {
+        return $this->getStoreValue(self::XML_PATH_DEBUG_ERROR_SENDER_EMAIL, $storeId, $scope);
+    }
+
+    /**
+     * @param int|null $storeId
+     * @param string $scope
+     * @return string
+     */
+    public function errorEmailReceiver(int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): string
+    {
+        return $this->getStoreValue(self::XML_PATH_DEBUG_ERROR_RECEIVER_EMAIL, $storeId, $scope);
+    }
+
+    /**
      * @param int|null $storeId
      * @return string
      */
@@ -227,6 +261,16 @@ class Config
     public function allowOneTimePurchase($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
     {
         return $this->getFlag(static::XML_PATH_ALLOW_ONE_TIME_PURCHASE, $storeId, $scope);
+    }
+
+    /**
+     * @param int $storeId
+     * @param string $scope
+     * @return null|string
+     */
+    public function subscriptionErrorAdminNotificationTemplate(int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_DEBUG_ERROR_EMAIL_TEMPLATE, $storeId, $scope);
     }
 
     /**

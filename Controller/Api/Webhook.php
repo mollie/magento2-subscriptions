@@ -34,6 +34,7 @@ use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Mollie\RetryUsingOtherStoreViews;
+use Mollie\Subscriptions\Service\Mollie\SendAdminNotification;
 
 class Webhook extends Action implements CsrfAwareActionInterface
 {
@@ -110,6 +111,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var ValidateMetadata
      */
     private $validateMetadata;
+    /**
+     * @var SendAdminNotification
+     */
+    private $sendAdminNotification;
 
     public function __construct(
         Context $context,
@@ -126,7 +131,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         MollieLogger $mollieLogger,
         SendOrderEmails $sendOrderEmails,
         RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
-        ValidateMetadata $validateMetadata
+        ValidateMetadata $validateMetadata,
+        SendAdminNotification $sendAdminNotification
     ) {
         parent::__construct($context);
 
@@ -144,6 +150,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->sendOrderEmails = $sendOrderEmails;
         $this->retryUsingOtherStoreViews = $retryUsingOtherStoreViews;
         $this->validateMetadata = $validateMetadata;
+        $this->sendAdminNotification = $sendAdminNotification;
     }
 
     public function execute()
@@ -193,9 +200,12 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $this->orderRepository->save($order);
 
             $this->mollie->processTransactionForOrder($order, 'webhook');
+
             return $this->returnOkResponse();
-        } catch (ApiException $exception) {
-            $this->mollieLogger->addInfoLog('ApiException occured while checking transaction', [
+        } catch (\Throwable $exception) {
+            $this->sendAdminNotification->send($id, $exception);
+
+            $this->mollieLogger->addInfoLog('Error occurred while processing subscription', [
                 'id' => $id,
                 'exception' => $exception->__toString()
             ]);

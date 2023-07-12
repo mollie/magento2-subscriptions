@@ -7,4 +7,5 @@
     <template id="Mollie_Subscriptions_emails_customer_restart_notification_template" label="Mollie Subscriptions customer restart notification email" file="restart_subscription_customer.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
     <template id="Mollie_Subscriptions_emails_admin_cancel_notification_template" label="Mollie Subscriptions admin cancel email" file="cancel_subscription_admin.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
     <template id="Mollie_Subscriptions_emails_customer_cancel_notification_template" label="Mollie Subscriptions customer cancel notification email" file="cancel_subscription_customer.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
+    <template id="Mollie_Subscriptions_debug_error_email_template" label="Mollie Subscriptions error admin notification email" file="subscription_error_admin_notification.html" type="html" module="Mollie_Subscriptions" area="frontend"/>
 </config>

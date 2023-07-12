@@ -16,26 +16,60 @@
             <comment><![CDATA[Enable this function to write debug records and log events, API calls, and other debugging-related information into a debug.log file.<br>Errors are always logged and written into the error.log file.]]></comment>
             <frontend_model>Mollie\Subscriptions\Block\Adminhtml\Magmodules\Heading</frontend_model>
         </field>
-        <field id="debug" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1"
+        <field id="debug" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Debug Mode</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>mollie_subscriptions/general/debug</config_path>
         </field>
-        <field id="debug_button" translate="label" type="button" sortOrder="12" showInDefault="1"
+        <field id="debug_button" translate="label" type="button" sortOrder="30" showInDefault="1"
                showInWebsite="0" showInStore="0">
             <label/>
             <frontend_model>Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\DebugCheck</frontend_model>
         </field>
-        <field id="error_button" translate="label" type="button" sortOrder="13" showInDefault="1"
+        <field id="error_button" translate="label" type="button" sortOrder="40" showInDefault="1"
                showInWebsite="0" showInStore="0">
             <label/>
             <frontend_model>Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\ErrorCheck</frontend_model>
         </field>
-        <field id="selftest_button" translate="label" type="button" sortOrder="21" showInDefault="1"
+        <field id="selftest_button" translate="label" type="button" sortOrder="50" showInDefault="1"
                showInWebsite="0" showInStore="0">
             <label/>
             <frontend_model>Mollie\Subscriptions\Block\Adminhtml\System\Config\Button\Selftest</frontend_model>
+        </field>
+        <field id="enable_error_emails" translate="label" type="select" sortOrder="60" showInDefault="1"
+               showInWebsite="0" showInStore="0">
+            <label>Enable Error Emails</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <comment><![CDATA[Whenever something fails during subscription processing, we will email you more information.]]></comment>
+            <config_path>mollie_subscriptions/debug/enable_error_emails</config_path>
+        </field>
+        <field id="error_sender_email" translate="label" type="select" sortOrder="70" showInDefault="1"
+               showInWebsite="0" showInStore="0">
+            <label>Send Error Emails From</label>
+            <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+            <config_path>mollie_subscriptions/debug/error_sender_email</config_path>
+            <depends>
+                <field id="enable_error_emails">1</field>
+            </depends>
+        </field>
+        <field id="error_receiver_email" translate="label" type="select" sortOrder="80" showInDefault="1"
+               showInWebsite="0" showInStore="0">
+            <label>Send Error Emails To</label>
+            <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+            <config_path>mollie_subscriptions/debug/error_receiver_email</config_path>
+            <depends>
+                <field id="enable_error_emails">1</field>
+            </depends>
+        </field>
+        <field id="error_email_template" translate="label" type="select" sortOrder="90" showInDefault="1"
+               showInWebsite="0" showInStore="0">
+            <label>Error Email Template</label>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <config_path>mollie_subscriptions/debug/error_email_template</config_path>
+            <depends>
+                <field id="enable_error_emails">1</field>
+            </depends>
         </field>
     </group>
 </include>

@@ -134,7 +134,7 @@ class CreateSubscriptions implements ObserverInterface
     private function getPayment(OrderInterface $order)
     {
         $transactionId = $order->getPayment()->getAdditionalInformation()['mollie_id'];
-        if (preg_match('/^ord_\w+$/', $transactionId)) {
+        if (substr($transactionId, 0, 4) == 'ord_') {
             $order = $this->mollieApi->orders->get($transactionId, ['embed' => 'payments']);
 
             return $order->payments()->offsetGet(0);

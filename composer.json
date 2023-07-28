@@ -2,14 +2,14 @@
     "name": "mollie/magento2-subscriptions",
     "description": "Mollie subscriptions extension for Magento 2",
     "type": "magento2-module",
-    "version": "1.12.0",
+    "version": "1.12.1",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
     ],
     "require": {
         "magento/framework": ">=102.0.0",
-        "mollie/magento2": ">=2.27.0",
+        "mollie/magento2": ">=2.29.1",
         "beberlei/assert": "*",
         "ext-json": "*"
     },

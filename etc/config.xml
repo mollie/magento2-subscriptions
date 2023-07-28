@@ -10,7 +10,7 @@
     <default>
         <mollie_subscriptions>
             <general>
-                <version>v1.12.0</version>
+                <version>v1.12.1</version>
                 <enable>0</enable>
                 <debug>1</debug>
             </general>

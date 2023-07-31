@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Service\Magento;
 
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -84,6 +85,11 @@ class CreateOrderFromSubscription
      */
     private $orderAddressRepository;
 
+    /**
+     * @var ProductInterface
+     */
+    private $product;
+
     public function __construct(
         Config $config,
         MollieCustomerRepositoryInterface $mollieCustomerRepository,
@@ -128,7 +134,10 @@ class CreateOrderFromSubscription
         $this->addProduct($cart);
 
         $cart->setBillingAddress($this->formatAddress($this->getAddress('billing')));
-        $this->setShippingAddress($cart);
+
+        if (!$this->product->getIsVirtual()) {
+            $this->setShippingAddress($cart);
+        }
 
         $cart->getPayment()->addData(['method' => 'mollie_methods_' . $molliePayment->method]);
 
@@ -159,9 +168,11 @@ class CreateOrderFromSubscription
         $sku = $this->subscription->metadata->sku;
         $quantity = isset($this->subscription->metadata) && isset($this->subscription->metadata->quantity) ?
             (float)$this->subscription->metadata->quantity : 1;
-        $product = $this->productRepository->get($sku);
+        $this->product = $this->productRepository->get($sku);
 
-        $cart->addProduct($product, $quantity);
+        $cart->addProduct($this->product, $quantity);
+
+        $cart->setIsVirtual($this->product->getIsVirtual());
     }
 
     /**

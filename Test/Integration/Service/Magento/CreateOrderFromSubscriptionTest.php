@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Test\Integration\Service\Magento;
 
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Mollie\Api\MollieApiClient;
@@ -48,6 +50,43 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $instance->execute(new MollieApiClient(), $payment, $subscription);
 
         $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @return void
+     */
+    public function testHandlesVirtualProductsCorrect(): void
+    {
+        $this->createMollieCustomer();
+        $order = $this->loadOrderById('100000001');
+
+        /** @var ProductInterface $product */
+        $product = $this->objectManager->get(ProductRepositoryInterface::class)->get('simple');
+        $product->setTypeId('virtual');
+
+        $molliePaymentBuilder = $this->objectManager->get(MolliePaymentBuilder::class);
+        $molliePaymentBuilder->setMethod('ideal');
+
+        $payment = $molliePaymentBuilder->build();
+        $payment->customerId = 'cst_testcustomer';
+
+        $subscription = $this->objectManager->get(Subscription::class);
+        $subscription->customerId = 'cst_testcustomer';
+        $subscription->metadata = new \stdClass();
+        $subscription->metadata->quantity = '1';
+        $subscription->metadata->sku = 'simple';
+
+        // If these aren't processed, the test will fail due to the customer not having a billing address
+        $subscription->metadata->billingAddressId = $order->getBillingAddressId();
+
+        $instance = $this->objectManager->create(CreateOrderFromSubscription::class);
+
+        $order = $instance->execute(new MollieApiClient(), $payment, $subscription);
+
+        $this->assertSame(1, $order->getIsVirtual());
     }
 
     private function createMollieCustomer(): void

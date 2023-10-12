@@ -20,10 +20,17 @@ use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Test\Fakes\FakeEncryptor;
 use Mollie\Payment\Test\Integration\MolliePaymentBuilder;
+use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
+use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class WebhookTest extends ControllerTestCase
 {
+    /**
+     * @var Subscription
+     */
+    private $subscription;
+
     public function testAcceptsPost()
     {
         $instance = $this->_objectManager->get(FakeEncryptor::class);
@@ -113,6 +120,38 @@ class WebhookTest extends ControllerTestCase
         $this->assertEquals(0, $spy->getInvocationCount());
     }
 
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
+     */
+    public function testUpdatesNextPaymentDate(): void
+    {
+        $transactionId = 'tr_testtransaction';
+
+        $this->createMollieCustomer();
+        $api = $this->getApi($transactionId);
+
+        $mollieSubscriptionApi = $this->createMock(MollieSubscriptionApi::class);
+        $mollieSubscriptionApi->method('loadByStore')->willReturn($api);
+        $this->_objectManager->addSharedInstance($mollieSubscriptionApi, MollieSubscriptionApi::class);
+
+        // Check how many orders there are before the webhook is called
+        $ordersCount = count($this->getOrderIdsByTransactionId($transactionId));
+
+        $mollieMock = $this->createMock(Mollie::class);
+        $mollieMock->method('processTransactionForOrder');
+        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
+
+        $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
+        $this->assertEquals(200, $this->getResponse()->getStatusCode());
+
+        $repository = $this->_objectManager->create(SubscriptionToProductRepositoryInterface::class);
+        $subscription = $repository->getBySubscriptionId('sub_testsubscription');
+
+        $this->assertEquals('2019-11-19', $subscription->getNextPaymentDate());
+    }
+
     private function createMollieCustomer(): void
     {
         /** @var CustomerRepositoryInterface $customerRepository */
@@ -155,9 +194,11 @@ class WebhookTest extends ControllerTestCase
     {
         /** @var Subscription $subscription */
         $subscription = $this->_objectManager->get(Subscription::class);
+        $subscription->id = 'sub_testsubscription';
         $subscription->customerId = 'cst_testcustomer';
         $subscription->metadata = new \stdClass();
         $subscription->metadata->sku = 'simple';
+        $subscription->nextPaymentDate = '2019-11-19';
         return $subscription;
     }
 
@@ -169,6 +210,7 @@ class WebhookTest extends ControllerTestCase
 
         $payment->id = $transactionId;
         $payment->customerId = 'cst_testcustomer';
+        $payment->subscriptionId = 'sub_testsubscription';
         $payment->_links = new \stdClass();
         $payment->_links->subscription = new \stdClass();
         $payment->_links->subscription->href = 'https://example.com/mollie/subscriptions/sub_testsubscription';
@@ -179,6 +221,9 @@ class WebhookTest extends ControllerTestCase
     private function getApi(string $transactionId): MollieApiClient
     {
         $subscription = $this->getSubscription();
+        $this->subscription = $subscription;
+
+        $this->createSubscriptionDatabaseRecord();
 
         $subscriptionsEndpointMock = $this->createMock(SubscriptionEndpoint::class);
         $subscriptionsEndpointMock->method('getForId')->willReturn($subscription);
@@ -205,5 +250,17 @@ class WebhookTest extends ControllerTestCase
         $orderList = $repository->getList($searchCriteria)->getItems();
 
         return array_shift($orderList);
+    }
+
+    private function createSubscriptionDatabaseRecord(): void
+    {
+        /** @var SubscriptionToProductInterface $subscription */
+        $subscription = $this->_objectManager->create(SubscriptionToProductInterface::class);
+        $subscription->setSubscriptionId('sub_testsubscription');
+        $subscription->setNextPaymentDate('2019-11-12');
+        $subscription->setCustomerId('cst_testcustomer');
+        $subscription->setProductId(1);
+
+        $this->_objectManager->get(SubscriptionToProductRepositoryInterface::class)->save($subscription);
     }
 }

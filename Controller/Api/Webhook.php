@@ -28,6 +28,7 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 use Mollie\Subscriptions\Service\Magento\CreateOrderFromSubscription;
 use Mollie\Subscriptions\Service\Mollie\RetryUsingOtherStoreViews;
 use Mollie\Subscriptions\Service\Mollie\SendAdminNotification;
+use Mollie\Subscriptions\Service\Mollie\UpdateNextPaymentDate;
 
 class Webhook extends Action implements CsrfAwareActionInterface
 {
@@ -89,6 +90,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var OrderCommentHistory
      */
     private $orderCommentHistory;
+    /**
+     * @var UpdateNextPaymentDate
+     */
+    private $updateNextPaymentDate;
 
     public function __construct(
         Context $context,
@@ -102,7 +107,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         LinkTransactionToOrder $linkTransactionToOrder,
         OrderCommentHistory $orderCommentHistory,
         SendAdminNotification $sendAdminNotification,
-        CreateOrderFromSubscription $createOrderFromSubscription
+        CreateOrderFromSubscription $createOrderFromSubscription,
+        UpdateNextPaymentDate $updateNextPaymentDate
     ) {
         parent::__construct($context);
 
@@ -117,6 +123,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->orderCommentHistory = $orderCommentHistory;
         $this->sendAdminNotification = $sendAdminNotification;
         $this->createOrderFromSubscription = $createOrderFromSubscription;
+        $this->updateNextPaymentDate = $updateNextPaymentDate;
     }
 
     public function execute()
@@ -145,6 +152,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         try {
             $molliePayment = $this->getPayment($id);
             $subscription = $this->api->subscriptions->getForId($molliePayment->customerId, $molliePayment->subscriptionId);
+            $this->updateNextPaymentDate->execute($subscription);
 
             $order = $this->createOrderFromSubscription->execute($this->api, $molliePayment, $subscription);
 

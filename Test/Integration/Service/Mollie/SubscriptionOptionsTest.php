@@ -7,6 +7,7 @@
 namespace Mollie\Subscriptions\Test\Integration\Service\Mollie;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Config\Source\IntervalType;
@@ -323,6 +324,42 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertArrayHasKey('metadata', $subscription->toArray());
         $this->assertArrayHasKey('shippingAddressId', $subscription->toArray()['metadata']);
         $this->assertEquals($shippingAddressId, $subscription->toArray()['metadata']['shippingAddressId']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @return void
+     */
+    public function testHandlesVirtualProducts(): void
+    {
+        /** @var Quote $quote */
+        $quote = $this->objectManager->create(Quote::class);
+        $quote->load('test01', 'reserved_order_id');
+
+        $order = $this->loadOrder('100000001');
+        $order->setQuoteId($quote->getId());
+        $order->getShippingAddress()->delete()->isDeleted(true);
+
+        $items = $order->getItems();
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $orderItem->setIsVirtual(true);
+        $orderItem->setData('row_total_incl_tax', '999.98');
+
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-infinite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $subscription = $result[0];
+        $this->assertEquals('999.98', $subscription->toArray()['amount']['value']);
+
+        $this->assertArrayHasKey('metadata', $subscription->toArray());
+        $this->assertArrayNotHasKey('shippingAddressId', $subscription->toArray()['metadata']);
     }
 
     public function includesTheCorrectIntervalProvider()

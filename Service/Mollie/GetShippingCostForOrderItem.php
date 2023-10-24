@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Service\Mollie;
 
@@ -53,7 +59,12 @@ class GetShippingCostForOrderItem
 
     public function execute(OrderInterface $order, OrderItemInterface $orderItem): float
     {
+        if ($order->getIsVirtual()) {
+            return 0.0;
+        }
+
         $this->order = $order;
+
         $result = $this->getCarrierResult($orderItem);
 
         if ($price = $this->getRateByCarrier($result)) {

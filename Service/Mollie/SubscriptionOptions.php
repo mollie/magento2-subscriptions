@@ -141,6 +141,10 @@ class SubscriptionOptions
 
     private function addShippingCost(): void
     {
+        if ($this->orderItem->getIsVirtual()) {
+            return;
+        }
+
         $shippingCost = $this->getShippingCostForOrderItem->execute($this->order, $this->orderItem);
         $this->options['amount'] += $shippingCost;
     }
@@ -176,8 +180,11 @@ class SubscriptionOptions
             'sku' => $product->getSku(),
             'quantity' => $this->orderItem->getQtyOrdered(),
             'billingAddressId' => $this->order->getBillingAddressId(),
-            'shippingAddressId' => $this->order->getshippingAddressId(),
         ];
+
+        if (!$this->orderItem->getIsVirtual()) {
+            $this->options['metadata']['shippingAddressId'] = $this->order->getshippingAddressId();
+        }
     }
 
     private function addWebhookUrl(): void

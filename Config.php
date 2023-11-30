@@ -29,6 +29,7 @@ class Config
     const XML_PATH_EXTENSION_SHIPPING_METHOD = 'mollie_subscriptions/general/shipping_method';
     const XML_PATH_DEBUG = 'mollie_subscriptions/general/debug';
     const XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER = 'mollie_subscriptions/prepayment_reminder/days_before_reminder';
+    const XML_PATH_PREPAYMENT_REMINDER_NEXT_PAYMENT_DATE_FORMAT = 'mollie_subscriptions/prepayment_reminder/next_payment_date_format';
     const XML_PATH_PREPAYMENT_REMINDER_ENABLED = 'mollie_subscriptions/prepayment_reminder/enabled';
     const XML_PATH_PREPAYMENT_REMINDER_TEMPLATE = 'mollie_subscriptions/prepayment_reminder/template';
     const XML_PATH_PREPAYMENT_REMINDER_SEND_BCC_TO = 'mollie_subscriptions/prepayment_reminder/send_bcc_to';
@@ -241,6 +242,11 @@ class Config
     public function daysBeforePrepaymentReminder($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
     {
         return $this->getStoreValue(static::XML_PATH_PREPAYMENT_REMINDER_DAYS_BEFORE_REMINDER, $storeId, $scope);
+    }
+
+    public function nextPaymentDateFormat($storeId = null, $scope = ScopeInterface::SCOPE_STORE): string
+    {
+        return $this->getStoreValue(static::XML_PATH_PREPAYMENT_REMINDER_NEXT_PAYMENT_DATE_FORMAT, $storeId, $scope);
     }
 
     /**

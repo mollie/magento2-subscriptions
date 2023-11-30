@@ -8,22 +8,24 @@ namespace Mollie\Subscriptions\Service\Email;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Customer;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
+use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class SubscriptionToProductEmailVariables
 {
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @var MollieSubscriptionApi
      */
     private $mollieSubscriptionApi;
-
-    /**
-     * @var Customer[]
-     */
-    private $customers = [];
 
     /**
      * @var ProductRepositoryInterface
@@ -36,18 +38,30 @@ class SubscriptionToProductEmailVariables
     private $priceCurrency;
 
     /**
+     * @var DateTime
+     */
+    private $dateTime;
+    /**
      * @var MollieApiClient[]
      */
     private $apiToStore = [];
+    /**
+     * @var Customer[]
+     */
+    private $customers = [];
 
     public function __construct(
+        Config $config,
         MollieSubscriptionApi $mollieSubscriptionApi,
         ProductRepositoryInterface $productRepository,
-        PriceCurrencyInterface $priceCurrency
+        PriceCurrencyInterface $priceCurrency,
+        DateTime $dateTime
     ) {
+        $this->config = $config;
         $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->productRepository = $productRepository;
         $this->priceCurrency = $priceCurrency;
+        $this->dateTime = $dateTime;
     }
 
     public function getMollieCustomer(SubscriptionToProductInterface $subscriptionToProduct): Customer
@@ -82,10 +96,12 @@ class SubscriptionToProductEmailVariables
             $subscriptionToProduct->getStoreId()
         );
 
+        $date = $this->formatDate($subscription->nextPaymentDate, $subscriptionToProduct->getStoreId());
+
         return [
             'subscription_id' => $subscriptionToProduct->getSubscriptionId(),
             'subscription_description' => $subscription->description,
-            'subscription_nextPaymentDate' => $subscription->nextPaymentDate,
+            'subscription_nextPaymentDate' => $date,
             'subscription_amount' => $amount,
             'customer_name' => $customer->name,
             'customer_email' => $customer->email,
@@ -101,5 +117,13 @@ class SubscriptionToProductEmailVariables
 
         $this->apiToStore[$storeId] = $this->mollieSubscriptionApi->loadByStore($storeId);
         return $this->apiToStore[$storeId];
+    }
+
+    public function formatDate(string $nextPaymentDate, int $storeId): string
+    {
+        return $this->dateTime->date(
+            $this->config->nextPaymentDateFormat($storeId),
+            $nextPaymentDate
+        );
     }
 }

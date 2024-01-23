@@ -41,7 +41,17 @@
                 <field id="enabled">1</field>
             </depends>
         </field>
-        <field id="cron_expr" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="0"
+        <field id="next_payment_date_format" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Next payment date format</label>
+            <config_path>mollie_subscriptions/prepayment_reminder/next_payment_date_format</config_path>
+            <comment><![CDATA[How to format the date in the next payment date reminder emails. Must be in a format that is accepted by <a href="https://www.php.net/manual/en/function.date.php" target="_blank">PHP date format</a>]]></comment>
+            <validate>required-entry</validate>
+            <depends>
+                <field id="enabled">1</field>
+            </depends>
+        </field>
+        <field id="cron_expr" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="0"
                showInStore="0">
             <label>Cron time</label>
             <config_path>mollie_subscriptions/prepayment_reminder/cron_expr</config_path>

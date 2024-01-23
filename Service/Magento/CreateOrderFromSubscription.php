@@ -196,6 +196,7 @@ class CreateOrderFromSubscription
         $quoteAddress->setSuffix($address->getSuffix());
         $quoteAddress->setPrefix($address->getPrefix());
         $quoteAddress->setRegionId($address->getRegionId());
+        $quoteAddress->setCustomAttributes($address->getCustomAttributes());
 
         return $quoteAddress;
     }

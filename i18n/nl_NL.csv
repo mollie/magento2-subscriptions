@@ -75,7 +75,7 @@ Type,Type
 "We confirm that you canceled the subscription with ID %subscription_id.","We bevestigen dat u het abonnement met ID %subscription_id heeft geannuleerd."
 "New subscription","Nieuw abonnement"
 "The customer %customerName has started a new subscription with the description %description and ID %subscription_id.","De klant %customerName heeft een nieuw abonnement gestart met de beschrijving %description en ID %subscription_id."
-"Your new subscription","Uw nieuw abonnement"
+"Your new subscription","Uw nieuwe abonnement"
 "Good news! We confirm your subscription to %product_name. The next order will be sent on its way to you on %nextPaymentDate.","Goed nieuws! We bevestigen uw abonnement op %product_name. De volgende bestelling wordt op %nextPaymentDate naar u verzonden."
 "Upcoming subscription renewal from %store_name","Aankomende abonnementsvernieuwing van %store_name"
 "We are very excited to get your %product_name subscription ready for %nextPaymentDate!","We zijn erg enthousiast om uw abonnement op %product_name klaar te maken voor %nextPaymentDate!"

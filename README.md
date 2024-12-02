@@ -1,7 +1,8 @@
 <p align="center">
-  <img src="https://info.mollie.com/hubfs/github/magento-2/logo.png" width="128" height="128"/>
+  <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/24823946/391594367-66de170d-2a3f-4176-b6f4-42299262428a.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20241202%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20241202T150108Z&X-Amz-Expires=300&X-Amz-Signature=4a5367f56a0ad9dae6fe06f62da919d2e3326da14ac47368afcb31a61a7d6c94&X-Amz-SignedHeaders=host" />
+  
 </p>
-<h1 align="center">Mollie Subscriptions Addon for Magento 2.3.x and higher</h1>
+<h1 align="left">Mollie Subscriptions Addon for Magento 2.3.x and higher</h1>
 
 This plugin is an **addon** on the [Mollie Magento 2 payment module](https://github.com/mollie/magento2/) and can't be installed seperatly without the Mollie Payment plugin installed.
 

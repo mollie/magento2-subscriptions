@@ -89,6 +89,10 @@ class CreateOrderFromSubscription
      * @var ProductInterface
      */
     private $product;
+    /**
+     * @var SubscriptionAddProductToCart
+     */
+    private $subscriptionAddToCart;
 
     public function __construct(
         Config $config,
@@ -101,7 +105,8 @@ class CreateOrderFromSubscription
         ProductRepositoryInterface $productRepository,
         AddressInterfaceFactory $addressFactory,
         MollieLogger $mollieLogger,
-        OrderAddressRepositoryInterface $orderAddressRepository
+        OrderAddressRepositoryInterface $orderAddressRepository,
+        SubscriptionAddProductToCart $addProductToCart
     ) {
         $this->mollieCustomerRepository = $mollieCustomerRepository;
         $this->customerRepository = $customerRepository;
@@ -114,6 +119,7 @@ class CreateOrderFromSubscription
         $this->config = $config;
         $this->mollieLogger = $mollieLogger;
         $this->orderAddressRepository = $orderAddressRepository;
+        $this->subscriptionAddToCart = $addProductToCart;
     }
 
     public function execute(MollieApiClient $api, Payment $molliePayment, Subscription $subscription): OrderInterface
@@ -131,7 +137,7 @@ class CreateOrderFromSubscription
         $this->customer = $this->customerRepository->getById($mollieCustomer->getCustomerId());
 
         $cart = $this->getCart();
-        $this->addProduct($cart);
+        $this->product = $this->subscriptionAddToCart->execute($cart, $this->subscription->metadata);
 
         $cart->setBillingAddress($this->formatAddress($this->getAddress('billing')));
 
@@ -161,18 +167,6 @@ class CreateOrderFromSubscription
         $cart->setCustomerIsGuest(0);
 
         return $cart;
-    }
-
-    private function addProduct(CartInterface $cart)
-    {
-        $sku = $this->subscription->metadata->sku;
-        $quantity = isset($this->subscription->metadata) && isset($this->subscription->metadata->quantity) ?
-            (float)$this->subscription->metadata->quantity : 1;
-        $this->product = $this->productRepository->get($sku);
-
-        $cart->addProduct($this->product, $quantity);
-
-        $cart->setIsVirtual($this->product->getIsVirtual());
     }
 
     /**

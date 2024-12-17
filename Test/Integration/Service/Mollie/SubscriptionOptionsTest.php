@@ -160,6 +160,37 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     }
 
     /**
+     * @magentoDataFixture Magento/Sales/_files/order_configurable_product.php
+     */
+    public function testAddsParentSku()
+    {
+        $order = $this->loadOrder('100000001');
+        $items = $order->getItems();
+
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = end($items);
+
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-finite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
+
+        $orderItem->getProduct()->setData('sku', 'example-sku');
+        $orderItem->getParentItem()->getProduct()->setData('sku', 'example-parent-sku');
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $this->assertCount(1, $result);
+        $subscription = $result[0];
+        $this->assertInstanceOf(SubscriptionOption::class, $subscription);
+        $this->assertArrayHasKey('metadata', $subscription->toArray());
+        $this->assertArrayHasKey('sku', $subscription->toArray()['metadata']);
+        $this->assertArrayHasKey('parent_sku', $subscription->toArray()['metadata']);
+        $this->assertEquals('example-sku', $subscription->toArray()['metadata']['sku']);
+        $this->assertEquals('example-parent-sku', $subscription->toArray()['metadata']['parent_sku']);
+    }
+
+    /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
     public function testAddsTheAmount()

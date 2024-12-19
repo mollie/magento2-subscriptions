@@ -176,11 +176,17 @@ class SubscriptionOptions
     private function addMetadata(): void
     {
         $product = $this->orderItem->getProduct();
-        $this->options['metadata'] = [
+        $metadata = [
             'sku' => $product->getSku(),
             'quantity' => $this->orderItem->getQtyOrdered(),
             'billingAddressId' => $this->order->getBillingAddressId(),
         ];
+
+        if ($parent = $this->orderItem->getParentItem()) {
+            $metadata['parent_sku'] = $parent->getProduct()->getSku();
+        }
+
+        $this->options['metadata'] = $metadata;
 
         if (!$this->orderItem->getIsVirtual()) {
             $this->options['metadata']['shippingAddressId'] = $this->order->getshippingAddressId();

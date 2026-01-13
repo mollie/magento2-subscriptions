@@ -49,6 +49,15 @@ class ActiveSubscriptions extends Template
     }
 
     /**
+     * @param float $amount
+     * @return string
+     */
+    public function formatPrice(float $amount): string
+    {
+        return $this->priceCurrency->convertAndFormat($amount);
+    }
+
+    /**
      * @return SubscriptionResponse[]
      */
     public function getSubscriptions(): array
@@ -64,7 +73,7 @@ class ActiveSubscriptions extends Template
         }
 
         $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
-        $subscriptions = $api->subscriptions->listForId($extensionAttributes->getMollieCustomerId());
+        $subscriptions = $api->subscriptions->pageForId($extensionAttributes->getMollieCustomerId());
 
         $this->subscriptions = array_map(function ($subscription) use ($customer) {
             return new SubscriptionResponse($subscription, $customer);
@@ -82,14 +91,5 @@ class ActiveSubscriptions extends Template
         }
 
         return false;
-    }
-
-    /**
-     * @param float $amount
-     * @return string
-     */
-    public function formatPrice(float $amount): string
-    {
-        return $this->priceCurrency->convertAndFormat($amount);
     }
 }

@@ -22,6 +22,7 @@ use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 use Mollie\Subscriptions\Service\Mollie\SubscriptionOptions;
 use Mollie\Subscriptions\Service\Order\OrderContainsSubscriptionProduct;
+use Throwable;
 
 class CreateSubscriptions implements ObserverInterface
 {
@@ -131,6 +132,38 @@ class CreateSubscriptions implements ObserverInterface
         $this->orderRepository->save($order);
     }
 
+    private function createSubscription(string $customerId, SubscriptionOption $subscriptionOptions)
+    {
+        try {
+            $this->config->addToLog('request', ['customerId' => $customerId, 'options' => $subscriptionOptions->toArray()]);
+            $subscription = $this->mollieApi->subscriptions->createForId($customerId, $subscriptionOptions->toArray());
+
+            /** @var SubscriptionToProductInterface $model */
+            $model = $this->subscriptionToProductFactory->create();
+            $model->setCustomerId($subscription->customerId);
+            $model->setSubscriptionId($subscription->id);
+            $model->setProductId($subscriptionOptions->getProductId());
+            $model->setStoreId($subscriptionOptions->getStoreId());
+            $model->setNextPaymentDate($subscription->nextPaymentDate);
+
+            $model = $this->subscriptionToProductRepository->save($model);
+
+            $this->eventManager->dispatch('mollie_subscription_created', ['subscription' => $model]);
+
+            $this->sendAdminNotificationEmail->execute($model);
+            $this->sendCustomerNotificationEmail->execute($model);
+        } catch (Throwable $exception) {
+            $this->config->addToLog('error', [
+                'message' => 'Error while trying to create subscription for order',
+                'subscription_options' => $subscriptionOptions->toArray(),
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            throw $exception;
+        }
+    }
+
     private function getPayment(OrderInterface $order)
     {
         $transactionId = $order->getPayment()->getAdditionalInformation()['mollie_id'];
@@ -141,26 +174,5 @@ class CreateSubscriptions implements ObserverInterface
         }
 
         return $this->mollieApi->payments->get($transactionId);
-    }
-
-    private function createSubscription(string $customerId, SubscriptionOption $subscriptionOptions)
-    {
-        $this->config->addToLog('request', ['customerId' => $customerId, 'options' => $subscriptionOptions->toArray()]);
-        $subscription = $this->mollieApi->subscriptions->createForId($customerId, $subscriptionOptions->toArray());
-
-        /** @var SubscriptionToProductInterface $model */
-        $model = $this->subscriptionToProductFactory->create();
-        $model->setCustomerId($subscription->customerId);
-        $model->setSubscriptionId($subscription->id);
-        $model->setProductId($subscriptionOptions->getProductId());
-        $model->setStoreId($subscriptionOptions->getStoreId());
-        $model->setNextPaymentDate($subscription->nextPaymentDate);
-
-        $model = $this->subscriptionToProductRepository->save($model);
-
-        $this->eventManager->dispatch('mollie_subscription_created', ['subscription' => $model]);
-
-        $this->sendAdminNotificationEmail->execute($model);
-        $this->sendCustomerNotificationEmail->execute($model);
     }
 }

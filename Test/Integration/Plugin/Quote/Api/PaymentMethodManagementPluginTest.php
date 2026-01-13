@@ -9,12 +9,12 @@ namespace Mollie\Subscriptions\Test\Integration\Plugin\Quote\Api;
 use Magento\Checkout\Model\Session;
 use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
-use Magento\TestFramework\ObjectManager;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Model\Methods\Voucher;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Plugin\Quote\Api\PaymentMethodManagementPlugin;
 use Mollie\Subscriptions\Service\Cart\CartContainsSubscriptionProduct;
+use ReflectionException;
 
 class PaymentMethodManagementPluginTest extends IntegrationTestCase
 {
@@ -23,15 +23,17 @@ class PaymentMethodManagementPluginTest extends IntegrationTestCase
      */
     private $session;
 
-    protected function setUpWithoutVoid()
+    public function setUp(): void
     {
+        parent::setUp();
+
         $this->session = $this->objectManager->create(Session::class);
     }
 
     /**
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/Checkout/_files/quote_with_simple_product.php
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testDoesNothingWhenNoSubscriptionsInCart()
     {
@@ -53,7 +55,7 @@ class PaymentMethodManagementPluginTest extends IntegrationTestCase
     /**
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/Checkout/_files/quote_with_simple_product.php
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testFiltersNonAllowedMethodsWhenCartContainsSubscriptionProduct()
     {

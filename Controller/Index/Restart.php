@@ -6,6 +6,7 @@
 
 namespace Mollie\Subscriptions\Controller\Index;
 
+use Exception;
 use Magento\Catalog\Model\Product;
 use Magento\Customer\Helper\Session\CurrentCustomer;
 use Magento\Customer\Model\Session;
@@ -22,6 +23,7 @@ use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterfaceFactory;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
+use stdClass;
 
 class Restart extends Action implements HttpPostActionInterface
 {
@@ -147,7 +149,7 @@ class Restart extends Action implements HttpPostActionInterface
             ]);
 
             $this->saveSubscriptionResult($subscription);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->messageManager->addErrorMessage(__('We are unable to restart the subscription'));
 
             $this->config->addToLog('error', [
@@ -164,16 +166,16 @@ class Restart extends Action implements HttpPostActionInterface
         return $this->_redirect('*/*/index');
     }
 
-    private function getMetadata(Subscription $canceledSubscription)
+    private function getMetadata(Subscription $canceledSubscription): ?array
     {
-        if ($canceledSubscription->metadata instanceof \stdClass) {
-            $metadata = $canceledSubscription->metadata;
-            $metadata->parent_id = $canceledSubscription->id;
+        if ($canceledSubscription->metadata instanceof stdClass) {
+            $metadata = json_decode(json_encode($canceledSubscription->metadata), true);
+            $metadata['parent_id'] = $canceledSubscription->id;
 
             return $metadata;
         }
 
-        return [];
+        return null;
     }
 
     private function saveSubscriptionResult(Subscription $subscription)

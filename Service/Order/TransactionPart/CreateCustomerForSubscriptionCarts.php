@@ -9,51 +9,25 @@ namespace Mollie\Subscriptions\Service\Order\TransactionPart;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Api;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 use Mollie\Subscriptions\Service\Order\OrderContainsSubscriptionProduct;
 
 class CreateCustomerForSubscriptionCarts implements TransactionPartInterface
 {
-    /**
-     * @var Api
-     */
-    private $api;
-
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-
-    /**
-     * @var OrderContainsSubscriptionProduct
-     */
-    private $orderContainsSubscriptionProduct;
-
     public function __construct(
-        Api $api,
-        CustomerRepositoryInterface $customerRepository,
-        OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct
+        private readonly Api $api,
+        private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct
     ) {
-        $this->api = $api;
-        $this->customerRepository = $customerRepository;
-        $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
     }
 
-    public function process(OrderInterface $order, $apiMethod, array $transaction)
+    public function process(OrderInterface $order, array $transaction): array
     {
         if (!$this->orderContainsSubscriptionProduct->check($order)) {
             return $transaction;
         }
 
-        if ($apiMethod == Payments::CHECKOUT_TYPE) {
-            $transaction['customerId'] = $this->getCustomerId($order);
-        }
-
-        if ($apiMethod == Orders::CHECKOUT_TYPE) {
-            $transaction['payment']['customerId'] = $this->getCustomerId($order);
-        }
+        $transaction['customerId'] = $this->getCustomerId($order);
 
         return $transaction;
     }

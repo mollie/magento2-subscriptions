@@ -14,9 +14,9 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\Request;
 use Magento\TestFramework\TestCase\AbstractController as ControllerTestCase;
-use Mollie\Api\Endpoints\PaymentEndpoint;
-use Mollie\Api\Endpoints\SubscriptionEndpoint;
-use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\GetPaymentRequest;
+use Mollie\Api\Http\Requests\GetSubscriptionRequest;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Subscription;
@@ -28,14 +28,14 @@ use Mollie\Payment\Test\Integration\MolliePaymentBuilder;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
+use Mollie\Subscriptions\Test\Fakes\Service\Mollie\MollieSubscriptionApiFake;
+use stdClass;
 
 class WebhookTest extends ControllerTestCase
 {
     /**
-     * @var Subscription
+     * @return void
      */
-    private $subscription;
-
     public function testAcceptsPost()
     {
         $instance = $this->_objectManager->get(FakeEncryptor::class);
@@ -43,16 +43,7 @@ class WebhookTest extends ControllerTestCase
 
         $this->_objectManager->addSharedInstance($instance, Encryptor::class);
 
-        $paymentEndpointMock = $this->createMock(PaymentEndpoint::class);
-        $paymentEndpointMock->method('get')->willThrowException(new ApiException('Invalid transaction (Test)'));
-
-        /** @var Mollie $mollie */
-        $api = new MollieApiClient();
-        $api->payments = $paymentEndpointMock;
-
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('getMollieApi')->willReturn($api);
-        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
+        $this->mockSubscriptionApi();
 
         $this->getRequest()->setMethod(Request::METHOD_POST);
         $this->getRequest()->setParams([
@@ -62,84 +53,6 @@ class WebhookTest extends ControllerTestCase
         $this->dispatch('mollie-subscriptions/api/webhook');
 
         $this->assert404NotFound();
-    }
-
-    /**
-     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
-     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
-     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
-     */
-    public function testPlacesOrderFromTransaction(): void
-    {
-        $transactionId = 'tr_testtransaction';
-
-        $this->createMollieCustomer();
-        $api = $this->getApi($transactionId);
-
-        $mollieSubscriptionApi = $this->createMock(MollieSubscriptionApi::class);
-        $mollieSubscriptionApi->method('loadByStore')->willReturn($api);
-        $this->_objectManager->addSharedInstance($mollieSubscriptionApi, MollieSubscriptionApi::class);
-
-        // Check how many orders there are before the webhook is called
-        $ordersCount = count($this->getOrderIdsByTransactionId($transactionId));
-
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('processTransactionForOrder');
-        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
-
-        $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
-        $this->assertEquals(200, $this->getResponse()->getStatusCode());
-
-        $orders = $this->getOrderIdsByTransactionId($transactionId);
-        $this->assertSame($ordersCount + 1, count($orders));
-    }
-
-    /**
-     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
-     * @magentoDataFixture Magento/ConfigurableProduct/_files/product_configurable.php
-     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
-     */
-    public function testPlacesOrderFromTransactionWithConfigurableProduct(): void
-    {
-        $transactionId = 'tr_testtransaction';
-
-        $this->createMollieCustomer();
-
-        // We need a configurable product, so change the subscription.
-        $api = $this->getApi($transactionId, function (Subscription $subscription) {
-            /** @var ProductRepository $repository */
-            $repository = $this->_objectManager->get(ProductRepository::class);
-            $product = $repository->get('configurable');
-            $childProducts = $product->getTypeInstance()->getUsedProducts($product);
-
-            $subscription->metadata->sku = $childProducts[0]->getSku();
-            $subscription->metadata->parent_sku = 'configurable';
-        });
-
-        $mollieSubscriptionApi = $this->createMock(MollieSubscriptionApi::class);
-        $mollieSubscriptionApi->method('loadByStore')->willReturn($api);
-        $this->_objectManager->addSharedInstance($mollieSubscriptionApi, MollieSubscriptionApi::class);
-
-        // Check how many orders there are before the webhook is called
-        $ordersCount = count($this->getOrderIdsByTransactionId($transactionId));
-
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('processTransactionForOrder');
-        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
-
-        $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
-        $this->assertEquals(200, $this->getResponse()->getStatusCode());
-
-        $orders = $this->getOrderIdsByTransactionId($transactionId);
-        $this->assertSame($ordersCount + 1, count($orders));
-
-        /** @var OrderInterface $lastOrder */
-        $lastOrder = end($orders);
-
-        $items = $lastOrder->getItems();
-        $lastItem = end($items);
-
-        $this->assertNotNull($lastItem->getParentItem());
     }
 
     /**
@@ -182,16 +95,13 @@ class WebhookTest extends ControllerTestCase
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
      */
-    public function testUpdatesNextPaymentDate(): void
+    public function testPlacesOrderFromTransaction(): void
     {
         $transactionId = 'tr_testtransaction';
 
         $this->createMollieCustomer();
-        $api = $this->getApi($transactionId);
 
-        $mollieSubscriptionApi = $this->createMock(MollieSubscriptionApi::class);
-        $mollieSubscriptionApi->method('loadByStore')->willReturn($api);
-        $this->_objectManager->addSharedInstance($mollieSubscriptionApi, MollieSubscriptionApi::class);
+        $this->mockSubscriptionApi();
 
         // Check how many orders there are before the webhook is called
         $ordersCount = count($this->getOrderIdsByTransactionId($transactionId));
@@ -203,10 +113,73 @@ class WebhookTest extends ControllerTestCase
         $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
         $this->assertEquals(200, $this->getResponse()->getStatusCode());
 
+        $orders = $this->getOrderIdsByTransactionId($transactionId);
+        $this->assertSame($ordersCount + 1, count($orders));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/product_configurable.php
+     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
+     */
+    public function testPlacesOrderFromTransactionWithConfigurableProduct(): void
+    {
+        $transactionId = 'tr_testtransaction';
+
+        $this->createMollieCustomer();
+
+        $repository = $this->_objectManager->get(ProductRepository::class);
+        $product = $repository->get('configurable');
+        $childProducts = $product->getTypeInstance()->getUsedProducts($product);
+
+        $this->mockSubscriptionApi($childProducts[0]->getSku(), 'configurable');
+
+        // Check how many orders there are before the webhook is called
+        $ordersCount = count($this->getOrderIdsByTransactionId($transactionId));
+
+        $mollieMock = $this->createMock(Mollie::class);
+        $mollieMock->method('processTransactionForOrder');
+        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
+
+        $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
+        $this->assertEquals(200, $this->getResponse()->getStatusCode());
+
+        $orders = $this->getOrderIdsByTransactionId($transactionId);
+        $this->assertSame($ordersCount + 1, count($orders));
+
+        /** @var OrderInterface $lastOrder */
+        $lastOrder = end($orders);
+
+        $items = $lastOrder->getItems();
+        $lastItem = end($items);
+
+        $this->assertNotNull($lastItem->getParentItem());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
+     */
+    public function testUpdatesNextPaymentDate(): void
+    {
+        $transactionId = 'tr_testtransaction';
+
+        $this->createMollieCustomer();
+
+        $this->mockSubscriptionApi();
+
+        $mollieMock = $this->createMock(Mollie::class);
+        $mollieMock->method('processTransactionForOrder');
+        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
+
+        $this->dispatch('mollie-subscriptions/api/webhook?id=' . $transactionId);
+        $this->assertEquals(200, $this->getResponse()->getStatusCode());
+
         $repository = $this->_objectManager->create(SubscriptionToProductRepositoryInterface::class);
         $subscription = $repository->getBySubscriptionId('sub_testsubscription');
 
-        $this->assertEquals('2019-11-19', $subscription->getNextPaymentDate());
+        $this->assertEquals('2016-11-19', $subscription->getNextPaymentDate());
     }
 
     private function createMollieCustomer(): void
@@ -233,51 +206,16 @@ class WebhookTest extends ControllerTestCase
         $repository->save($customer);
     }
 
-    private function getOrderIdsByTransactionId(string $transactionId): array
+    private function createSubscriptionDatabaseRecord(): void
     {
-        /** @var OrderRepositoryInterface $repository */
-        $repository = $this->_objectManager->get(OrderRepositoryInterface::class);
+        /** @var SubscriptionToProductInterface $subscription */
+        $subscription = $this->_objectManager->create(SubscriptionToProductInterface::class);
+        $subscription->setSubscriptionId('sub_testsubscription');
+        $subscription->setNextPaymentDate('2019-11-12');
+        $subscription->setCustomerId('cst_testcustomer');
+        $subscription->setProductId(1);
 
-        /** @var SearchCriteriaBuilder $criteria */
-        $criteria = $this->_objectManager->get(SearchCriteriaBuilder::class);
-        $criteria->addFilter('mollie_transaction_id', $transactionId);
-
-        $list = $repository->getList($criteria->create());
-
-        return $list->getItems();
-    }
-
-    private function getSubscription(?callable $customize = null): Subscription
-    {
-        /** @var Subscription $subscription */
-        $subscription = $this->_objectManager->get(Subscription::class);
-        $subscription->id = 'sub_testsubscription';
-        $subscription->customerId = 'cst_testcustomer';
-        $subscription->metadata = new \stdClass();
-        $subscription->metadata->sku = 'simple';
-        $subscription->nextPaymentDate = '2019-11-19';
-
-        if ($customize) {
-            $customize($subscription);
-        }
-
-        return $subscription;
-    }
-
-    private function getPayment(string $transactionId): Payment
-    {
-        $molliePaymentBuilder = $this->_objectManager->get(MolliePaymentBuilder::class);
-        $molliePaymentBuilder->setMethod('ideal');
-        $payment = $molliePaymentBuilder->build();
-
-        $payment->id = $transactionId;
-        $payment->customerId = 'cst_testcustomer';
-        $payment->subscriptionId = 'sub_testsubscription';
-        $payment->_links = new \stdClass();
-        $payment->_links->subscription = new \stdClass();
-        $payment->_links->subscription->href = 'https://example.com/mollie/subscriptions/sub_testsubscription';
-
-        return $payment;
+        $this->_objectManager->get(SubscriptionToProductRepositoryInterface::class)->save($subscription);
     }
 
     private function getApi(string $transactionId, ?callable $customize = null): MollieApiClient
@@ -302,6 +240,53 @@ class WebhookTest extends ControllerTestCase
         return $api;
     }
 
+    private function getOrderIdsByTransactionId(string $transactionId): array
+    {
+        /** @var OrderRepositoryInterface $repository */
+        $repository = $this->_objectManager->get(OrderRepositoryInterface::class);
+
+        /** @var SearchCriteriaBuilder $criteria */
+        $criteria = $this->_objectManager->get(SearchCriteriaBuilder::class);
+        $criteria->addFilter('mollie_transaction_id', $transactionId);
+
+        $list = $repository->getList($criteria->create());
+
+        return $list->getItems();
+    }
+
+    private function getPayment(string $transactionId): Payment
+    {
+        $molliePaymentBuilder = $this->_objectManager->get(MolliePaymentBuilder::class);
+        $molliePaymentBuilder->setMethod('ideal');
+        $payment = $molliePaymentBuilder->build();
+
+        $payment->id = $transactionId;
+        $payment->customerId = 'cst_testcustomer';
+        $payment->subscriptionId = 'sub_testsubscription';
+        $payment->_links = new stdClass();
+        $payment->_links->subscription = new stdClass();
+        $payment->_links->subscription->href = 'https://example.com/mollie/subscriptions/sub_testsubscription';
+
+        return $payment;
+    }
+
+    private function getSubscription(?callable $customize = null): Subscription
+    {
+        /** @var Subscription $subscription */
+        $subscription = $this->_objectManager->get(Subscription::class);
+        $subscription->id = 'sub_testsubscription';
+        $subscription->customerId = 'cst_testcustomer';
+        $subscription->metadata = new stdClass();
+        $subscription->metadata->sku = 'simple';
+        $subscription->nextPaymentDate = '2019-11-19';
+
+        if ($customize) {
+            $customize($subscription);
+        }
+
+        return $subscription;
+    }
+
     private function loadOrderById($orderId): OrderInterface
     {
         $repository = $this->_objectManager->get(OrderRepositoryInterface::class);
@@ -313,15 +298,35 @@ class WebhookTest extends ControllerTestCase
         return array_shift($orderList);
     }
 
-    private function createSubscriptionDatabaseRecord(): void
+    private function mockSubscriptionApi(string $sku = 'simple', ?string $parentSku = null): void
     {
-        /** @var SubscriptionToProductInterface $subscription */
-        $subscription = $this->_objectManager->create(SubscriptionToProductInterface::class);
-        $subscription->setSubscriptionId('sub_testsubscription');
-        $subscription->setNextPaymentDate('2019-11-12');
-        $subscription->setCustomerId('cst_testcustomer');
-        $subscription->setProductId(1);
+        $subscription = [
+            'id' => 'sub_testsubscription',
+            'nextPaymentDate' => '2016-11-19',
+            'metadata' => [
+                'sku' => $sku,
+            ]
+        ];
 
-        $this->_objectManager->get(SubscriptionToProductRepositoryInterface::class)->save($subscription);
+        if ($parentSku) {
+            $subscription['metadata']['parent_sku'] = $parentSku;
+        }
+
+        $client = MollieApiClient::fake([
+            GetPaymentRequest::class => MockResponse::ok(json_encode([
+                'id' => 'tr_testtransaction',
+                'customerId' => 'cst_testcustomer',
+                'subscriptionId' => 'sub_testsubscription',
+            ])),
+
+            GetSubscriptionRequest::class => MockResponse::ok(json_encode($subscription)),
+        ]);
+
+        /** @var MollieSubscriptionApiFake $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->_objectManager->get(MollieSubscriptionApiFake::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->_objectManager->addSharedInstance($fakeMollieApiClient, MollieSubscriptionApi::class);
+
+        $this->createSubscriptionDatabaseRecord();
     }
 }

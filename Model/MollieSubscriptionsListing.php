@@ -6,6 +6,8 @@
 
 namespace Mollie\Subscriptions\Model;
 
+use DateInterval;
+use DateTimeImmutable;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
@@ -93,12 +95,16 @@ class MollieSubscriptionsListing extends Listing
         $api = $this->mollieSubscriptionApi->loadByStore($storeId);
         $paging = $this->getContext()->getRequestParam('paging');
 
-        $pageSize = $paging['pageSize'] ?? 20;
+        $pageSize = $paging['pageSize'] ?? null;
         if ($pageSize > 250) {
             $pageSize = 250;
         }
 
-        $result = $api->subscriptions->page(
+        if (!$this->getContext()->getRequestParam('offsetID')) {
+            $pageSize = null;
+        }
+
+        $result = $api->subscriptions->allFor(
             $this->getContext()->getRequestParam('offsetID'),
             $pageSize
         );
@@ -110,8 +116,8 @@ class MollieSubscriptionsListing extends Listing
         $items = array_map(function (Subscription $subscription) use ($daysBeforeReminder) {
             $prePaymentReminder = null;
             if ($subscription->nextPaymentDate) {
-                $prePaymentReminder = new \DateTimeImmutable($subscription->nextPaymentDate);
-                $prePaymentReminder = $prePaymentReminder->sub(new \DateInterval('P' . $daysBeforeReminder . 'D'));
+                $prePaymentReminder = new DateTimeImmutable($subscription->nextPaymentDate);
+                $prePaymentReminder = $prePaymentReminder->sub(new DateInterval('P' . $daysBeforeReminder . 'D'));
             }
 
             $response = new SubscriptionResponse(
@@ -132,6 +138,36 @@ class MollieSubscriptionsListing extends Listing
         ];
     }
 
+    private function getCustomerMollieCustomerById(string $customerId)
+    {
+        foreach ($this->customers as $customer) {
+            if ($customer->getExtensionAttributes()->getMollieCustomerId() == $customerId) {
+                return $customer;
+            }
+        }
+
+        return $this->customerFactory->create();
+    }
+
+    private function parseLink(string $link): string
+    {
+        $query = parse_url($link, PHP_URL_QUERY);
+        parse_str($query, $parts);
+
+        return $parts['from'];
+    }
+
+    private function parsePreviousNext(SubscriptionCollection $result)
+    {
+        if ($result->hasNext()) {
+            $this->next = $this->parseLink($result->_links->next->href);
+        }
+
+        if ($result->hasPrevious()) {
+            $this->previous = $this->parseLink($result->_links->previous->href);
+        }
+    }
+
     private function preloadCustomers(array $result)
     {
         $mollieCustomerIds = array_column($result, 'customerId');
@@ -147,35 +183,5 @@ class MollieSubscriptionsListing extends Listing
         $searchCriteria = $this->searchCriteriaBuilderFactory->create();
         $searchCriteria->addFilter('entity_id', $customerIds, 'in');
         $this->customers = $this->customerRepository->getList($searchCriteria->create())->getItems();
-    }
-
-    private function getCustomerMollieCustomerById(string $customerId)
-    {
-        foreach ($this->customers as $customer) {
-            if ($customer->getExtensionAttributes()->getMollieCustomerId() == $customerId) {
-                return $customer;
-            }
-        }
-
-        return $this->customerFactory->create();
-    }
-
-    private function parsePreviousNext(SubscriptionCollection $result)
-    {
-        if ($result->hasNext()) {
-            $this->next = $this->parseLink($result->_links->next->href);
-        }
-
-        if ($result->hasPrevious()) {
-            $this->previous = $this->parseLink($result->_links->previous->href);
-        }
-    }
-
-    private function parseLink(string $link): string
-    {
-        $query = parse_url($link, PHP_URL_QUERY);
-        parse_str($query, $parts);
-
-        return $parts['from'];
     }
 }

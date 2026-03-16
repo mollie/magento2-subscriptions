@@ -82,7 +82,8 @@ class SubscriptionAddProductToCart
         $request->setProductClassId($item->getTaxClassId());
         $taxRate = $this->taxCalculation->getRate($request);
 
-        $priceIncl = $subscription->amount->value;
+        $quantity = (float)($subscription->metadata->quantity ?? 1);
+        $priceIncl = $subscription->amount->value / $quantity;
         $newPrice = $priceIncl;
 
         if ($taxRate !== 0.0) {

@@ -48,8 +48,11 @@ class UpdateSubscriptionProduct implements ObserverInterface
 
     private function subscriptionTableHasPriceUpdate(ProductInterface $product): bool
     {
-        $old = $this->serializer->unserialize($product->getOrigData('mollie_subscription_table'));
-        $new = $this->serializer->unserialize($product->getData('mollie_subscription_table'));
+        $oldRaw = $product->getOrigData('mollie_subscription_table');
+        $newRaw = $product->getData('mollie_subscription_table');
+
+        $old = $this->safeUnserializeToArray($oldRaw);
+        $new = $this->safeUnserializeToArray($newRaw);
 
         $oldMapping = $this->getIdentifierToPriceMapping($old);
         $newMapping = $this->getIdentifierToPriceMapping($new);
@@ -63,11 +66,46 @@ class UpdateSubscriptionProduct implements ObserverInterface
         return false;
     }
 
+    /**
+     * Safely convert a serialized value or array into a normalized array.
+     * - Null/empty/false values are treated as empty arrays
+     * - Already-array values are returned as-is
+     * - Any unserialize errors result in an empty array
+     *
+     * @param mixed $value
+     */
+    private function safeUnserializeToArray($value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if ($value === null || $value === '' || $value === false) {
+            return [];
+        }
+
+        try {
+            $result = $this->serializer->unserialize($value);
+            return is_array($result) ? $result : [];
+        } catch (\InvalidArgumentException $e) {
+            return [];
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
     private function getIdentifierToPriceMapping(array $table): array
     {
         $output = [];
         foreach ($table as $row) {
-            $output[$row['identifier']] = $row['price'];
+            if (!is_array($row)) {
+                continue;
+            }
+            if (!isset($row['identifier']) || $row['identifier'] === '' || $row['identifier'] === null) {
+                continue;
+            }
+            $price = $row['price'] ?? null; // Price is optional
+            $output[$row['identifier']] = $price;
         }
 
         return $output;

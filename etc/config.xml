@@ -8,7 +8,7 @@
     <default>
         <mollie_subscriptions>
             <general>
-                <version>v1.17.0</version>
+                <version>v1.17.1</version>
                 <enable>0</enable>
                 <debug>1</debug>
                 <update_subscription_when_price_changes>0</update_subscription_when_price_changes>

@@ -41,8 +41,7 @@
                 <enable_customer_cancel_notification>0</enable_customer_cancel_notification>
                 <customer_cancel_notification_template>Mollie_Subscriptions_emails_customer_cancel_notification_template</customer_cancel_notification_template>
                 <enable_admin_failure_notification>1</enable_admin_failure_notification>
-                <admin_failure_notification_template>Mollie_Subscriptions_emails_admin_failure_notification_template
-                </admin_failure_notification_template>
+                <admin_failure_notification_template>Mollie_Subscriptions_emails_admin_failure_notification_template</admin_failure_notification_template>
             </emails>
         </mollie_subscriptions>
     </default>

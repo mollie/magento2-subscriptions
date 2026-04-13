@@ -45,5 +45,14 @@
                 </admin_failure_notification_template>
             </emails>
         </mollie_subscriptions>
+        <carriers>
+            <mollie_subscriptions>
+                <active>1</active>
+                <model>Mollie\Subscriptions\Model\Carrier\SubscriptionShipping</model>
+                <name>Mollie Subscriptions Fallback Shipping</name>
+                <title>Mollie Subscriptions Shipping Fallback</title>
+                <price>0</price>
+            </mollie_subscriptions>
+        </carriers>
     </default>
 </config>

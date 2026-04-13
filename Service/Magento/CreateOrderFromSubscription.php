@@ -19,6 +19,8 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote\Address as QuoteAddress;
+use Magento\Quote\Model\Quote\Address\RateFactory;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderAddressRepositoryInterface;
@@ -29,6 +31,7 @@ use Mollie\Api\Resources\Subscription;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Subscriptions\Config;
+use Mollie\Subscriptions\Model\Carrier\SubscriptionShipping;
 
 class CreateOrderFromSubscription
 {
@@ -97,6 +100,10 @@ class CreateOrderFromSubscription
      * @var SubscriptionAddProductToCart
      */
     private $subscriptionAddToCart;
+    /**
+     * @var RateFactory
+     */
+    private $rateFactory;
 
     public function __construct(
         Config $config,
@@ -110,7 +117,8 @@ class CreateOrderFromSubscription
         AddressInterfaceFactory $addressFactory,
         MollieLogger $mollieLogger,
         OrderAddressRepositoryInterface $orderAddressRepository,
-        SubscriptionAddProductToCart $addProductToCart
+        SubscriptionAddProductToCart $addProductToCart,
+        RateFactory $rateFactory
     ) {
         $this->mollieCustomerRepository = $mollieCustomerRepository;
         $this->customerRepository = $customerRepository;
@@ -124,6 +132,7 @@ class CreateOrderFromSubscription
         $this->mollieLogger = $mollieLogger;
         $this->orderAddressRepository = $orderAddressRepository;
         $this->subscriptionAddToCart = $addProductToCart;
+        $this->rateFactory = $rateFactory;
     }
 
     public function execute(MollieApiClient $api, Payment $molliePayment, Subscription $subscription): OrderInterface
@@ -222,6 +231,32 @@ class CreateOrderFromSubscription
                 ', switched to ' . $newMethod
             );
         }
+
+        if ($shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod()) === false) {
+            $this->applyFallbackShippingMethod($shippingAddress);
+        }
+    }
+
+    private function applyFallbackShippingMethod(QuoteAddress $shippingAddress): void
+    {
+        $fallbackCode = 'mollie_subscriptions_fallback_shipping';
+
+        $rate = $this->rateFactory->create();
+        $rate->setCarrier(SubscriptionShipping::CARRIER_CODE);
+        $rate->setCarrierTitle('Mollie Subscriptions Shipping Fallback');
+        $rate->setMethod('fallback_shipping');
+        $rate->setMethodTitle('Subscription Shipping');
+        $rate->setPrice(0);
+        $rate->setCost(0);
+        $rate->setCode($fallbackCode);
+
+        $shippingAddress->addShippingRate($rate);
+        $shippingAddress->setShippingMethod($fallbackCode);
+
+        $this->mollieLogger->addInfoLog(
+            'subscriptions',
+            'No shipping rates available at all, using Mollie Subscriptions fallback carrier'
+        );
     }
 
     /**

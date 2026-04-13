@@ -95,6 +95,7 @@ class Cancel extends Action implements HttpPostActionInterface
     {
         $customer = $this->currentCustomer->getCustomer();
         $extensionAttributes = $customer->getExtensionAttributes();
+        $canceled = false;
 
         $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
@@ -102,6 +103,7 @@ class Cancel extends Action implements HttpPostActionInterface
         try {
             $model = $this->subscriptionToProductRepository->getBySubscriptionId($subscriptionId);
             $api->subscriptions->cancelForId($extensionAttributes->getMollieCustomerId(), $subscriptionId);
+            $canceled = true;
 
             $this->sendAdminCancelNotificationEmail->execute($model);
             $this->sendCustomerCancelNotificationEmail->execute($model);
@@ -116,7 +118,9 @@ class Cancel extends Action implements HttpPostActionInterface
 
             return $this->_redirect('*/*/');
         } finally {
-            $this->deleteSubscriptionReference($extensionAttributes->getMollieCustomerId(), $subscriptionId);
+            if ($canceled) {
+                $this->deleteSubscriptionReference($extensionAttributes->getMollieCustomerId(), $subscriptionId);
+            }
         }
 
         $this->messageManager->addSuccessMessage(

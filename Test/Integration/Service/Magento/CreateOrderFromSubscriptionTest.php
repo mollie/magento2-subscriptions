@@ -99,6 +99,45 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $this->assertSame(1, $order->getIsVirtual());
     }
 
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store carriers/flatrate/active 0
+     * @magentoConfigFixture default_store carriers/freeshipping/active 0
+     * @magentoConfigFixture default_store carriers/tablerate/active 0
+     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
+     *
+     * @return void
+     */
+    public function testFallsBackToSubscriptionShippingWhenNoRatesAvailable(): void
+    {
+        $this->createMollieCustomer();
+        $order = $this->loadOrderById('100000001');
+
+        $molliePaymentBuilder = $this->objectManager->get(MolliePaymentBuilder::class);
+        $molliePaymentBuilder->setMethod('ideal');
+
+        $payment = $molliePaymentBuilder->build();
+        $payment->customerId = 'cst_testcustomer';
+
+        $subscription = $this->objectManager->get(Subscription::class);
+        $subscription->amount = new stdClass();
+        $subscription->amount->value = 100;
+        $subscription->amount->currency = 'EUR';
+        $subscription->customerId = 'cst_testcustomer';
+        $subscription->metadata = new stdClass();
+        $subscription->metadata->quantity = '1';
+        $subscription->metadata->sku = 'simple';
+        $subscription->metadata->billingAddressId = $order->getBillingAddressId();
+        $subscription->metadata->shippingAddressId = $order->getBillingAddressId();
+
+        $instance = $this->objectManager->create(CreateOrderFromSubscription::class);
+
+        $result = $instance->execute(new MollieApiClient(), $payment, $subscription);
+
+        $this->assertSame('mollie_subscriptions_fallback_shipping', $result->getShippingMethod());
+    }
+
     private function createMollieCustomer(): void
     {
         /** @var CustomerRepositoryInterface $customerRepository */

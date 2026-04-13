@@ -8,7 +8,7 @@
     <default>
         <mollie_subscriptions>
             <general>
-                <version>v1.17.1</version>
+                <version>v1.18.0</version>
                 <enable>0</enable>
                 <debug>1</debug>
                 <update_subscription_when_price_changes>0</update_subscription_when_price_changes>
@@ -41,9 +41,17 @@
                 <enable_customer_cancel_notification>0</enable_customer_cancel_notification>
                 <customer_cancel_notification_template>Mollie_Subscriptions_emails_customer_cancel_notification_template</customer_cancel_notification_template>
                 <enable_admin_failure_notification>1</enable_admin_failure_notification>
-                <admin_failure_notification_template>Mollie_Subscriptions_emails_admin_failure_notification_template
-                </admin_failure_notification_template>
+                <admin_failure_notification_template>Mollie_Subscriptions_emails_admin_failure_notification_template</admin_failure_notification_template>
             </emails>
         </mollie_subscriptions>
+        <carriers>
+            <mollie_subscriptions>
+                <active>1</active>
+                <model>Mollie\Subscriptions\Model\Carrier\SubscriptionShipping</model>
+                <name>Mollie Subscriptions Fallback Shipping</name>
+                <title>Mollie Subscriptions Shipping Fallback</title>
+                <price>0</price>
+            </mollie_subscriptions>
+        </carriers>
     </default>
 </config>

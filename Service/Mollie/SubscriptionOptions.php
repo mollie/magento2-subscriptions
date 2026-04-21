@@ -6,6 +6,7 @@
 
 namespace Mollie\Subscriptions\Service\Mollie;
 
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
@@ -62,18 +63,25 @@ class SubscriptionOptions
      */
     private $getShippingCostForOrderItem;
 
+    /**
+     * @var ManagerInterface
+     */
+    private $eventManager;
+
     public function __construct(
         General $mollieHelper,
         UrlInterface $urlBuilder,
         ParseSubscriptionOptions $parseSubscriptionOptions,
         GetShippingCostForOrderItem $getShippingCostForOrderItem,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        ManagerInterface $eventManager
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->urlBuilder = $urlBuilder;
         $this->parseSubscriptionOptions = $parseSubscriptionOptions;
         $this->getShippingCostForOrderItem = $getShippingCostForOrderItem;
         $this->storeManager = $storeManager;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -116,7 +124,7 @@ class SubscriptionOptions
             $this->options['amount']
         );
 
-        return new SubscriptionOption(
+        $subscriptionOption = new SubscriptionOption(
             $orderItem->getProductId(),
             $this->currentOption->getIdentifier(),
             $this->order->getStoreId(),
@@ -128,6 +136,14 @@ class SubscriptionOptions
             $this->options['startDate'],
             $this->options['times'] ?? null
         );
+
+        $subscriptionOption->setOrderItem($orderItem);
+
+        $this->eventManager->dispatch('mollie_subscription_option_init', [
+            'dto' => $subscriptionOption
+        ]);
+
+        return $subscriptionOption;
     }
 
     private function addAmount(): void

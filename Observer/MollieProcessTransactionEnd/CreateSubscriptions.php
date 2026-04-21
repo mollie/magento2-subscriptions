@@ -124,7 +124,7 @@ class CreateSubscriptions implements ObserverInterface
 
         $subscriptions = $this->subscriptionOptions->forOrder($order);
         foreach ($subscriptions as $subscriptionOptions) {
-            $this->createSubscription($payment->customerId, $subscriptionOptions);
+            $this->createSubscription($payment->customerId, $subscriptionOptions, $order);
         }
 
         $order->getPayment()->setAdditionalInformation('subscription_created', date('Y-m-d'));
@@ -143,7 +143,7 @@ class CreateSubscriptions implements ObserverInterface
         return $this->mollieApi->payments->get($transactionId);
     }
 
-    private function createSubscription(string $customerId, SubscriptionOption $subscriptionOptions)
+    private function createSubscription(string $customerId, SubscriptionOption $subscriptionOptions, OrderInterface $order)
     {
         $this->config->addToLog('request', ['customerId' => $customerId, 'options' => $subscriptionOptions->toArray()]);
         $subscription = $this->mollieApi->subscriptions->createForId($customerId, $subscriptionOptions->toArray());
@@ -159,7 +159,12 @@ class CreateSubscriptions implements ObserverInterface
 
         $model = $this->subscriptionToProductRepository->save($model);
 
-        $this->eventManager->dispatch('mollie_subscription_created', ['subscription' => $model]);
+        $this->eventManager->dispatch('mollie_subscription_created', [
+            'model' => $model,
+            'order' => $order,
+            'subscription' => $subscription,
+            'dto' => $subscriptionOptions,
+        ]);
 
         $this->sendAdminNotificationEmail->execute($model);
         $this->sendCustomerNotificationEmail->execute($model);

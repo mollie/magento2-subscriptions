@@ -12,6 +12,7 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\NotFoundException;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -23,6 +24,8 @@ use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
+use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
+use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Service\Email\SendForPayment;
 use Mollie\Subscriptions\Service\Magento\CreateOrderFromSubscription;
@@ -99,6 +102,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var SendForPayment
      */
     private $sendEmailForPayment;
+    /**
+     * @var SubscriptionToProductRepositoryInterface
+     */
+    private $subscriptionToProductRepository;
 
     public function __construct(
         Context $context,
@@ -114,7 +121,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         SendAdminNotification $sendAdminNotification,
         CreateOrderFromSubscription $createOrderFromSubscription,
         UpdateNextPaymentDate $updateNextPaymentDate,
-        SendForPayment $sendEmailForPayment
+        SendForPayment $sendEmailForPayment,
+        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
     ) {
         parent::__construct($context);
 
@@ -131,6 +139,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->createOrderFromSubscription = $createOrderFromSubscription;
         $this->updateNextPaymentDate = $updateNextPaymentDate;
         $this->sendEmailForPayment = $sendEmailForPayment;
+        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
     }
 
     public function execute()
@@ -168,6 +177,18 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $this->linkTransactionToOrder->execute($molliePayment->id, $order);
 
             $this->mollie->processTransactionForOrder($order, Payments::TRANSACTION_TYPE_SUBSCRIPTION);
+
+            try {
+                $subscriptionToProduct = $this->subscriptionToProductRepository->get($molliePayment->subscriptionId);
+                $this->_eventManager->dispatch('mollie_subscription_renewed', [
+                    'order' => $order,
+                    'model' => $subscriptionToProduct,
+                    'subscription' => $subscription,
+                ]);
+            } catch (NoSuchEntityException $e) {
+                // do nothing
+            }
+
             $this->sendEmailForPayment->execute($subscription, $molliePayment);
 
             return $this->returnOkResponse();

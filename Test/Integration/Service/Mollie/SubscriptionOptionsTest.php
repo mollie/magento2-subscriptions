@@ -13,6 +13,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Config\Source\IntervalType;
 use Mollie\Subscriptions\DTO\SubscriptionOption;
 use Mollie\Subscriptions\Service\Mollie\SubscriptionOptions;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SubscriptionOptionsTest extends IntegrationTestCase
 {
@@ -67,6 +68,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @dataProvider includesTheCorrectIntervalProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    #[DataProvider('includesTheCorrectIntervalProvider')]
     public function testIncludesTheCorrectInterval($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -101,6 +103,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @dataProvider addsADescriptionProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    #[DataProvider('addsADescriptionProvider')]
     public function testAddsADescription($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -303,6 +306,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @param $input
      * @param $expected
      */
+    #[DataProvider('addsTheStartDate')]
     public function testAddsTheStartDate($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -340,6 +344,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @param $input
      * @param $expected
      */
+    #[DataProvider('addsTheStartDate')]
     public function testAddsTheDelayedStartDate($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -458,7 +463,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertArrayNotHasKey('shippingAddressId', $subscription->toArray()['metadata']);
     }
 
-    public function includesTheCorrectIntervalProvider(): array
+    public static function includesTheCorrectIntervalProvider(): array
     {
         return [
             'day' => [['amount' => 7, 'type' => IntervalType::DAYS], '7 days'],
@@ -471,7 +476,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         ];
     }
 
-    public function addsADescriptionProvider(): array
+    public static function addsADescriptionProvider(): array
     {
         return [
             'single day' => [['amount' => 1, 'type' => IntervalType::DAYS], 'Every day'],
@@ -485,7 +490,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         ];
     }
 
-    public function addsTheStartDate(): array
+    public static function addsTheStartDate(): array
     {
         $now = new \DateTimeImmutable('now');
 

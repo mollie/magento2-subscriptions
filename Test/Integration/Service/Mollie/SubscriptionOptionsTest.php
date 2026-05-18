@@ -252,6 +252,36 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    public function testMultipliesCustomPriceByQuantity(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $items = $order->getItems();
+
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $orderItem->setQtyOrdered(3);
+
+        $this->setOptionIdOnOrderItem($orderItem, 'custom-price');
+        $this->setTheSubscriptionOnTheProduct(
+            $orderItem->getProduct(),
+            '{"identifier":"custom-price","title":"Custom price subscription","interval_amount":"1","interval_type":"weeks","repetition_type":"infinite","price":3.00}'
+        );
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $this->assertCount(1, $result);
+        $subscription = $result[0];
+        $this->assertArrayHasKey('amount', $subscription->toArray());
+        $this->assertArrayHasKey('value', $subscription->toArray()['amount']);
+        // 3.00 per unit * 3 qty = 9.00, + 5.00 shipping
+        $this->assertEquals('14.00', $subscription->toArray()['amount']['value']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
     public function testAddsTheWebhookUrl()
     {
         $order = $this->loadOrder('100000001');

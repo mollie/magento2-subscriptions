@@ -14,6 +14,7 @@ use Magento\Framework\DataObject;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Tax\Model\Calculation as TaxCalculation;
+use Magento\Tax\Model\Config as TaxConfig;
 use Mollie\Api\Resources\Subscription;
 
 class SubscriptionAddProductToCart
@@ -26,13 +27,19 @@ class SubscriptionAddProductToCart
      * @var TaxCalculation
      */
     private $taxCalculation;
+    /**
+     * @var TaxConfig
+     */
+    private $taxConfig;
 
     public function __construct(
         ProductRepositoryInterface $productRepository,
-        TaxCalculation $taxCalculation
+        TaxCalculation $taxCalculation,
+        TaxConfig $taxConfig
     ) {
         $this->productRepository = $productRepository;
         $this->taxCalculation = $taxCalculation;
+        $this->taxConfig = $taxConfig;
     }
 
     public function execute(CartInterface $cart, Subscription $subscription): ProductInterface
@@ -86,7 +93,7 @@ class SubscriptionAddProductToCart
         $priceIncl = $subscription->amount->value / $quantity;
         $newPrice = $priceIncl;
 
-        if ($taxRate !== 0.0) {
+        if ($taxRate !== 0.0 && !$this->taxConfig->priceIncludesTax($item->getStore())) {
             $newPrice = $priceIncl / (1 + ($taxRate / 100));
         }
 

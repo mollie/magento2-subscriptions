@@ -133,7 +133,7 @@ class SubscriptionOptions
     private function addAmount(): void
     {
         if ($this->currentOption->getPrice() !== null) {
-            $this->options['amount'] = $this->currentOption->getPrice();
+            $this->options['amount'] = $this->currentOption->getPrice() * $this->orderItem->getQtyOrdered();
             return;
         }
 

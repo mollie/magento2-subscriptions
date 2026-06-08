@@ -72,6 +72,7 @@ Type,Type
 "Subscription canceled","Abonnement geannuleerd"
 "Hello,","Hallo,"
 "The customer %customerName has canceled a subscription with the description %subscription_description and ID %subscription_id.","De klant %customerName heeft een abonnement geannuleerd met de beschrijving %subscription_description en ID %subscription_id."
+"The customer %customerName has a failed payment for subscription with the description %subscription_description and ID %subscription_id.","The customer %customerName has a failed payment for subscription with the description %subscription_description and ID %subscription_id."
 "Thanks again,","Nogmaals bedankt,"
 %store_name,%store_name
 "Dear %name,","Beste %name,"

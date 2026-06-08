@@ -13,6 +13,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Config\Source\IntervalType;
 use Mollie\Subscriptions\DTO\SubscriptionOption;
 use Mollie\Subscriptions\Service\Mollie\SubscriptionOptions;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SubscriptionOptionsTest extends IntegrationTestCase
 {
@@ -67,6 +68,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @dataProvider includesTheCorrectIntervalProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    #[DataProvider('includesTheCorrectIntervalProvider')]
     public function testIncludesTheCorrectInterval($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -101,6 +103,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @dataProvider addsADescriptionProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    #[DataProvider('addsADescriptionProvider')]
     public function testAddsADescription($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -193,6 +196,34 @@ class SubscriptionOptionsTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    public function testAddsTheOptionId(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $items = $order->getItems();
+
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+
+        $this->setOptionIdOnOrderItem($orderItem, 'weekly-finite');
+        $this->setTheSubscriptionOnTheProduct($orderItem->getProduct());
+
+        $orderItem->getProduct()->setData('sku', 'example-sku');
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $this->assertCount(1, $result);
+        $subscription = $result[0];
+        $this->assertInstanceOf(SubscriptionOption::class, $subscription);
+        $this->assertArrayHasKey('metadata', $subscription->toArray());
+        $this->assertArrayHasKey('optionId', $subscription->toArray()['metadata']);
+        $this->assertEquals('weekly-finite', $subscription->toArray()['metadata']['optionId']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
     public function testAddsTheAmount()
     {
         $order = $this->loadOrder('100000001');
@@ -216,6 +247,36 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertArrayHasKey('value', $subscription->toArray()['amount']);
         // 999.98 + 5.00 for the shipping
         $this->assertEquals('1004.98', $subscription->toArray()['amount']['value']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testMultipliesCustomPriceByQuantity(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $items = $order->getItems();
+
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = array_shift($items);
+        $orderItem->setQtyOrdered(3);
+
+        $this->setOptionIdOnOrderItem($orderItem, 'custom-price');
+        $this->setTheSubscriptionOnTheProduct(
+            $orderItem->getProduct(),
+            '{"identifier":"custom-price","title":"Custom price subscription","interval_amount":"1","interval_type":"weeks","repetition_type":"infinite","price":3.00}'
+        );
+
+        /** @var SubscriptionOptions $instance */
+        $instance = $this->objectManager->create(SubscriptionOptions::class);
+        $result = $instance->forOrder($order);
+
+        $this->assertCount(1, $result);
+        $subscription = $result[0];
+        $this->assertArrayHasKey('amount', $subscription->toArray());
+        $this->assertArrayHasKey('value', $subscription->toArray()['amount']);
+        // 3.00 per unit * 3 qty = 9.00, + 5.00 shipping
+        $this->assertEquals('14.00', $subscription->toArray()['amount']['value']);
     }
 
     /**
@@ -275,6 +336,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @param $input
      * @param $expected
      */
+    #[DataProvider('addsTheStartDate')]
     public function testAddsTheStartDate($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -312,6 +374,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
      * @param $input
      * @param $expected
      */
+    #[DataProvider('addsTheStartDate')]
     public function testAddsTheDelayedStartDate($input, $expected)
     {
         $order = $this->loadOrder('100000001');
@@ -430,7 +493,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         $this->assertArrayNotHasKey('shippingAddressId', $subscription->toArray()['metadata']);
     }
 
-    public function includesTheCorrectIntervalProvider(): array
+    public static function includesTheCorrectIntervalProvider(): array
     {
         return [
             'day' => [['amount' => 7, 'type' => IntervalType::DAYS], '7 days'],
@@ -443,7 +506,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         ];
     }
 
-    public function addsADescriptionProvider(): array
+    public static function addsADescriptionProvider(): array
     {
         return [
             'single day' => [['amount' => 1, 'type' => IntervalType::DAYS], 'Every day'],
@@ -457,7 +520,7 @@ class SubscriptionOptionsTest extends IntegrationTestCase
         ];
     }
 
-    public function addsTheStartDate(): array
+    public static function addsTheStartDate(): array
     {
         $now = new \DateTimeImmutable('now');
 

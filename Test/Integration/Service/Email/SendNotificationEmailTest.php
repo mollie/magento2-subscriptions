@@ -9,10 +9,11 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
 use Mollie\Subscriptions\Service\Email\SubscriptionToProductEmailVariables;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SendNotificationEmailTest extends IntegrationTestCase
 {
-    public function sendNotificationEmailProvider(): array
+    public static function sendNotificationEmailProvider(): array
     {
         return [
             ['adminNotification', 'admin', 'New subscription'],
@@ -36,6 +37,7 @@ class SendNotificationEmailTest extends IntegrationTestCase
      * @magentoAppIsolation enabled
      * @return void
      */
+    #[DataProvider('sendNotificationEmailProvider')]
     public function testSendNotificationEmail(string $configSource, string $sendTo, string $expectedSubject): void
     {
         $customer = new \Mollie\Api\Resources\Customer(new MollieApiClient);
@@ -84,6 +86,7 @@ class SendNotificationEmailTest extends IntegrationTestCase
      * @magentoAppIsolation enabled
      * @return void
      */
+    #[DataProvider('sendNotificationEmailProvider')]
     public function testWhenDisabledNoEmailIsSent(string $configSource, string $sendTo, string $expectedSubject): void
     {
         /** @var SendNotificationEmail $instance */

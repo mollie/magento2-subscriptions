@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">mollie_subscriptions_subscription_update_price_form.update_price_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Update Subscription Price</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back" class="Mollie\Subscriptions\Block\Adminhtml\UpdatePrice\BackButton"/>
+            <button name="save" class="Mollie\Subscriptions\Block\Adminhtml\UpdatePrice\SaveButton"/>
+        </buttons>
+        <namespace>mollie_subscriptions_subscription_update_price_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>mollie_subscriptions_subscription_update_price_form.update_price_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="update_price_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="*/*/savePrice"/>
+        </settings>
+        <dataProvider class="Mollie\Subscriptions\Model\UpdatePrice\DataProvider" name="update_price_form_data_source">
+            <settings>
+                <requestFieldName>subscription_id</requestFieldName>
+                <primaryFieldName>subscription_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">Subscription Details</label>
+        </settings>
+
+        <field name="current_price" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">general</item>
+                </item>
+            </argument>
+
+            <settings>
+                <label translate="true">Current Price</label>
+                <dataType>text</dataType>
+                <dataScope>current_price</dataScope>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="new_price" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">general</item>
+                </item>
+            </argument>
+
+            <settings>
+                <label translate="true">New Price</label>
+                <dataType>text</dataType>
+                <dataScope>new_price</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+</form>

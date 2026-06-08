@@ -38,29 +38,51 @@ class Actions extends Column
 
         $storeId = $this->getContext()->getRequestParam('filters')['store_id'] ?? null;
         foreach ($dataSource['data']['items'] as &$item) {
-            if ($item['status'] != 'active') {
-                continue;
-            }
+            $output = [];
 
-            $url = $this->urlBuilder->getUrl(
-                'mollie_subscriptions/subscriptions/cancel',
-                [
-                    'store_id' => $storeId,
-                    'customer_id' => $item['customer_id'],
-                    'subscription_id' => $item['id'],
-                ]
-            );
+            $output['transactions'] = [
+                'href' => $this->urlBuilder->getUrl(
+                    'mollie_subscriptions/subscriptions/transactions',
+                    [
+                        'store_id' => $storeId,
+                        'customer_id' => $item['customer_id'],
+                        'subscription_id' => $item['id'],
+                    ]
+                ),
+                'label' => __('View transactions'),
+            ];
 
-            $item[$this->getData('name')] = [
-                'view' => [
-                    'href' => $url,
+            if ($item['status'] == 'active') {
+                $output['update_price'] = [
+                    'href' => $this->urlBuilder->getUrl(
+                        'mollie_subscriptions/subscriptions/updatePrice',
+                        [
+                            'store_id' => $storeId,
+                            'customer_id' => $item['customer_id'],
+                            'subscription_id' => $item['id'],
+                        ]
+                    ),
+                    'label' => __('Update price'),
+                ];
+
+                $output['cancel'] = [
+                    'href' => $this->urlBuilder->getUrl(
+                        'mollie_subscriptions/subscriptions/cancel',
+                        [
+                            'store_id' => $storeId,
+                            'customer_id' => $item['customer_id'],
+                            'subscription_id' => $item['id'],
+                        ]
+                    ),
                     'label' => __('Cancel'),
                     'confirm' => [
                         'title' => __('Delete'),
                         'message' => __('Are you sure you want to delete this record?'),
                     ],
-                ]
-            ];
+                ];
+            }
+
+            $item[$this->getData('name')] = $output;
         }
 
         return $dataSource;

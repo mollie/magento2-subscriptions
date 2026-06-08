@@ -21,7 +21,13 @@
             class="action primary tocart product-addtocart-button select-subscription"
             value="onetimepurchase"
             title="<?= __('One Time Purchase') ?>"
-        ><?= __('One Time Purchase'); ?></button>
+        >
+            <?= __('One Time Purchase'); ?>
+
+            <?php if ($block->showPriceInSubscriptionButton()): ?>
+                <?= $block->formatPrice($block->getProductPrice()) ?>
+            <?php endif; ?>
+        </button>
     <?php endif; ?>
 
     <?php foreach ($block->getOptions() as $option): ?>
@@ -33,6 +39,10 @@
             title="<?= $block->escapeHtmlAttr($option->getTitle()) ?>"
             >
             <?= $block->escapeHtml($option->getTitle()); ?>
+
+            <?php if ($block->showPriceInSubscriptionButton()): ?>
+                <?= $block->formatPrice($option->getPrice()) ?>
+            <?php endif; ?>
         </button>
     <?php endforeach; ?>
 

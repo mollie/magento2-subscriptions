@@ -105,7 +105,7 @@ class CreateSubscriptions implements ObserverInterface
         $this->sendCustomerNotificationEmail = $sendCustomerNotificationEmail;
     }
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var OrderInterface $order */
         $order = $observer->getData('order');
@@ -132,7 +132,7 @@ class CreateSubscriptions implements ObserverInterface
         $this->orderRepository->save($order);
     }
 
-    private function createSubscription(string $customerId, SubscriptionOption $subscriptionOptions)
+    private function createSubscription(string $customerId, SubscriptionOption $subscriptionOptions): void
     {
         try {
             $this->config->addToLog('request', ['customerId' => $customerId, 'options' => $subscriptionOptions->toArray()]);
@@ -145,6 +145,7 @@ class CreateSubscriptions implements ObserverInterface
             $model->setProductId($subscriptionOptions->getProductId());
             $model->setStoreId($subscriptionOptions->getStoreId());
             $model->setNextPaymentDate($subscription->nextPaymentDate);
+            $model->setOptionId($subscriptionOptions->getOptionId());
 
             $model = $this->subscriptionToProductRepository->save($model);
 
@@ -167,11 +168,6 @@ class CreateSubscriptions implements ObserverInterface
     private function getPayment(OrderInterface $order)
     {
         $transactionId = $order->getPayment()->getAdditionalInformation()['mollie_id'];
-        if (substr($transactionId, 0, 4) == 'ord_') {
-            $order = $this->mollieApi->orders->get($transactionId, ['embed' => 'payments']);
-
-            return $order->payments()->offsetGet(0);
-        }
 
         return $this->mollieApi->payments->get($transactionId);
     }

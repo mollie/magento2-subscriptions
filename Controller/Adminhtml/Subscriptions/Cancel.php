@@ -53,9 +53,11 @@ class Cancel extends Action
         $api = $this->mollieSubscriptionApi->loadByStore($this->getRequest()->getParam('store_id'));
         $customerId = $this->getRequest()->getParam('customer_id');
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
+        $canceled = false;
 
         try {
             $api->subscriptions->cancelForId($customerId, $subscriptionId);
+            $canceled = true;
             $model = $this->subscriptionToProductRepository->getBySubscriptionId($subscriptionId);
             $this->eventManager->dispatch('mollie_subscription_after_cancelled', ['subscription' => $model]);
         } catch (\Exception $exception) {
@@ -69,8 +71,10 @@ class Cancel extends Action
 
             return $this->_redirect('*/*/');
         } finally {
-            $this->subscriptionToProductRepository->deleteBySubscriptionId($customerId, $subscriptionId);
-            $this->eventManager->dispatch('mollie_subscription_cancelled', ['subscription_id' => $subscriptionId]);
+            if ($canceled) {
+                $this->subscriptionToProductRepository->deleteBySubscriptionId($customerId, $subscriptionId);
+                $this->eventManager->dispatch('mollie_subscription_cancelled', ['subscription_id' => $subscriptionId]);
+            }
         }
 
         $this->messageManager->addSuccessMessage(

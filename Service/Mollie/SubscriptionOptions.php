@@ -100,7 +100,7 @@ class SubscriptionOptions
     {
         $this->options = [];
         $this->orderItem = $orderItem;
-        $this->loadSubscriptionOption($orderItem);
+        $this->loadSubscriptionOption();
 
         $this->addAmount();
         $this->addShippingCost();
@@ -118,6 +118,7 @@ class SubscriptionOptions
 
         return new SubscriptionOption(
             $orderItem->getProductId(),
+            $this->currentOption->getIdentifier(),
             $this->order->getStoreId(),
             $amount,
             $this->options['interval'] ?? '',
@@ -132,7 +133,7 @@ class SubscriptionOptions
     private function addAmount(): void
     {
         if ($this->currentOption->getPrice() !== null) {
-            $this->options['amount'] = $this->currentOption->getPrice();
+            $this->options['amount'] = $this->currentOption->getPrice() * $this->orderItem->getQtyOrdered();
             return;
         }
 
@@ -186,10 +187,13 @@ class SubscriptionOptions
     private function addMetadata(): void
     {
         $product = $this->orderItem->getProduct();
+        $optionId = $this->getOptionIdFromOrderItem();
+
         $metadata = [
             'sku' => $product->getSku(),
             'quantity' => $this->orderItem->getQtyOrdered(),
             'billingAddressId' => $this->order->getBillingAddressId(),
+            'optionId' => $optionId,
         ];
 
         if ($parent = $this->orderItem->getParentItem()) {
@@ -288,9 +292,9 @@ class SubscriptionOptions
         return '';
     }
 
-    private function loadSubscriptionOption(OrderItemInterface $item): void
+    private function getOptionIdFromOrderItem(): string
     {
-        $mollieMetadata = $item->getBuyRequest()->getData('mollie_metadata');
+        $mollieMetadata = $this->orderItem->getBuyRequest()->getData('mollie_metadata');
         if ($mollieMetadata === null) {
             throw new \Exception('No Mollie Metadata present on order item');
         }
@@ -299,8 +303,13 @@ class SubscriptionOptions
             throw new \Exception('No recurring metadata or option_id present on order item');
         }
 
-        $optionId = $mollieMetadata['recurring_metadata']['option_id'];
-        $options = $this->parseSubscriptionOptions->execute($item->getProduct());
+        return $mollieMetadata['recurring_metadata']['option_id'];
+    }
+
+    private function loadSubscriptionOption(): void
+    {
+        $optionId = $this->getOptionIdFromOrderItem();
+        $options = $this->parseSubscriptionOptions->execute($this->orderItem->getProduct());
         foreach($options as $option) {
             if ($option->getIdentifier() == $optionId) {
                 $this->currentOption = $option;

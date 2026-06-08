@@ -24,8 +24,9 @@ use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
-use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
+use Mollie\Subscriptions\Service\Email\SendForPayment;
 use Mollie\Subscriptions\Service\Magento\CreateOrderFromSubscription;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 use Mollie\Subscriptions\Service\Mollie\RetryUsingOtherStoreViews;
 use Mollie\Subscriptions\Service\Mollie\SendAdminNotification;
 use Mollie\Subscriptions\Service\Mollie\UpdateNextPaymentDate;
@@ -94,6 +95,10 @@ class Webhook extends Action implements CsrfAwareActionInterface
      * @var UpdateNextPaymentDate
      */
     private $updateNextPaymentDate;
+    /**
+     * @var SendForPayment
+     */
+    private $sendEmailForPayment;
 
     public function __construct(
         Context $context,
@@ -108,7 +113,8 @@ class Webhook extends Action implements CsrfAwareActionInterface
         OrderCommentHistory $orderCommentHistory,
         SendAdminNotification $sendAdminNotification,
         CreateOrderFromSubscription $createOrderFromSubscription,
-        UpdateNextPaymentDate $updateNextPaymentDate
+        UpdateNextPaymentDate $updateNextPaymentDate,
+        SendForPayment $sendEmailForPayment
     ) {
         parent::__construct($context);
 
@@ -124,6 +130,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->sendAdminNotification = $sendAdminNotification;
         $this->createOrderFromSubscription = $createOrderFromSubscription;
         $this->updateNextPaymentDate = $updateNextPaymentDate;
+        $this->sendEmailForPayment = $sendEmailForPayment;
     }
 
     public function execute()
@@ -161,6 +168,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
             $this->linkTransactionToOrder->execute($molliePayment->id, $order);
 
             $this->mollie->processTransactionForOrder($order, Payments::TRANSACTION_TYPE_SUBSCRIPTION);
+            $this->sendEmailForPayment->execute($subscription, $molliePayment);
 
             return $this->returnOkResponse();
         } catch (\Throwable $exception) {

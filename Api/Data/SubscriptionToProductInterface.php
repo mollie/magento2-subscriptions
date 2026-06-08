@@ -15,6 +15,7 @@ interface SubscriptionToProductInterface extends ExtensibleDataInterface
     const CUSTOMER_ID = 'customer_id';
     const SUBSCRIPTION_ID = 'subscription_id';
     const PRODUCT_ID = 'product_id';
+    const OPTION_ID = 'option_id';
     const STORE_ID = 'store_id';
     const HAS_PRICE_UPDATE = 'has_price_update';
     const NEXT_PAYMENT_DATE = 'next_payment_date';
@@ -71,6 +72,19 @@ interface SubscriptionToProductInterface extends ExtensibleDataInterface
      * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
      */
     public function setProductId(int $productId);
+
+    /**
+     * Get option_id
+     * @return string|null
+     */
+    public function getOptionId(): ?string;
+
+    /**
+     * Set option_id
+     * @param string $optionId
+     * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
+     */
+    public function setOptionId(string $optionId);
 
     /**
      * Get store_id

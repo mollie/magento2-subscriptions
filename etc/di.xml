@@ -138,6 +138,14 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="Mollie\Subscriptions\Service\Email\SendAdminFailureNotificationEmail"
+                 type="Mollie\Subscriptions\Service\Email\SendNotificationEmail">
+        <arguments>
+            <argument name="configSource" xsi:type="string">adminFailureNotification</argument>
+            <argument name="sendTo" xsi:type="string">admin</argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="Mollie\Subscriptions\Service\Email\SendCustomerCancelNotificationEmail" type="Mollie\Subscriptions\Service\Email\SendNotificationEmail">
         <arguments>
             <argument name="configSource" xsi:type="string">customerCancelNotification</argument>
@@ -163,6 +171,14 @@
         <arguments>
             <argument name="sendAdminCancelNotificationEmail" xsi:type="object">Mollie\Subscriptions\Service\Email\SendAdminCancelNotificationEmail</argument>
             <argument name="sendCustomerCancelNotificationEmail" xsi:type="object">Mollie\Subscriptions\Service\Email\SendCustomerCancelNotificationEmail</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Subscriptions\Service\Email\SendForPayment">
+        <arguments>
+            <argument name="sendFailureNotificationEmail" xsi:type="object">
+                Mollie\Subscriptions\Service\Email\SendAdminFailureNotificationEmail
+            </argument>
         </arguments>
     </type>
 

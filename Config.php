@@ -45,9 +45,18 @@ class Config
     const XML_PATH_EMAILS_ADMIN_CANCEL_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_cancel_notification_template';
     const XML_PATH_EMAILS_ENABLE_CUSTOMER_CANCEL_NOTIFICATION = 'mollie_subscriptions/emails/enable_customer_cancel_notification';
     const XML_PATH_EMAILS_CUSTOMER_CANCEL_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/customer_cancel_notification_template';
+    const XML_PATH_EMAILS_ENABLE_ADMIN_FAILURE_NOTIFICATION = 'mollie_subscriptions/emails/enable_admin_failure_notification';
+    const XML_PATH_EMAILS_ADMIN_FAILURE_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_failure_notification_template';
     const XML_PATH_DISABLE_NEW_ORDER_CONFIRMATION = 'mollie_subscriptions/emails/disable_new_order_confirmation';
     const XML_PATH_ALLOW_ONE_TIME_PURCHASE = 'mollie_subscriptions/general/allow_one_time_purchases';
+    const XML_PATH_SHOW_PRICE_IN_SUBSCRIPTION_BUTTON = 'mollie_subscriptions/general/show_price_in_subscription_button';
+    const XML_PATH_UPDATE_SUBSCRIPTION_WHEN_PRICE_CHANGES = 'mollie_subscriptions/general/update_subscription_when_price_changes';
     const MODULE_SUPPORT_LINK = 'https://www.magmodules.eu/help/%s';
+
+    /**
+     * @var \Mollie\Payment\Config
+     */
+    private $config;
 
     /**
      * @var StoreManagerInterface
@@ -58,20 +67,30 @@ class Config
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
-
     /**
      * @var ProductMetadataInterface
      */
     private $metadata;
 
     public function __construct(
+        \Mollie\Payment\Config $config,
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
         ProductMetadataInterface $metadata
     ) {
+        $this->config = $config;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
         $this->metadata = $metadata;
+    }
+
+    public function addToLog(string $type, $data): void
+    {
+        if (!$this->getFlag(static::XML_PATH_DEBUG)) {
+            return;
+        }
+
+        $this->config->addToLog($type, $data);
     }
 
     /**
@@ -269,6 +288,16 @@ class Config
         return $this->getFlag(static::XML_PATH_ALLOW_ONE_TIME_PURCHASE, $storeId, $scope);
     }
 
+    public function showPriceInSubscriptionButton(?int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_SHOW_PRICE_IN_SUBSCRIPTION_BUTTON, $storeId, $scope);
+    }
+
+    public function updateSubscriptionWhenPriceChanges(?int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_UPDATE_SUBSCRIPTION_WHEN_PRICE_CHANGES, $storeId, $scope);
+    }
+
     /**
      * @param int $storeId
      * @param string $scope
@@ -377,6 +406,16 @@ class Config
     public function getAdminCancelNotificationTemplate($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
     {
         return $this->getStoreValue(static::XML_PATH_EMAILS_ADMIN_CANCEL_NOTIFICATION_TEMPLATE, $storeId, $scope);
+    }
+
+    public function enableAdminFailureNotificationEmail(?int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->getFlag(static::XML_PATH_EMAILS_ENABLE_ADMIN_FAILURE_NOTIFICATION, $storeId, $scope);
+    }
+
+    public function getAdminFailureNotificationTemplate(?int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getStoreValue(static::XML_PATH_EMAILS_ADMIN_FAILURE_NOTIFICATION_TEMPLATE, $storeId, $scope);
     }
 
     /**

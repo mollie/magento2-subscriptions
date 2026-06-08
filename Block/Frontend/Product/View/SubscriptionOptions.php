@@ -8,6 +8,7 @@ namespace Mollie\Subscriptions\Block\Frontend\Product\View;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Boolean;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Mollie\Subscriptions\Config;
@@ -32,12 +33,17 @@ class SubscriptionOptions extends Template
      * @var ParseSubscriptionOptions
      */
     private $parseSubscriptionOptions;
+    /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceCurrency;
 
     public function __construct(
         Template\Context $context,
         Registry $registry,
         Config $config,
         ParseSubscriptionOptions $parseSubscriptionOptions,
+        PriceCurrencyInterface $priceCurrency,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -45,6 +51,7 @@ class SubscriptionOptions extends Template
         $this->registry = $registry;
         $this->config = $config;
         $this->parseSubscriptionOptions = $parseSubscriptionOptions;
+        $this->priceCurrency = $priceCurrency;
     }
 
     /**
@@ -70,5 +77,27 @@ class SubscriptionOptions extends Template
         }
 
         return (bool)$value;
+    }
+
+    public function showPriceInSubscriptionButton(): bool
+    {
+        return $this->config->showPriceInSubscriptionButton();
+    }
+
+    public function getProductPrice(): float
+    {
+        /** @var ProductInterface $product */
+        $product = $this->registry->registry('current_product');
+
+        if ($product->getPrice() === null) {
+            return 0.0;
+        }
+
+        return (float)$product->getPrice();
+    }
+
+    public function formatPrice(float $price, bool $includeContainer = false): string
+    {
+        return $this->priceCurrency->format($price, $includeContainer);
     }
 }

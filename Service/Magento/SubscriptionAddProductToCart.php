@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -8,6 +12,10 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\DataObject;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Tax\Model\Calculation as TaxCalculation;
+use Magento\Tax\Model\Config as TaxConfig;
+use Mollie\Api\Resources\Subscription;
 
 class SubscriptionAddProductToCart
 {
@@ -15,15 +23,28 @@ class SubscriptionAddProductToCart
      * @var ProductRepositoryInterface
      */
     private $productRepository;
+    /**
+     * @var TaxCalculation
+     */
+    private $taxCalculation;
+    /**
+     * @var TaxConfig
+     */
+    private $taxConfig;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        TaxCalculation $taxCalculation,
+        TaxConfig $taxConfig
     ) {
         $this->productRepository = $productRepository;
+        $this->taxCalculation = $taxCalculation;
+        $this->taxConfig = $taxConfig;
     }
 
-    public function execute(CartInterface $cart, object $metadata): ProductInterface
+    public function execute(CartInterface $cart, Subscription $subscription): ProductInterface
     {
+        $metadata = $subscription->metadata;
         $sku = $metadata->sku;
         $parentSku = isset($metadata->parent_sku) ? $metadata->parent_sku : null;
         $quantity = isset($metadata->quantity) ? (float)$metadata->quantity : 1;
@@ -32,7 +53,8 @@ class SubscriptionAddProductToCart
         $cart->setIsVirtual($product->getIsVirtual());
 
         if (!$parentSku) {
-            $cart->addProduct($product, $quantity);
+            $item = $cart->addProduct($product, $quantity);
+            $this->setSubscriptionPrice($cart, $item, $subscription);
 
             return $product;
         }
@@ -41,16 +63,41 @@ class SubscriptionAddProductToCart
         $productAttributeOptions = $product->getTypeInstance(true)->getConfigurableAttributesAsArray($product);
 
         $options = [];
-        foreach($productAttributeOptions as $option) {
-            $options[$option['attribute_id']] =  $childProduct->getData($option['attribute_code']);
+        foreach ($productAttributeOptions as $option) {
+            $options[$option['attribute_id']] = $childProduct->getData($option['attribute_code']);
         }
 
-        $cart->addProduct($product, new DataObject([
+        $item = $cart->addProduct($product, new DataObject([
             'product' => $product->getId(),
             'qty' => $quantity,
             'super_attribute' => $options,
         ]));
 
+        $this->setSubscriptionPrice($cart, $item, $subscription);
+
         return $product;
+    }
+
+    private function setSubscriptionPrice(CartInterface $cart, Item $item, Subscription $subscription): void
+    {
+        $request = $this->taxCalculation->getRateRequest(
+            $cart->getShippingAddress(),
+            $cart->getBillingAddress(),
+            $cart->getCustomerTaxClassId(),
+            $item->getStore()
+        );
+        $request->setProductClassId($item->getTaxClassId());
+        $taxRate = $this->taxCalculation->getRate($request);
+
+        $quantity = (float)($subscription->metadata->quantity ?? 1);
+        $priceIncl = $subscription->amount->value / $quantity;
+        $newPrice = $priceIncl;
+
+        if ($taxRate !== 0.0 && !$this->taxConfig->priceIncludesTax($item->getStore())) {
+            $newPrice = $priceIncl / (1 + ($taxRate / 100));
+        }
+
+        $item->setCustomPrice($newPrice);
+        $item->setOriginalCustomPrice($newPrice);
     }
 }

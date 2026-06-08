@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright © Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="emails" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
@@ -99,6 +97,22 @@
             <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
             <depends>
                 <field id="enable_customer_cancel_notification">1</field>
+            </depends>
+        </field>
+        <field id="enable_admin_failure_notification" translate="label" type="select" sortOrder="120" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Send admin email on payment failure?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/emails/enable_admin_failure_notification</config_path>
+        </field>
+        <field id="admin_failure_notification_template" translate="label comment" type="select" sortOrder="130"
+               showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Payment failure notification template for admin</label>
+            <config_path>mollie_subscriptions/emails/admin_failure_notification_template</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+            <depends>
+                <field id="enable_admin_failure_notification">1</field>
             </depends>
         </field>
     </group>

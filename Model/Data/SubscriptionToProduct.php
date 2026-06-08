@@ -89,6 +89,25 @@ class SubscriptionToProduct extends AbstractExtensibleObject implements Subscrip
     }
 
     /**
+     * Get option_id
+     * @return string|null
+     */
+    public function getOptionId(): ?string
+    {
+        return $this->_get(self::OPTION_ID);
+    }
+
+    /**
+     * Set option_id
+     * @param string $optionId
+     * @return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
+     */
+    public function setOptionId(?string $optionId)
+    {
+        return $this->setData(self::OPTION_ID, $optionId);
+    }
+
+    /**
      * Get store_id
      * @return int|null
      */

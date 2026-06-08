@@ -59,11 +59,13 @@ class ChangeAddToCartText implements ObserverInterface
         $html = $transport->getData('html');
 
         $document = $this->domDocumentFactory->create();
+        $document->encoding = 'UTF-8';
         $document->preserveWhiteSpace = false;
         $document->formatOutput = true;
 
         try {
             libxml_use_internal_errors(true);
+            $html = mb_convert_encoding($html, 'UTF-8', mb_detect_encoding($html));
             $load = $document->loadHTML($html, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
             libxml_clear_errors();
 
@@ -88,12 +90,9 @@ class ChangeAddToCartText implements ObserverInterface
         }
 
         $subscriptionOptionsBlock = $block->getLayout()->createBlock(SubscriptionOptions::class)->toHtml();
-        $subscriptionOptionsBlock = str_replace('@', 'at-----', $subscriptionOptionsBlock);
 
         $newHtml = $this->domDocumentFactory->create();
-        $newHtml->preserveWhiteSpace = false;
-        $newHtml->formatOutput = false;
-        $newHtml->loadHTML($subscriptionOptionsBlock, LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+        $newHtml->loadHTML('<replaceme>');
 
         // Import our HTML before the regular "add to cart button".
         $imported = $document->importNode($newHtml->documentElement, true);
@@ -103,7 +102,7 @@ class ChangeAddToCartText implements ObserverInterface
         $button->parentNode->removeChild($button);
 
         $saveHTML = $document->saveHTML();
-        $saveHTML = str_replace('at-----', '@', $saveHTML);
+        $saveHTML = str_replace('<replaceme></replaceme>', $subscriptionOptionsBlock, $saveHTML);
         $transport->setData('html', $saveHTML);
     }
 

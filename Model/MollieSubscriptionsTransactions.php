@@ -6,23 +6,19 @@
 
 namespace Mollie\Subscriptions\Model;
 
-use DateInterval;
-use DateTimeImmutable;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Ui\Component\Listing;
-use Mollie\Api\Resources\Subscription;
-use Mollie\Api\Resources\SubscriptionCollection;
-use Mollie\Payment\Api\Data\MollieCustomerInterface;
+use Mollie\Api\Resources\Payment;
+use Mollie\Api\Resources\PaymentCollection;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 use Mollie\Subscriptions\Config;
-use Mollie\Subscriptions\DTO\SubscriptionResponse;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
-class MollieSubscriptionsListing extends Listing
+class MollieSubscriptionsTransactions extends Listing
 {
     /**
      * @var Config
@@ -90,44 +86,43 @@ class MollieSubscriptionsListing extends Listing
         $this->config = $config;
     }
 
-    public function getDataSourceData()
+    public function getDataSourceData(): array
     {
         $storeId = $this->getContext()->getRequestParam('filters')['store_id'] ?? null;
+        $customerId = $this->getContext()->getRequestParam('customer_id');
+        $subscriptionId = $this->getContext()->getRequestParam('subscription_id');
+
         $api = $this->mollieSubscriptionApi->loadByStore($storeId);
+
         $paging = $this->getContext()->getRequestParam('paging');
 
-        $pageSize = $paging['pageSize'] ?? null;
+        $pageSize = $paging['pageSize'] ?? 20;
         if ($pageSize > 250) {
             $pageSize = 250;
         }
 
-        if (!$this->getContext()->getRequestParam('offsetID')) {
-            $pageSize = null;
-        }
-
-        $result = $api->subscriptions->allFor(
+        $result = $api->subscriptionPayments->pageForIds(
+            $customerId,
+            $subscriptionId,
             $this->getContext()->getRequestParam('offsetID'),
-            $pageSize
+            $pageSize,
         );
 
-        $this->preloadCustomers((array)$result);
         $this->parsePreviousNext($result);
 
-        $daysBeforeReminder = $this->config->daysBeforePrepaymentReminder($storeId);
-        $items = array_map(function (Subscription $subscription) use ($daysBeforeReminder) {
-            $prePaymentReminder = null;
-            if ($subscription->nextPaymentDate) {
-                $prePaymentReminder = new DateTimeImmutable($subscription->nextPaymentDate);
-                $prePaymentReminder = $prePaymentReminder->sub(new DateInterval('P' . $daysBeforeReminder . 'D'));
-            }
-
-            $response = new SubscriptionResponse(
-                $subscription,
-                $this->getCustomerMollieCustomerById($subscription->customerId),
-                $prePaymentReminder
-            );
-
-            return $response->toArray();
+        $items = array_map(function (Payment $payment) {
+            return [
+                'id' => $payment->id,
+                'amount' => $payment->amount->value,
+                'description' => $payment->description,
+                'status' => $payment->status,
+                'created_at' => $payment->createdAt,
+                'paid_at' => $payment->paidAt,
+                'canceled_at' => $payment->canceledAt,
+                'expires_at' => $payment->expiresAt,
+                'failed_at' => $payment->failedAt,
+                'due_date' => $payment->dueDate,
+            ];
         }, (array)$result);
 
         return [
@@ -139,17 +134,6 @@ class MollieSubscriptionsListing extends Listing
         ];
     }
 
-    private function getCustomerMollieCustomerById(string $customerId)
-    {
-        foreach ($this->customers as $customer) {
-            if ($customer->getExtensionAttributes()->getMollieCustomerId() == $customerId) {
-                return $customer;
-            }
-        }
-
-        return $this->customerFactory->create();
-    }
-
     private function parseLink(string $link): string
     {
         $query = parse_url($link, PHP_URL_QUERY);
@@ -158,7 +142,7 @@ class MollieSubscriptionsListing extends Listing
         return $parts['from'];
     }
 
-    private function parsePreviousNext(SubscriptionCollection $result)
+    private function parsePreviousNext(PaymentCollection $result): void
     {
         if ($result->hasNext()) {
             $this->next = $this->parseLink($result->_links->next->href);
@@ -167,22 +151,5 @@ class MollieSubscriptionsListing extends Listing
         if ($result->hasPrevious()) {
             $this->previous = $this->parseLink($result->_links->previous->href);
         }
-    }
-
-    private function preloadCustomers(array $result)
-    {
-        $mollieCustomerIds = array_column($result, 'customerId');
-
-        $searchCriteria = $this->searchCriteriaBuilderFactory->create();
-        $searchCriteria->addFilter('mollie_customer_id', $mollieCustomerIds, 'in');
-        $result = $this->mollieCustomerRepository->getList($searchCriteria->create());
-
-        $customerIds = array_map(function (MollieCustomerInterface $customerInfo) {
-            return $customerInfo->getCustomerId();
-        }, $result->getItems());
-
-        $searchCriteria = $this->searchCriteriaBuilderFactory->create();
-        $searchCriteria->addFilter('entity_id', $customerIds, 'in');
-        $this->customers = $this->customerRepository->getList($searchCriteria->create())->getItems();
     }
 }

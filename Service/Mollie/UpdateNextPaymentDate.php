@@ -26,6 +26,10 @@ class UpdateNextPaymentDate
 
     public function execute(Subscription $subscription): void
     {
+        if ($subscription->nextPaymentDate === null) {
+            return;
+        }
+
         $row = $this->subscriptionToProductRepository->getBySubscriptionId($subscription->id);
         $row->setNextPaymentDate($subscription->nextPaymentDate);
         $this->subscriptionToProductRepository->save($row);

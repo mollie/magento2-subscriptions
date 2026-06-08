@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Copyright © Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
@@ -28,11 +26,26 @@
             <config_path>mollie_subscriptions/general/shipping_method</config_path>
             <comment>This method is used when recurring orders are created.</comment>
         </field>
-        <field id="allow_one_time_purchase" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="allow_one_time_purchase" translate="label" type="select" sortOrder="40" showInDefault="1"
+               showInWebsite="1" showInStore="1">
             <label>Allow one-time purchase for products?</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>mollie_subscriptions/general/allow_one_time_purchases</config_path>
             <comment>Note: This can be changed on a per-product level</comment>
+        </field>
+        <field id="show_price_in_subscription_button" translate="label" type="select" sortOrder="50" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Include price in subscription button</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/general/show_price_in_subscription_button</config_path>
+            <comment>Renders the subscription interval price in the purchase button. Applies to one-time purchase as well when active.</comment>
+        </field>
+        <field id="update_subscription_when_price_changes" translate="label" type="select" sortOrder="60"
+               showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Update the subscription when the price changes?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>mollie_subscriptions/general/update_subscription_when_price_changes</config_path>
+            <comment>When the product price is updates, should we update the subscription as well?</comment>
         </field>
     </group>
 </include>

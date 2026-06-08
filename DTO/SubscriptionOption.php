@@ -15,6 +15,11 @@ class SubscriptionOption
     private $productId;
 
     /**
+     * @var string
+     */
+    private $optionId;
+
+    /**
      * @var int
      */
     private $storeId;
@@ -48,7 +53,6 @@ class SubscriptionOption
      * @var \DateTimeImmutable
      */
     private $startDate;
-
     /**
      * @var int|null
      */
@@ -56,6 +60,7 @@ class SubscriptionOption
 
     public function __construct(
         int $productId,
+        string $optionId,
         int $storeId,
         array $amount,
         string $interval,
@@ -66,6 +71,7 @@ class SubscriptionOption
         ?int $times = null
     ) {
         $this->productId = $productId;
+        $this->optionId = $optionId;
         $this->storeId = $storeId;
         $this->amount = $amount;
         $this->interval = $interval;
@@ -79,6 +85,11 @@ class SubscriptionOption
     public function getProductId(): int
     {
         return $this->productId;
+    }
+
+    public function getOptionId(): string
+    {
+        return $this->optionId;
     }
 
     public function getStoreId(): int

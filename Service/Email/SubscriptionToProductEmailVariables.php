@@ -96,17 +96,22 @@ class SubscriptionToProductEmailVariables
             $subscriptionToProduct->getStoreId()
         );
 
-        $date = $this->formatDate($subscription->nextPaymentDate, $subscriptionToProduct->getStoreId());
-
-        return [
+        $variables = [
             'subscription_id' => $subscriptionToProduct->getSubscriptionId(),
             'subscription_description' => $subscription->description,
-            'subscription_nextPaymentDate' => $date,
+            'subscription_nextPaymentDate' => null,
             'subscription_amount' => $amount,
             'customer_name' => $customer->name,
             'customer_email' => $customer->email,
             'product' => $product,
         ];
+
+        if ($subscription->nextPaymentDate !== null) {
+            $date = $this->formatDate($subscription->nextPaymentDate, $subscriptionToProduct->getStoreId());
+            $variables['subscription_nextPaymentDate'] = $date;
+        }
+
+        return $variables;
     }
 
     private function getApiForStore($storeId): MollieApiClient

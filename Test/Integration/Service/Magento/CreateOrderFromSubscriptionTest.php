@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -119,6 +123,57 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $instance->execute(new MollieApiClient(), $payment, $subscription);
 
         $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store carriers/flatrate/active 0
+     * @magentoConfigFixture default_store carriers/freeshipping/active 0
+     * @magentoConfigFixture default_store carriers/tablerate/active 0
+     * @magentoConfigFixture default_store mollie_subscriptions/general/shipping_method flatrate_flatrate
+     *
+     * @return void
+     */
+    public function testFallsBackToSubscriptionShippingWhenNoRatesAvailable(): void
+    {
+        $this->createMollieCustomer();
+        $order = $this->loadOrderById('100000001');
+
+        $subscription = [
+            'id' => 'sub_testsubscription',
+            'nextPaymentDate' => '2016-11-19',
+            'metadata' => [
+                'sku' => 'simple',
+                // If these aren't processed, the test will fail due to the customer not having a billing address
+                'billingAddressId' => $order->getBillingAddressId(),
+                'shippingAddressId' => $order->getBillingAddressId(),
+            ]
+        ];
+
+        $client = MollieApiClient::fake([
+            GetPaymentRequest::class => MockResponse::ok(json_encode([
+                'id' => 'tr_testtransaction',
+                'customerId' => 'cst_testcustomer',
+                'subscriptionId' => 'sub_testsubscription',
+            ])),
+
+            GetSubscriptionRequest::class => MockResponse::ok(json_encode($subscription)),
+        ]);
+
+        /** @var MollieSubscriptionApiFake $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(MollieSubscriptionApiFake::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, MollieSubscriptionApi::class);
+
+        $instance = $this->objectManager->create(CreateOrderFromSubscription::class);
+
+        $payment = $fakeMollieApiClient->loadByStore()->payments->get('');
+        $subscription = $fakeMollieApiClient->loadByStore()->subscriptions->getForId('', '');
+
+        $result = $instance->execute(new MollieApiClient(), $payment, $subscription);
+
+        $this->assertSame('mollie_subscriptions_fallback_shipping', $result->getShippingMethod());
     }
 
     private function createMollieCustomer(): void

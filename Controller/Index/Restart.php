@@ -190,6 +190,10 @@ class Restart extends Action implements HttpPostActionInterface
         $model->setStoreId($this->storeManager->getStore()->getId());
         $model->setNextPaymentDate($subscription->nextPaymentDate);
 
+        if (property_exists($subscription->metadata, 'optionId')) {
+            $model->setOptionId($subscription->metadata->optionId);
+        }
+
         $model = $this->subscriptionToProductRepository->save($model);
         $this->eventManager->dispatch('mollie_subscription_restarted', ['subscription' => $model]);
 

@@ -10,10 +10,10 @@ jobs:
           - PHP_VERSION: php81-fpm
             MAGENTO_VERSION: 2.4.6-p4
           - PHP_VERSION: php84-fpm
-            MAGENTO_VERSION: 2.4.8-p3
+            MAGENTO_VERSION: 2.4.9
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Start Docker
         run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
@@ -26,9 +26,8 @@ jobs:
 
       - name: Install Mollie and Mollie Subscription extensions
         run: |
-          docker exec magento-project-community-edition ./install-composer-package mollie/magento2-subscriptions:@dev
-          docker exec magento-project-community-edition rm -rf vendor/mollie/magento2
-          docker exec magento-project-community-edition composer install --prefer-source
+          docker exec magento-project-community-edition composer config preferred-install.mollie/magento2 source
+          docker exec magento-project-community-edition ./install-composer-package mollie/magento2 mollie/magento2-subscriptions:@dev
 
       - name: Enable modules
         run: docker exec magento-project-community-edition bash -c "php bin/magento module:enable Mollie_Payment Mollie_Subscriptions && php bin/magento setup:upgrade"

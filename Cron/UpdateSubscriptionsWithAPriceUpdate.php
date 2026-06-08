@@ -7,12 +7,14 @@
 namespace Mollie\Subscriptions\Cron;
 
 
+use Exception;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
-use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
+use Mollie\Subscriptions\Config;
+use Mollie\Subscriptions\Service\Magento\GetPriceUpdateForSubscription;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class UpdateSubscriptionsWithAPriceUpdate
@@ -48,6 +50,10 @@ class UpdateSubscriptionsWithAPriceUpdate
      * @var PriceCurrencyInterface
      */
     private $priceCurrency;
+    /**
+     * @var GetPriceUpdateForSubscription
+     */
+    private $getPriceUpdateForSubscription;
 
     public function __construct(
         Config $config,
@@ -55,14 +61,17 @@ class UpdateSubscriptionsWithAPriceUpdate
         General $mollieHelper,
         SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
         ProductRepositoryInterface $productRepository,
-        PriceCurrencyInterface $priceCurrency
-    ) {
+        PriceCurrencyInterface $priceCurrency,
+        GetPriceUpdateForSubscription $getPriceUpdateForSubscription
+    )
+    {
         $this->config = $config;
         $this->mollieSubscriptionApi = $mollieSubscriptionApi;
         $this->mollieHelper = $mollieHelper;
         $this->subscriptionToProductRepository = $subscriptionToProductRepository;
         $this->productRepository = $productRepository;
         $this->priceCurrency = $priceCurrency;
+        $this->getPriceUpdateForSubscription = $getPriceUpdateForSubscription;
     }
 
     public function execute()
@@ -70,9 +79,13 @@ class UpdateSubscriptionsWithAPriceUpdate
         $subscriptions = $this->subscriptionToProductRepository->getSubscriptionsWithAPriceUpdate();
 
         foreach ($subscriptions->getItems() as $item) {
+            if (!$this->config->updateSubscriptionWhenPriceChanges($item->getStoreId())) {
+                continue;
+            }
+
             try {
                 $this->updateSubscription($item);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->config->addToLog('error', [
                     'message' => __('Unable to change the price for subscription "%1"', $item->getEntityId()),
                     'exception' => $exception->getMessage(),
@@ -96,7 +109,8 @@ class UpdateSubscriptionsWithAPriceUpdate
 
     private function updateSubscription(SubscriptionToProductInterface $item): void
     {
-        $price = $this->productRepository->getById($item->getProductId())->getPrice();
+        $product = $this->productRepository->getById($item->getProductId());
+        $price = $this->getPriceUpdateForSubscription->execute($item, $product);
         $api = $this->getApiForStore($item->getStoreId());
 
         $subscription = $api->subscriptions->getForId($item->getCustomerId(), $item->getSubscriptionId());
@@ -113,10 +127,21 @@ class UpdateSubscriptionsWithAPriceUpdate
             return;
         }
 
-        $subscription->amount = $this->mollieHelper->getAmountArray(
+        $amount = $this->mollieHelper->getAmountArray(
             $subscription->amount->currency,
             $this->priceCurrency->convert($price, $item->getStoreId(), $subscription->amount->currency)
         );
+
+        if ($subscription->amount->currency == $amount['currency'] &&
+            $subscription->amount->value == $amount['value']
+        ) {
+            $item->setHasPriceUpdate(0);
+            $this->subscriptionToProductRepository->save($item);
+
+            return;
+        }
+
+        $subscription->amount = $amount;
         $subscription->update();
 
         $this->config->addToLog('success', __(

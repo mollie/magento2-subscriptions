@@ -69,7 +69,6 @@
         <arguments>
             <argument name="parts" xsi:type="array">
                 <item name="create_customer_for_subscription_carts" xsi:type="object">Mollie\Subscriptions\Service\Order\TransactionPart\CreateCustomerForSubscriptionCarts</item>
-                <item name="sequenceType" xsi:type="object">Mollie\Subscriptions\Service\Order\TransactionPart\SequenceType</item>
                 <item name="change_transaction_price_for_trial" xsi:type="object">Mollie\Subscriptions\Service\Order\TransactionPart\ChangeTransactionPriceForTrial</item>
             </argument>
         </arguments>

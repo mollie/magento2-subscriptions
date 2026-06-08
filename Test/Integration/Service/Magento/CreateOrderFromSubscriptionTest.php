@@ -39,6 +39,7 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $subscription = [
             'id' => 'sub_testsubscription',
             'nextPaymentDate' => '2016-11-19',
+            'amount' => ['value' => '100.00', 'currency' => 'EUR'],
             'metadata' => [
                 'sku' => 'simple',
                 // If these aren't processed, the test will fail due to the customer not having a billing address
@@ -89,6 +90,7 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $subscription = [
             'id' => 'sub_testsubscription',
             'nextPaymentDate' => '2016-11-19',
+            'amount' => ['value' => '100.00', 'currency' => 'EUR'],
             'metadata' => [
                 'sku' => 'simple',
                 // If these aren't processed, the test will fail due to the customer not having a billing address
@@ -143,6 +145,7 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $subscription = [
             'id' => 'sub_testsubscription',
             'nextPaymentDate' => '2016-11-19',
+            'amount' => ['value' => '100.00', 'currency' => 'EUR'],
             'metadata' => [
                 'sku' => 'simple',
                 // If these aren't processed, the test will fail due to the customer not having a billing address

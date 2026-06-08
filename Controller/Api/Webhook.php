@@ -19,8 +19,8 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Magento\GetOrderIdsByTransactionId;
 use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
-use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
@@ -69,9 +69,9 @@ class Webhook extends Action implements CsrfAwareActionInterface
     private $api;
 
     /**
-     * @var ValidateMetadata
+     * @var GetOrderIdsByTransactionId
      */
-    private $validateMetadata;
+    private $getOrderIdsByTransactionId;
     /**
      * @var SendAdminNotification
      */
@@ -108,7 +108,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         MollieLogger $mollieLogger,
         SendOrderEmails $sendOrderEmails,
         RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
-        ValidateMetadata $validateMetadata,
+        GetOrderIdsByTransactionId $getOrderIdsByTransactionId,
         LinkTransactionToOrder $linkTransactionToOrder,
         OrderCommentHistory $orderCommentHistory,
         SendAdminNotification $sendAdminNotification,
@@ -124,7 +124,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         $this->mollieLogger = $mollieLogger;
         $this->sendOrderEmails = $sendOrderEmails;
         $this->retryUsingOtherStoreViews = $retryUsingOtherStoreViews;
-        $this->validateMetadata = $validateMetadata;
+        $this->getOrderIdsByTransactionId = $getOrderIdsByTransactionId;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->sendAdminNotification = $sendAdminNotification;
@@ -144,11 +144,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
             throw new NotFoundException(__('No id provided'));
         }
 
-        // The metadata is removed for recurring payments, which makes sense as we put the order ID in there,
-        // so we need to skip the validation
-        $this->validateMetadata->skipValidation();
-
-        if ($orders = $this->mollie->getOrderIdsByTransactionId($id)) {
+        if ($orders = $this->getOrderIdsByTransactionId->execute($id)) {
             foreach ($orders as $orderId) {
                 $this->mollie->processTransaction($orderId, Payments::TRANSACTION_TYPE_SUBSCRIPTION);
             }

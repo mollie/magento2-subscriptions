@@ -116,12 +116,13 @@ class SubscriptionToProductEmailVariables
 
     private function getApiForStore($storeId): MollieApiClient
     {
-        if (array_key_exists($storeId, $this->apiToStore)) {
-            return $this->apiToStore[$storeId];
+        $key = $storeId ?? '';
+        if (array_key_exists($key, $this->apiToStore)) {
+            return $this->apiToStore[$key];
         }
 
-        $this->apiToStore[$storeId] = $this->mollieSubscriptionApi->loadByStore($storeId);
-        return $this->apiToStore[$storeId];
+        $this->apiToStore[$key] = $this->mollieSubscriptionApi->loadByStore($storeId);
+        return $this->apiToStore[$key];
     }
 
     public function formatDate(string $nextPaymentDate, int $storeId): string

@@ -32,7 +32,7 @@ class SendForPayment
 
     public function execute(Subscription $subscription, Payment $molliePayment): void
     {
-        if ($molliePayment->status !== PaymentStatus::STATUS_FAILED) {
+        if ($molliePayment->status !== PaymentStatus::FAILED) {
             return;
         }
 

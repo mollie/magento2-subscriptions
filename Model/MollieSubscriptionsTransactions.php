@@ -22,9 +22,9 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class MollieSubscriptionsTransactions extends Listing
 {
-    private ?string $next;
+    private ?string $next = null;
 
-    private ?string $previous;
+    private ?string $previous = null;
 
     public function __construct(
         ContextInterface $context,
@@ -45,7 +45,7 @@ class MollieSubscriptionsTransactions extends Listing
 
         $paging = $this->getContext()->getRequestParam('paging');
 
-        $pageSize = $paging['pageSize'] ?? 20;
+        $pageSize = (int) ($paging['pageSize'] ?? 20);
         if ($pageSize > 250) {
             $pageSize = 250;
         }

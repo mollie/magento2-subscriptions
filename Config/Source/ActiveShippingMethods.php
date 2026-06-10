@@ -3,6 +3,7 @@
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Config\Source;
 
@@ -11,15 +12,9 @@ use Magento\Shipping\Model\Config\Source\Allmethods;
 
 class ActiveShippingMethods extends AbstractSource
 {
-    /**
-     * @var Allmethods
-     */
-    private $allMethods;
-
     public function __construct(
-        Allmethods $allMethods
+        private readonly Allmethods $allMethods
     ) {
-        $this->allMethods = $allMethods;
     }
 
     public function getAllOptions()

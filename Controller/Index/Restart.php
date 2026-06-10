@@ -4,8 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Index;
 
+use Exception;
 use Magento\Catalog\Model\Product;
 use Magento\Customer\Helper\Session\CurrentCustomer;
 use Magento\Customer\Model\Session;
@@ -22,90 +25,25 @@ use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterfaceFactory;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 use Mollie\Subscriptions\Service\Email\SendNotificationEmail;
 use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
+use stdClass;
 
 class Restart extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var CurrentCustomer
-     */
-    private $currentCustomer;
-
-    /**
-     * @var Session
-     */
-    private $customerSession;
-
-    /**
-     * @var SubscriptionToProductInterfaceFactory
-     */
-    private $subscriptionToProductFactory;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
-
-    /**
-     * @var Product
-     */
-    private $product;
-
-    /**
-     * @var SendNotificationEmail
-     */
-    private $sendAdminRestartNotificationEmail;
-
-    /**
-     * @var SendNotificationEmail
-     */
-    private $sendCustomerRestartNotificationEmail;
-
     public function __construct(
         Context $context,
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        CurrentCustomer $currentCustomer,
-        Session $customerSession,
-        SubscriptionToProductInterfaceFactory $subscriptionToProductFactory,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        StoreManagerInterface $storeManager,
-        ManagerInterface $eventManager,
-        Product $product,
-        SendNotificationEmail $sendAdminRestartNotificationEmail,
-        SendNotificationEmail $sendCustomerRestartNotificationEmail
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly CurrentCustomer $currentCustomer,
+        private readonly Session $customerSession,
+        private readonly SubscriptionToProductInterfaceFactory $subscriptionToProductFactory,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly StoreManagerInterface $storeManager,
+        private readonly ManagerInterface $eventManager,
+        private readonly Product $product,
+        private readonly SendNotificationEmail $sendAdminRestartNotificationEmail,
+        private readonly SendNotificationEmail $sendCustomerRestartNotificationEmail
     ) {
         parent::__construct($context);
-        $this->config = $config;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->currentCustomer = $currentCustomer;
-        $this->customerSession = $customerSession;
-        $this->subscriptionToProductFactory = $subscriptionToProductFactory;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->storeManager = $storeManager;
-        $this->eventManager = $eventManager;
-        $this->product = $product;
-        $this->sendAdminRestartNotificationEmail = $sendAdminRestartNotificationEmail;
-        $this->sendCustomerRestartNotificationEmail = $sendCustomerRestartNotificationEmail;
     }
 
     public function dispatch(RequestInterface $request)
@@ -122,7 +60,7 @@ class Restart extends Action implements HttpPostActionInterface
         $customer = $this->currentCustomer->getCustomer();
         $extensionAttributes = $customer->getExtensionAttributes();
 
-        $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
+        $api = $this->mollieSubscriptionApi->loadByStore(storeId($customer->getStoreId()));
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
 
         $canceledSubscription = $api->subscriptions->getForId(
@@ -147,7 +85,7 @@ class Restart extends Action implements HttpPostActionInterface
             ]);
 
             $this->saveSubscriptionResult($subscription);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->messageManager->addErrorMessage(__('We are unable to restart the subscription'));
 
             $this->config->addToLog('error', [
@@ -164,19 +102,19 @@ class Restart extends Action implements HttpPostActionInterface
         return $this->_redirect('*/*/index');
     }
 
-    private function getMetadata(Subscription $canceledSubscription)
+    private function getMetadata(Subscription $canceledSubscription): ?array
     {
-        if ($canceledSubscription->metadata instanceof \stdClass) {
-            $metadata = $canceledSubscription->metadata;
-            $metadata->parent_id = $canceledSubscription->id;
+        if ($canceledSubscription->metadata instanceof stdClass) {
+            $metadata = json_decode(json_encode($canceledSubscription->metadata), true);
+            $metadata['parent_id'] = $canceledSubscription->id;
 
             return $metadata;
         }
 
-        return [];
+        return null;
     }
 
-    private function saveSubscriptionResult(Subscription $subscription)
+    private function saveSubscriptionResult(Subscription $subscription): void
     {
         $productId = $this->product->getIdBySku($subscription->metadata->sku);
 
@@ -184,8 +122,8 @@ class Restart extends Action implements HttpPostActionInterface
         $model = $this->subscriptionToProductFactory->create();
         $model->setCustomerId($subscription->customerId);
         $model->setSubscriptionId($subscription->id);
-        $model->setProductId($productId);
-        $model->setStoreId($this->storeManager->getStore()->getId());
+        $model->setProductId((int) $productId);
+        $model->setStoreId((int) $this->storeManager->getStore()->getId());
         $model->setNextPaymentDate($subscription->nextPaymentDate);
 
         if (property_exists($subscription->metadata, 'optionId')) {

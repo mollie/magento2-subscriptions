@@ -14,21 +14,10 @@ use Mollie\Subscriptions\Service\Mollie\GetSelectedOption;
 
 class GetTrialDiscountForCart
 {
-    /**
-     * @var GetSelectedOption
-     */
-    private $getSelectedOption;
-    /**
-     * @var TrialDiscountForCartFactory
-     */
-    private $trialDiscountForCartFactory;
-
     public function __construct(
-        GetSelectedOption $getSelectedOption,
-        TrialDiscountForCartFactory $trialDiscountForCartFactory
+        private readonly GetSelectedOption $getSelectedOption,
+        private readonly TrialDiscountForCartFactory $trialDiscountForCartFactory
     ) {
-        $this->getSelectedOption = $getSelectedOption;
-        $this->trialDiscountForCartFactory = $trialDiscountForCartFactory;
     }
 
     /**

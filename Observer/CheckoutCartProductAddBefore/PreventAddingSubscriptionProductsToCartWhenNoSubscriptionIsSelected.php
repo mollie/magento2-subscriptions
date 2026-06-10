@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Observer\CheckoutCartProductAddBefore;
 
 use Magento\Framework\Event\Observer;
@@ -12,7 +14,7 @@ use Magento\Framework\Exception\LocalizedException;
 
 class PreventAddingSubscriptionProductsToCartWhenNoSubscriptionIsSelected implements ObserverInterface
 {
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         $product = $observer->getData('product');
         if (!$product->getData('mollie_subscription_product')) {

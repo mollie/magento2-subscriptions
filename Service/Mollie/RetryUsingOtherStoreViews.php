@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Mollie;
 
 use Magento\Framework\Exception\NotFoundException;
@@ -15,29 +17,11 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class RetryUsingOtherStoreViews
 {
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var StoreRepositoryInterface
-     */
-    private $storeRepository;
-
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-
     public function __construct(
-        StoreManagerInterface $storeManager,
-        StoreRepositoryInterface $storeRepository,
-        MollieApiClient $mollieApiClient
+        private readonly StoreManagerInterface $storeManager,
+        private readonly StoreRepositoryInterface $storeRepository,
+        private readonly MollieApiClient $mollieApiClient
     ) {
-        $this->storeManager = $storeManager;
-        $this->storeRepository = $storeRepository;
-        $this->mollieApiClient = $mollieApiClient;
     }
 
     public function execute(string $id): Payment
@@ -50,7 +34,7 @@ class RetryUsingOtherStoreViews
         $stores = $this->storeRepository->getList();
         $filtered = array_filter(
             $stores,
-            function (StoreInterface $store) use ($currentGroupId, $currentStoreId) {
+            function (StoreInterface $store) use ($currentGroupId, $currentStoreId): bool {
                 return $store->getStoreGroupId() === $currentGroupId &&
                     $store->getId() !== $currentStoreId;
             }

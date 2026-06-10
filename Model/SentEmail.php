@@ -14,28 +14,16 @@ use Mollie\Subscriptions\Api\Data\SentEmailInterfaceFactory;
 
 class SentEmail extends AbstractModel
 {
-    /**
-     * @var DataObjectHelper
-     */
-    private $dataObjectHelper;
-    /**
-     * @var SentEmailInterfaceFactory
-     */
-    private $sentEmailDataFactory;
-
     public function __construct(
         Context $context,
         Registry $registry,
-        DataObjectHelper $dataObjectHelper,
-        SentEmailInterfaceFactory $sentEmailDataFactory,
+        private readonly DataObjectHelper $dataObjectHelper,
+        private readonly SentEmailInterfaceFactory $sentEmailDataFactory,
         ResourceModel\SentEmail $resource,
         ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->sentEmailDataFactory = $sentEmailDataFactory;
     }
 
     public function getDataModel(): SentEmailInterface

@@ -4,6 +4,8 @@
  *  See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Setup\Patch\Data;
 
 use Magento\Catalog\Model\Product;
@@ -16,18 +18,12 @@ use Mollie\Subscriptions\Config\Source\Status;
 
 class SubscriptionAttributes implements DataPatchInterface
 {
-    /**
-     * @var EavSetupFactory
-     */
-    private $eavSetupFactory;
-
     public function __construct(
-        EavSetupFactory $eavSetupFactory
+        private readonly EavSetupFactory $eavSetupFactory
     ) {
-        $this->eavSetupFactory = $eavSetupFactory;
     }
 
-    public function apply()
+    public function apply(): self
     {
         $eavSetup = $this->eavSetupFactory->create();
 
@@ -154,12 +150,12 @@ class SubscriptionAttributes implements DataPatchInterface
         return $this;
     }
 
-    public static function getDependencies()
+    public static function getDependencies(): array
     {
         return [];
     }
 
-    public function getAliases()
+    public function getAliases(): array
     {
         return [];
     }

@@ -14,10 +14,11 @@ use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Model\Quote;
-use Mollie\Api\Resources\Subscription;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\GetSubscriptionRequest;
+use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Service\Magento\SubscriptionAddProductToCart;
-use stdClass;
 
 class SubscriptionAddProductToCartTest extends IntegrationTestCase
 {
@@ -43,13 +44,14 @@ class SubscriptionAddProductToCartTest extends IntegrationTestCase
     {
         $cart = $this->buildCartWithAlabamaBillingAddress();
 
-        $subscription = $this->objectManager->get(Subscription::class);
-        $subscription->amount = new stdClass();
-        $subscription->amount->value = 10.75;
-        $subscription->amount->currency = 'EUR';
-        $subscription->metadata = new stdClass();
-        $subscription->metadata->quantity = '1';
-        $subscription->metadata->sku = 'simple';
+        $client = MollieApiClient::fake([
+            GetSubscriptionRequest::class => MockResponse::ok(json_encode([
+                'id' => 'sub_testsubscription',
+                'amount' => ['value' => '10.75', 'currency' => 'EUR'],
+                'metadata' => ['quantity' => '1', 'sku' => 'simple'],
+            ])),
+        ]);
+        $subscription = $client->subscriptions->getForId('', '');
 
         $instance = $this->objectManager->create(SubscriptionAddProductToCart::class);
         $instance->execute($cart, $subscription);
@@ -78,13 +80,14 @@ class SubscriptionAddProductToCartTest extends IntegrationTestCase
     {
         $cart = $this->buildCartWithAlabamaBillingAddress();
 
-        $subscription = $this->objectManager->get(Subscription::class);
-        $subscription->amount = new stdClass();
-        $subscription->amount->value = 10.75;
-        $subscription->amount->currency = 'EUR';
-        $subscription->metadata = new stdClass();
-        $subscription->metadata->quantity = '1';
-        $subscription->metadata->sku = 'simple';
+        $client = MollieApiClient::fake([
+            GetSubscriptionRequest::class => MockResponse::ok(json_encode([
+                'id' => 'sub_testsubscription',
+                'amount' => ['value' => '10.75', 'currency' => 'EUR'],
+                'metadata' => ['quantity' => '1', 'sku' => 'simple'],
+            ])),
+        ]);
+        $subscription = $client->subscriptions->getForId('', '');
 
         $instance = $this->objectManager->create(SubscriptionAddProductToCart::class);
         $instance->execute($cart, $subscription);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Email;
 
 use Magento\Framework\Api\FilterBuilder;
@@ -11,43 +13,13 @@ use Mollie\Subscriptions\Config;
 
 class RetrieveRecordsForPrePaymentReminder
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilderFactory;
-
-    /**
-     * @var FilterBuilder
-     */
-    private $filterBuilder;
-
-    /**
-     * @var FilterGroupBuilder
-     */
-    private $filterGroupBuilder;
-
     public function __construct(
-        Config $config,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        FilterBuilder $filterBuilder,
-        FilterGroupBuilder $filterGroupBuilder
+        private readonly Config $config,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
+        private readonly FilterBuilder $filterBuilder,
+        private readonly FilterGroupBuilder $filterGroupBuilder
     ) {
-        $this->config = $config;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->filterBuilder = $filterBuilder;
-        $this->filterGroupBuilder = $filterGroupBuilder;
     }
 
     public function execute(\DateTimeImmutable $today): SubscriptionToProductSearchResultsInterface

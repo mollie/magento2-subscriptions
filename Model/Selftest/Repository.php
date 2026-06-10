@@ -14,26 +14,15 @@ use Mollie\Subscriptions\Api\Selftest\RepositoryInterface;
  */
 class Repository implements RepositoryInterface
 {
-    /**
-     * @var array
-     */
-    private $testList;
-
-    /**
-     * Repository constructor.
-     *
-     * @param array $testList
-     */
     public function __construct(
-        $testList
+        private readonly array $testList
     ) {
-        $this->testList = $testList;
     }
 
     /**
      * @inheritDoc
      */
-    public function test($output = true): array
+    public function test(bool $output = true): array
     {
         $result = [];
         foreach ($this->testList as $data) {

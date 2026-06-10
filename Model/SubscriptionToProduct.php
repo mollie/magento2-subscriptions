@@ -17,16 +17,6 @@ use Mollie\Subscriptions\Model\ResourceModel\SubscriptionToProduct\Collection;
 class SubscriptionToProduct extends \Magento\Framework\Model\AbstractModel
 {
     /**
-     * @var SubscriptionToProductInterfaceFactory
-     */
-    protected $subscriptionToProductDataFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
      * @var string
      */
     protected $_eventPrefix = 'mollie_subscriptions_subscription_to_product';
@@ -34,22 +24,16 @@ class SubscriptionToProduct extends \Magento\Framework\Model\AbstractModel
     public function __construct(
         Context $context,
         Registry $registry,
-        SubscriptionToProductInterfaceFactory $subscriptionToProductDataFactory,
-        DataObjectHelper $dataObjectHelper,
+        protected readonly SubscriptionToProductInterfaceFactory $subscriptionToProductDataFactory,
+        protected readonly DataObjectHelper $dataObjectHelper,
         ResourceModel\SubscriptionToProduct $resource,
         Collection $resourceCollection,
         array $data = []
     ) {
-        $this->subscriptionToProductDataFactory = $subscriptionToProductDataFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
-    /**
-     * Retrieve subscription_to_product model with subscription_to_product data
-     * @return SubscriptionToProductInterface
-     */
-    public function getDataModel()
+    public function getDataModel(): SubscriptionToProductInterface
     {
         $subscription_to_productData = $this->getData();
         

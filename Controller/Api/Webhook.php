@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Api;
 
 use Magento\Framework\App\Action\Action;
@@ -12,6 +14,7 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NotFoundException;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
@@ -19,8 +22,8 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Magento\GetOrderIdsByTransactionId;
 use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
-use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Subscriptions\Config;
@@ -34,103 +37,27 @@ use Mollie\Subscriptions\Service\Mollie\UpdateNextPaymentDate;
 class Webhook extends Action implements CsrfAwareActionInterface
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var Mollie
-     */
-    private $mollie;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var MollieLogger
-     */
-    private $mollieLogger;
-
-    /**
-     * @var SendOrderEmails
-     */
-    private $sendOrderEmails;
-
-    /**
-     * @var RetryUsingOtherStoreViews
-     */
-    private $retryUsingOtherStoreViews;
-
-    /**
      * @var MollieApiClient
      */
     private $api;
 
-    /**
-     * @var ValidateMetadata
-     */
-    private $validateMetadata;
-    /**
-     * @var SendAdminNotification
-     */
-    private $sendAdminNotification;
-
-    /**
-     * @var CreateOrderFromSubscription
-     */
-    private $createOrderFromSubscription;
-
-    /**
-     * @var LinkTransactionToOrder
-     */
-    private $linkTransactionToOrder;
-
-    /**
-     * @var OrderCommentHistory
-     */
-    private $orderCommentHistory;
-    /**
-     * @var UpdateNextPaymentDate
-     */
-    private $updateNextPaymentDate;
-    /**
-     * @var SendForPayment
-     */
-    private $sendEmailForPayment;
-
     public function __construct(
         Context $context,
-        Config $config,
-        Mollie $mollie,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        MollieLogger $mollieLogger,
-        SendOrderEmails $sendOrderEmails,
-        RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
-        ValidateMetadata $validateMetadata,
-        LinkTransactionToOrder $linkTransactionToOrder,
-        OrderCommentHistory $orderCommentHistory,
-        SendAdminNotification $sendAdminNotification,
-        CreateOrderFromSubscription $createOrderFromSubscription,
-        UpdateNextPaymentDate $updateNextPaymentDate,
-        SendForPayment $sendEmailForPayment
+        private readonly Config $config,
+        private readonly Mollie $mollie,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly MollieLogger $mollieLogger,
+        private readonly SendOrderEmails $sendOrderEmails,
+        private readonly RetryUsingOtherStoreViews $retryUsingOtherStoreViews,
+        private readonly GetOrderIdsByTransactionId $getOrderIdsByTransactionId,
+        private readonly LinkTransactionToOrder $linkTransactionToOrder,
+        private readonly OrderCommentHistory $orderCommentHistory,
+        private readonly SendAdminNotification $sendAdminNotification,
+        private readonly CreateOrderFromSubscription $createOrderFromSubscription,
+        private readonly UpdateNextPaymentDate $updateNextPaymentDate,
+        private readonly SendForPayment $sendEmailForPayment
     ) {
         parent::__construct($context);
-
-        $this->config = $config;
-        $this->mollie = $mollie;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->mollieLogger = $mollieLogger;
-        $this->sendOrderEmails = $sendOrderEmails;
-        $this->retryUsingOtherStoreViews = $retryUsingOtherStoreViews;
-        $this->validateMetadata = $validateMetadata;
-        $this->linkTransactionToOrder = $linkTransactionToOrder;
-        $this->orderCommentHistory = $orderCommentHistory;
-        $this->sendAdminNotification = $sendAdminNotification;
-        $this->createOrderFromSubscription = $createOrderFromSubscription;
-        $this->updateNextPaymentDate = $updateNextPaymentDate;
-        $this->sendEmailForPayment = $sendEmailForPayment;
     }
 
     public function execute()
@@ -144,11 +71,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
             throw new NotFoundException(__('No id provided'));
         }
 
-        // The metadata is removed for recurring payments, which makes sense as we put the order ID in there,
-        // so we need to skip the validation
-        $this->validateMetadata->skipValidation();
-
-        if ($orders = $this->mollie->getOrderIdsByTransactionId($id)) {
+        if ($orders = $this->getOrderIdsByTransactionId->execute($id)) {
             foreach ($orders as $orderId) {
                 $this->mollie->processTransaction($orderId, Payments::TRANSACTION_TYPE_SUBSCRIPTION);
             }
@@ -183,7 +106,7 @@ class Webhook extends Action implements CsrfAwareActionInterface
         }
     }
 
-    private function returnOkResponse()
+    private function returnOkResponse(): ResultInterface
     {
         $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
         $result->setHeader('content-type', 'text/plain');

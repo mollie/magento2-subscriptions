@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Adminhtml\Subscriptions;
 
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -18,45 +20,14 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class SavePrice implements HttpPostActionInterface
 {
-    /**
-     * @var ManagerInterface
-     */
-    private $messageManager;
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
-    /**
-     * @var DataPersistorInterface
-     */
-    private $dataPersistor;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieApi;
-
     public function __construct(
-        ManagerInterface $messageManager,
-        RequestInterface $request,
-        ResultFactory $resultFactory,
-        DataPersistorInterface $dataPersistor,
-        Config $config,
-        MollieSubscriptionApi $mollieApi
+        private readonly ManagerInterface $messageManager,
+        private readonly RequestInterface $request,
+        private readonly ResultFactory $resultFactory,
+        private readonly DataPersistorInterface $dataPersistor,
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieApi
     ) {
-        $this->messageManager = $messageManager;
-        $this->request = $request;
-        $this->resultFactory = $resultFactory;
-        $this->dataPersistor = $dataPersistor;
-        $this->config = $config;
-        $this->mollieApi = $mollieApi;
     }
 
     public function execute(): ResultInterface

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Mollie;
 
 use Magento\Framework\UrlInterface;
@@ -34,50 +36,20 @@ class SubscriptionOptions
     private $options = [];
 
     /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-
-    /**
-     * @var ParseSubscriptionOptions
-     */
-    private $parseSubscriptionOptions;
-
-    /**
      * @var ProductSubscriptionOption
      */
     private $currentOption;
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var GetShippingCostForOrderItem
-     */
-    private $getShippingCostForOrderItem;
 
     public function __construct(
-        General $mollieHelper,
-        UrlInterface $urlBuilder,
-        ParseSubscriptionOptions $parseSubscriptionOptions,
-        GetShippingCostForOrderItem $getShippingCostForOrderItem,
-        StoreManagerInterface $storeManager
+        private readonly General $mollieHelper,
+        private readonly UrlInterface $urlBuilder,
+        private readonly ParseSubscriptionOptions $parseSubscriptionOptions,
+        private readonly GetShippingCostForOrderItem $getShippingCostForOrderItem,
+        private readonly StoreManagerInterface $storeManager
     ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->urlBuilder = $urlBuilder;
-        $this->parseSubscriptionOptions = $parseSubscriptionOptions;
-        $this->getShippingCostForOrderItem = $getShippingCostForOrderItem;
-        $this->storeManager = $storeManager;
     }
 
     /**
-     * @param OrderInterface $order
      * @return SubscriptionOption[]
      */
     public function forOrder(OrderInterface $order): array
@@ -117,9 +89,9 @@ class SubscriptionOptions
         );
 
         return new SubscriptionOption(
-            $orderItem->getProductId(),
+            (int) $orderItem->getProductId(),
             $this->currentOption->getIdentifier(),
-            $this->order->getStoreId(),
+            storeId($this->order->getStoreId()),
             $amount,
             $this->options['interval'] ?? '',
             $this->options['description'] ?? '',
@@ -142,7 +114,7 @@ class SubscriptionOptions
             $rowTotal = $this->orderItem->getParentItem()->getRowTotalInclTax();
         }
 
-        $this->options['amount'] = $rowTotal;
+        $this->options['amount'] = (float) $rowTotal;
     }
 
     private function addShippingCost(): void
@@ -262,31 +234,31 @@ class SubscriptionOptions
 
         if ($intervalType == IntervalType::DAYS) {
             if ($intervalAmount == 1) {
-                return __('Every day', $intervalAmount);
+                return (string) __('Every day', $intervalAmount);
             }
 
-            return __('Every %1 days', $intervalAmount);
+            return (string) __('Every %1 days', $intervalAmount);
         }
 
         if ($intervalType == IntervalType::WEEKS) {
             if ($intervalAmount == 1) {
-                return __('Every week');
+                return (string) __('Every week');
             }
 
-            return __('Every %1 weeks', $intervalAmount);
+            return (string) __('Every %1 weeks', $intervalAmount);
         }
 
         if ($intervalType == IntervalType::MONTHS) {
             if ($intervalAmount == 1) {
-                return __('Every month');
+                return (string) __('Every month');
             }
 
-            return __('Every %1 months', $intervalAmount);
+            return (string) __('Every %1 months', $intervalAmount);
         }
 
         // 365 days is the maximum.
         if ($intervalType == IntervalType::YEARS) {
-            return __('Every year');
+            return (string) __('Every year');
         }
 
         return '';

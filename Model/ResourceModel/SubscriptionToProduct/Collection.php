@@ -15,12 +15,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected $_idFieldName = 'subscription_to_product_id';
 
-    /**
-     * Define resource model
-     *
-     * @return void
-     */
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->_init(
             \Mollie\Subscriptions\Model\SubscriptionToProduct::class,

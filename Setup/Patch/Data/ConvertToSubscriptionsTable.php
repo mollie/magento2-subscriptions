@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Setup\Patch\Data;
 
 use Magento\Catalog\Model\Product\Action;
@@ -13,29 +15,11 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 class ConvertToSubscriptionsTable implements DataPatchInterface
 {
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    /**
-     * @var Action
-     */
-    private $productAction;
-
     public function __construct(
-        CollectionFactory $collectionFactory,
-        SerializerInterface $serializer,
-        Action $productAction
+        private readonly CollectionFactory $collectionFactory,
+        private readonly SerializerInterface $serializer,
+        private readonly Action $productAction
     ) {
-        $this->collectionFactory = $collectionFactory;
-        $this->serializer = $serializer;
-        $this->productAction = $productAction;
     }
 
     public function apply(): self

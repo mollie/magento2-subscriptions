@@ -11,54 +11,20 @@ namespace Mollie\Subscriptions\Test\Integration\Service\Magento;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\GetPaymentRequest;
+use Mollie\Api\Http\Requests\GetSubscriptionRequest;
 use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Subscription;
 use Mollie\Payment\Api\Data\MollieCustomerInterface;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Payment\Test\Integration\MolliePaymentBuilder;
 use Mollie\Subscriptions\Service\Magento\CreateOrderFromSubscription;
-use stdClass;
+use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
+use Mollie\Subscriptions\Test\Fakes\Service\Mollie\MollieSubscriptionApiFake;
 
 class CreateOrderFromSubscriptionTest extends IntegrationTestCase
 {
-    /**
-     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
-     * @magentoDataFixture Magento/Sales/_files/order.php
-     *
-     * @return void
-     */
-    public function testUsesOrderBillingAndShippingAddresses(): void
-    {
-        $this->createMollieCustomer();
-        $order = $this->loadOrderById('100000001');
-
-        $molliePaymentBuilder = $this->objectManager->get(MolliePaymentBuilder::class);
-        $molliePaymentBuilder->setMethod('ideal');
-
-        $payment = $molliePaymentBuilder->build();
-        $payment->customerId = 'cst_testcustomer';
-
-        $subscription = $this->objectManager->get(Subscription::class);
-        $subscription->amount = new stdClass();
-        $subscription->amount->value = 100;
-        $subscription->amount->currency = 'EUR';
-        $subscription->customerId = 'cst_testcustomer';
-        $subscription->metadata = new stdClass();
-        $subscription->metadata->quantity = '1';
-        $subscription->metadata->sku = 'simple';
-
-        // If these aren't processed, the test will fail due to the customer not having a billing address
-        $subscription->metadata->billingAddressId = $order->getBillingAddressId();
-        $subscription->metadata->shippingAddressId = $order->getBillingAddressId();
-
-        $instance = $this->objectManager->create(CreateOrderFromSubscription::class);
-
-        $instance->execute(new MollieApiClient(), $payment, $subscription);
-
-        $this->expectNotToPerformAssertions();
-    }
-
     /**
      * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
      * @magentoDataFixture Magento/Sales/_files/order.php
@@ -70,33 +36,95 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $this->createMollieCustomer();
         $order = $this->loadOrderById('100000001');
 
+        $subscription = [
+            'id' => 'sub_testsubscription',
+            'nextPaymentDate' => '2016-11-19',
+            'amount' => ['value' => '100.00', 'currency' => 'EUR'],
+            'metadata' => [
+                'sku' => 'simple',
+                // If these aren't processed, the test will fail due to the customer not having a billing address
+                'billingAddressId' => $order->getBillingAddressId(),
+            ]
+        ];
+
+        $client = MollieApiClient::fake([
+            GetPaymentRequest::class => MockResponse::ok(json_encode([
+                'id' => 'tr_testtransaction',
+                'customerId' => 'cst_testcustomer',
+                'subscriptionId' => 'sub_testsubscription',
+            ])),
+
+            GetSubscriptionRequest::class => MockResponse::ok(json_encode($subscription)),
+        ]);
+
+        /** @var MollieSubscriptionApiFake $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(MollieSubscriptionApiFake::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, MollieSubscriptionApi::class);
+
         /** @var ProductInterface $product */
         $product = $this->objectManager->get(ProductRepositoryInterface::class)->get('simple');
         $product->setTypeId('virtual');
 
-        $molliePaymentBuilder = $this->objectManager->get(MolliePaymentBuilder::class);
-        $molliePaymentBuilder->setMethod('ideal');
-
-        $payment = $molliePaymentBuilder->build();
-        $payment->customerId = 'cst_testcustomer';
-
-        $subscription = $this->objectManager->get(Subscription::class);
-        $subscription->amount = new stdClass();
-        $subscription->amount->value = 100;
-        $subscription->amount->currency = 'EUR';
-        $subscription->customerId = 'cst_testcustomer';
-        $subscription->metadata = new stdClass();
-        $subscription->metadata->quantity = '1';
-        $subscription->metadata->sku = 'simple';
-
-        // If these aren't processed, the test will fail due to the customer not having a billing address
-        $subscription->metadata->billingAddressId = $order->getBillingAddressId();
-
         $instance = $this->objectManager->create(CreateOrderFromSubscription::class);
+
+        $payment = $fakeMollieApiClient->loadByStore()->payments->get('');
+        $subscription = $fakeMollieApiClient->loadByStore()->subscriptions->getForId('', '');
 
         $order = $instance->execute(new MollieApiClient(), $payment, $subscription);
 
         $this->assertSame(1, $order->getIsVirtual());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer_with_addresses.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @return void
+     */
+    public function testUsesOrderBillingAndShippingAddresses(): void
+    {
+        $this->createMollieCustomer();
+        $order = $this->loadOrderById('100000001');
+
+        $subscription = [
+            'id' => 'sub_testsubscription',
+            'nextPaymentDate' => '2016-11-19',
+            'amount' => ['value' => '100.00', 'currency' => 'EUR'],
+            'metadata' => [
+                'sku' => 'simple',
+                // If these aren't processed, the test will fail due to the customer not having a billing address
+                'billingAddressId' => $order->getBillingAddressId(),
+                'shippingAddressId' => $order->getBillingAddressId(),
+            ]
+        ];
+
+        $client = MollieApiClient::fake([
+            GetPaymentRequest::class => MockResponse::ok(json_encode([
+                'id' => 'tr_testtransaction',
+                'customerId' => 'cst_testcustomer',
+                'subscriptionId' => 'sub_testsubscription',
+            ])),
+
+            GetSubscriptionRequest::class => MockResponse::ok(json_encode($subscription)),
+        ]);
+
+        /** @var MollieSubscriptionApiFake $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(MollieSubscriptionApiFake::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, MollieSubscriptionApi::class);
+
+        $molliePaymentBuilder = $this->objectManager->get(MolliePaymentBuilder::class);
+        $molliePaymentBuilder->setMethod('ideal');
+
+        $instance = $this->objectManager->create(CreateOrderFromSubscription::class);
+
+        $payment = $fakeMollieApiClient->loadByStore()->payments->get('');
+        $subscription = $fakeMollieApiClient->loadByStore()->subscriptions->getForId('', '');
+
+        $instance->execute(new MollieApiClient(), $payment, $subscription);
+
+        $this->expectNotToPerformAssertions();
     }
 
     /**
@@ -114,24 +142,37 @@ class CreateOrderFromSubscriptionTest extends IntegrationTestCase
         $this->createMollieCustomer();
         $order = $this->loadOrderById('100000001');
 
-        $molliePaymentBuilder = $this->objectManager->get(MolliePaymentBuilder::class);
-        $molliePaymentBuilder->setMethod('ideal');
+        $subscription = [
+            'id' => 'sub_testsubscription',
+            'nextPaymentDate' => '2016-11-19',
+            'amount' => ['value' => '100.00', 'currency' => 'EUR'],
+            'metadata' => [
+                'sku' => 'simple',
+                // If these aren't processed, the test will fail due to the customer not having a billing address
+                'billingAddressId' => $order->getBillingAddressId(),
+                'shippingAddressId' => $order->getBillingAddressId(),
+            ]
+        ];
 
-        $payment = $molliePaymentBuilder->build();
-        $payment->customerId = 'cst_testcustomer';
+        $client = MollieApiClient::fake([
+            GetPaymentRequest::class => MockResponse::ok(json_encode([
+                'id' => 'tr_testtransaction',
+                'customerId' => 'cst_testcustomer',
+                'subscriptionId' => 'sub_testsubscription',
+            ])),
 
-        $subscription = $this->objectManager->get(Subscription::class);
-        $subscription->amount = new stdClass();
-        $subscription->amount->value = 100;
-        $subscription->amount->currency = 'EUR';
-        $subscription->customerId = 'cst_testcustomer';
-        $subscription->metadata = new stdClass();
-        $subscription->metadata->quantity = '1';
-        $subscription->metadata->sku = 'simple';
-        $subscription->metadata->billingAddressId = $order->getBillingAddressId();
-        $subscription->metadata->shippingAddressId = $order->getBillingAddressId();
+            GetSubscriptionRequest::class => MockResponse::ok(json_encode($subscription)),
+        ]);
+
+        /** @var MollieSubscriptionApiFake $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(MollieSubscriptionApiFake::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, MollieSubscriptionApi::class);
 
         $instance = $this->objectManager->create(CreateOrderFromSubscription::class);
+
+        $payment = $fakeMollieApiClient->loadByStore()->payments->get('');
+        $subscription = $fakeMollieApiClient->loadByStore()->subscriptions->getForId('', '');
 
         $result = $instance->execute(new MollieApiClient(), $payment, $subscription);
 

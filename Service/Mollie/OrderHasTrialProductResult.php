@@ -6,22 +6,10 @@ namespace Mollie\Subscriptions\Service\Mollie;
 
 class OrderHasTrialProductResult
 {
-    /**
-     * @var bool
-     */
-    private $outcome;
-    /**
-     * @var float
-     */
-    private $trialAmountTotal;
-
     public function __construct(
-        bool $outcome,
-        float $trialAmountTotal
-    )
-    {
-        $this->outcome = $outcome;
-        $this->trialAmountTotal = $trialAmountTotal;
+        private readonly bool $outcome,
+        private readonly float $trialAmountTotal
+    ) {
     }
 
     public function getOutcome(): bool

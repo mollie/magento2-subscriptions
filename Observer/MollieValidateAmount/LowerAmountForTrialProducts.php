@@ -12,15 +12,9 @@ use Mollie\Subscriptions\Service\Mollie\OrderHasTrialProduct;
 
 class LowerAmountForTrialProducts implements ObserverInterface
 {
-    /**
-     * @var OrderHasTrialProduct
-     */
-    private $orderHasTrialProduct;
-
     public function __construct(
-        OrderHasTrialProduct $orderHasTrialProduct
+        private readonly OrderHasTrialProduct $orderHasTrialProduct
     ) {
-        $this->orderHasTrialProduct = $orderHasTrialProduct;
     }
 
     public function execute(Observer $observer): void

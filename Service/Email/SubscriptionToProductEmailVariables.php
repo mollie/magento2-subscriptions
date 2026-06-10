@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Email;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -18,30 +20,6 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 class SubscriptionToProductEmailVariables
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $priceCurrency;
-
-    /**
-     * @var DateTime
-     */
-    private $dateTime;
-    /**
      * @var MollieApiClient[]
      */
     private $apiToStore = [];
@@ -51,22 +29,17 @@ class SubscriptionToProductEmailVariables
     private $customers = [];
 
     public function __construct(
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        ProductRepositoryInterface $productRepository,
-        PriceCurrencyInterface $priceCurrency,
-        DateTime $dateTime
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly PriceCurrencyInterface $priceCurrency,
+        private readonly DateTime $dateTime
     ) {
-        $this->config = $config;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->productRepository = $productRepository;
-        $this->priceCurrency = $priceCurrency;
-        $this->dateTime = $dateTime;
     }
 
     public function getMollieCustomer(SubscriptionToProductInterface $subscriptionToProduct): Customer
     {
-        $storeId = $subscriptionToProduct->getStoreId();
+        $storeId = storeId($subscriptionToProduct->getStoreId());
         $customerId = $subscriptionToProduct->getCustomerId();
         $key = $storeId . '-' . $customerId;
         if (array_key_exists($key, $this->customers)) {
@@ -81,7 +54,7 @@ class SubscriptionToProductEmailVariables
 
     public function get(SubscriptionToProductInterface $subscriptionToProduct): array
     {
-        $api = $this->getApiForStore($subscriptionToProduct->getStoreId());
+        $api = $this->getApiForStore(storeId($subscriptionToProduct->getStoreId()));
         $subscription = $api->subscriptions->getForId(
             $subscriptionToProduct->getCustomerId(),
             $subscriptionToProduct->getSubscriptionId()
@@ -107,24 +80,25 @@ class SubscriptionToProductEmailVariables
         ];
 
         if ($subscription->nextPaymentDate !== null) {
-            $date = $this->formatDate($subscription->nextPaymentDate, $subscriptionToProduct->getStoreId());
+            $date = $this->formatDate($subscription->nextPaymentDate, storeId($subscriptionToProduct->getStoreId()));
             $variables['subscription_nextPaymentDate'] = $date;
         }
 
         return $variables;
     }
 
-    private function getApiForStore($storeId): MollieApiClient
+    private function getApiForStore(?int $storeId): MollieApiClient
     {
-        if (array_key_exists($storeId, $this->apiToStore)) {
-            return $this->apiToStore[$storeId];
+        $key = $storeId ?? '';
+        if (array_key_exists($key, $this->apiToStore)) {
+            return $this->apiToStore[$key];
         }
 
-        $this->apiToStore[$storeId] = $this->mollieSubscriptionApi->loadByStore($storeId);
-        return $this->apiToStore[$storeId];
+        $this->apiToStore[$key] = $this->mollieSubscriptionApi->loadByStore($storeId);
+        return $this->apiToStore[$key];
     }
 
-    public function formatDate(string $nextPaymentDate, int $storeId): string
+    public function formatDate(string $nextPaymentDate, ?int $storeId): string
     {
         return $this->dateTime->date(
             $this->config->nextPaymentDateFormat($storeId),

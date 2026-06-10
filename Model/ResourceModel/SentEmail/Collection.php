@@ -9,7 +9,7 @@ use Mollie\Subscriptions\Model\SentEmail;
 
 class Collection extends AbstractCollection
 {
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->_init(SentEmail::class, \Mollie\Subscriptions\Model\ResourceModel\SentEmail::class);
     }

@@ -10,21 +10,10 @@ use Mollie\Subscriptions\DTO\ProductSubscriptionOptionFactory;
 
 class GetSelectedOption
 {
-    /**
-     * @var ParseSubscriptionOptions
-     */
-    private $parseSubscriptionOptions;
-    /**
-     * @var ProductSubscriptionOptionFactory
-     */
-    private $productSubscriptionOptionFactory;
-
     public function __construct(
-        ParseSubscriptionOptions $parseSubscriptionOptions,
-        ProductSubscriptionOptionFactory $productSubscriptionOptionFactory
+        private readonly ParseSubscriptionOptions $parseSubscriptionOptions,
+        private readonly ProductSubscriptionOptionFactory $productSubscriptionOptionFactory
     ) {
-        $this->parseSubscriptionOptions = $parseSubscriptionOptions;
-        $this->productSubscriptionOptionFactory = $productSubscriptionOptionFactory;
     }
 
     public function execute(ProductInterface $product, string $optionId): ProductSubscriptionOption

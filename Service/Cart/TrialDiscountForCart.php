@@ -10,33 +10,12 @@ namespace Mollie\Subscriptions\Service\Cart;
 
 class TrialDiscountForCart
 {
-    /**
-     * @var float
-     */
-    private $product;
-    /**
-     * @var float
-     */
-    private $shipping;
-    /**
-     * @var float
-     */
-    private $discount;
-    /**
-     * @var int
-     */
-    private $itemCount;
-
     public function __construct(
-        float $product,
-        float $shipping,
-        float $discount,
-        int $itemCount
+        private readonly float $product,
+        private readonly float $shipping,
+        private readonly float $discount,
+        private readonly int $itemCount
     ) {
-        $this->product = $product;
-        $this->shipping = $shipping;
-        $this->discount = $discount;
-        $this->itemCount = $itemCount;
     }
 
     public function getProduct(): float

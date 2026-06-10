@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Cron;
 
 use Mollie\Payment\Config as MollieConfig;
@@ -15,58 +17,22 @@ use Mollie\Subscriptions\Service\Mollie\CheckIfSubscriptionIsActive;
 
 class SendPrePaymentReminderEmailCron
 {
-    /**
-     * @var MollieConfig
-     */
-    private $mollieConfig;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
-    /**
-     * @var SendPrepaymentReminderEmail
-     */
-    private $sendPrepaymentReminderEmail;
-
-    /**
-     * @var CheckIfSubscriptionIsActive
-     */
-    private $checkIfSubscriptionIsActive;
-
-    /**
-     * @var RetrieveRecordsForPrePaymentReminder
-     */
-    private $retrieveRecordsForPrePaymentReminder;
-
     public function __construct(
-        MollieConfig $mollieConfig,
-        Config $config,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        SendPrepaymentReminderEmail $sendPrepaymentReminderEmail,
-        CheckIfSubscriptionIsActive $checkIfSubscriptionIsActive,
-        RetrieveRecordsForPrePaymentReminder $retrieveRecordsForPrePaymentReminder
+        private readonly MollieConfig $mollieConfig,
+        private readonly Config $config,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly SendPrepaymentReminderEmail $sendPrepaymentReminderEmail,
+        private readonly CheckIfSubscriptionIsActive $checkIfSubscriptionIsActive,
+        private readonly RetrieveRecordsForPrePaymentReminder $retrieveRecordsForPrePaymentReminder
     ) {
-        $this->mollieConfig = $mollieConfig;
-        $this->config = $config;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->sendPrepaymentReminderEmail = $sendPrepaymentReminderEmail;
-        $this->checkIfSubscriptionIsActive = $checkIfSubscriptionIsActive;
-        $this->retrieveRecordsForPrePaymentReminder = $retrieveRecordsForPrePaymentReminder;
     }
 
-    public function execute()
+    public function execute(): void
     {
         $today = new \DateTimeImmutable();
         $subscriptions = $this->retrieveRecordsForPrePaymentReminder->execute($today);
         foreach ($subscriptions->getItems() as $subscription) {
-            if (!$this->config->isPrepaymentReminderEnabled($subscription->getStoreId())) {
+            if (!$this->config->isPrepaymentReminderEnabled(storeId($subscription->getStoreId()))) {
                 continue;
             }
 

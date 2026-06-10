@@ -19,38 +19,15 @@ use Mollie\Subscriptions\Api\Selftest\RepositoryInterface as SelftestRepository;
  */
 class Index extends Action
 {
-
-    /**
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-
-    /**
-     * @var SelftestRepository
-     */
-    private $selftestRepository;
-
-    /**
-     * Check constructor.
-     *
-     * @param Action\Context $context
-     * @param JsonFactory $resultJsonFactory
-     * @param SelftestRepository $selftestRepository
-     */
     public function __construct(
         Action\Context $context,
-        JsonFactory $resultJsonFactory,
-        SelftestRepository $selftestRepository
+        private readonly JsonFactory $resultJsonFactory,
+        private readonly SelftestRepository $selftestRepository
     ) {
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->selftestRepository = $selftestRepository;
         parent::__construct($context);
     }
 
-    /**
-     * @return Json
-     */
-    public function execute()
+    public function execute(): Json
     {
         $resultJson = $this->resultJsonFactory->create();
         $result = $this->selftestRepository->test();

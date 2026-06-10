@@ -12,7 +12,7 @@ class SentEmail extends AbstractDb
 
     public const ID_FIELD_NAME = 'entity_id';
 
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->_init(self::MAIN_TABLE, self::ID_FIELD_NAME);
     }

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Plugin\Quote\Api;
 
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -26,25 +28,13 @@ class PaymentMethodManagementPlugin
         'mollie_methods_trustly',
     ];
 
-    /**
-     * @var CartContainsSubscriptionProduct
-     */
-    private $cartContainsSubscriptionProduct;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
     public function __construct(
-        CartContainsSubscriptionProduct $cartContainsSubscriptionProduct,
-        CartRepositoryInterface $cartRepository
+        private readonly CartContainsSubscriptionProduct $cartContainsSubscriptionProduct,
+        private readonly CartRepositoryInterface $cartRepository
     ) {
-        $this->cartContainsSubscriptionProduct = $cartContainsSubscriptionProduct;
-        $this->cartRepository = $cartRepository;
     }
 
-    public function afterGetList(PaymentMethodManagementInterface $subject, $result, $cartId)
+    public function afterGetList(PaymentMethodManagementInterface $subject, array $result, int $cartId): array
     {
         $cart = $this->cartRepository->get($cartId);
 

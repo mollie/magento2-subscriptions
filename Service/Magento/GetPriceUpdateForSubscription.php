@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Magento;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -13,22 +15,10 @@ use Mollie\Subscriptions\Service\Mollie\ParseSubscriptionOptions;
 
 class GetPriceUpdateForSubscription
 {
-    /**
-     * @var ParseSubscriptionOptions
-     */
-    private $parseSubscriptionOptions;
-    /**
-     * @var Data
-     */
-    private $catalogData;
-
     public function __construct(
-        ParseSubscriptionOptions $parseSubscriptionOptions,
-        Data $catalogData
-    )
-    {
-        $this->parseSubscriptionOptions = $parseSubscriptionOptions;
-        $this->catalogData = $catalogData;
+        private readonly ParseSubscriptionOptions $parseSubscriptionOptions,
+        private readonly Data $catalogData
+    ) {
     }
 
     /**
@@ -62,12 +52,12 @@ class GetPriceUpdateForSubscription
             }
 
             if ($option->getPrice() === null) {
-                return $product->getPrice();
+                return (float) $product->getPrice();
             }
 
             return $option->getPrice();
         }
 
-        return $product->getPrice();
+        return (float) $product->getPrice();
     }
 }

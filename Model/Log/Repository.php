@@ -16,29 +16,10 @@ use Mollie\Subscriptions\Logger\ErrorLogger;
  */
 class Repository implements LogRepositoryInterface
 {
-
-    /**
-     * @var DebugLogger
-     */
-    private $debugLogger;
-
-    /**
-     * @var ErrorLogger
-     */
-    private $errorLogger;
-
-    /**
-     * Repository constructor.
-     *
-     * @param DebugLogger $debugLogger
-     * @param ErrorLogger $errorLogger
-     */
     public function __construct(
-        DebugLogger $debugLogger,
-        ErrorLogger $errorLogger
+        private readonly DebugLogger $debugLogger,
+        private readonly ErrorLogger $errorLogger
     ) {
-        $this->debugLogger = $debugLogger;
-        $this->errorLogger = $errorLogger;
     }
 
     /**

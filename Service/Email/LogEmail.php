@@ -17,21 +17,10 @@ use Mollie\Subscriptions\Api\SentEmailRepositoryInterface;
 
 class LogEmail
 {
-    /**
-     * @var SentEmailRepositoryInterface
-     */
-    private $sentEmailRepository;
-    /**
-     * @var SentEmailInterfaceFactory
-     */
-    private $sentEmailInterfaceFactory;
-
     public function __construct(
-        SentEmailRepositoryInterface $sentEmailRepository,
-        SentEmailInterfaceFactory $sentEmailInterfaceFactory
+        private readonly SentEmailRepositoryInterface $sentEmailRepository,
+        private readonly SentEmailInterfaceFactory $sentEmailInterfaceFactory
     ) {
-        $this->sentEmailRepository = $sentEmailRepository;
-        $this->sentEmailInterfaceFactory = $sentEmailInterfaceFactory;
     }
 
     public function execute(TransportInterface $transport): void

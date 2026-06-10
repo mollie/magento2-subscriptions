@@ -39,7 +39,7 @@ class UpdateWebhookPath implements DataPatchInterface
                 continue;
             }
 
-            $subscriptions = $api->subscriptions->page();
+            $subscriptions = $api->subscriptions->allFor();
             $this->updateSubscriptions($subscriptions);
         }
 

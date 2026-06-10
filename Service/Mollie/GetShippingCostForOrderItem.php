@@ -54,7 +54,7 @@ class GetShippingCostForOrderItem
 
         /** @var Method $rate */
         $rate = array_shift($rates);
-        return $rate->getPrice();
+        return (float) $rate->getPrice();
     }
 
     private function getRateByCarrier(CarrierResult $result): ?float
@@ -72,7 +72,7 @@ class GetShippingCostForOrderItem
 
         /** @var Method $rate */
         $rate = array_shift($rates);
-        return $rate->getData('price');
+        return (float) $rate->getData('price');
     }
 
     private function getCarrierResult(OrderItemInterface $orderItem): CarrierResult

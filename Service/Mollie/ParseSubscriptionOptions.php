@@ -37,7 +37,11 @@ class ParseSubscriptionOptions
 
         return array_map(function ($option) use ($product) {
             if (array_key_exists('price', $option)) {
-                $option['price'] = $this->addTaxToPrice($product, $option['price']);
+                $option['price'] = $this->addTaxToPrice($product, (float) $option['price']);
+            }
+
+            if (array_key_exists('trial_days', $option) && $option['trial_days'] !== null) {
+                $option['trial_days'] = (int) $option['trial_days'];
             }
 
             return $this->productSubscriptionOptionFactory->create($option);

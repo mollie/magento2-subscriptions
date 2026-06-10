@@ -52,12 +52,12 @@ class GetPriceUpdateForSubscription
             }
 
             if ($option->getPrice() === null) {
-                return $product->getPrice();
+                return (float) $product->getPrice();
             }
 
             return $option->getPrice();
         }
 
-        return $product->getPrice();
+        return (float) $product->getPrice();
     }
 }

@@ -43,7 +43,7 @@ $subscriptions = $block->getSubscriptions();
                 <?php endif; ?>
                 <td data-th="<?= $block->escapeHtml(__('Status')) ?>" class="col"><?= $subscription->getStatus() ?></td>
                 <td data-th="<?= $block->escapeHtml(__('Description')) ?>" class="col"><?= $subscription->getDescription() ?></td>
-                <td data-th="<?= $block->escapeHtml(__('Total')) ?>" class="col total"><?= /* @noEscape */ $block->formatPrice($subscription->getAmount()) ?></td>
+                <td data-th="<?= $block->escapeHtml(__('Total')) ?>" class="col total"><?= /* @noEscape */ $block->formatPrice((float) $subscription->getAmount()) ?></td>
                 <?php /**
                 <td data-th="<?= $block->escapeHtml(__('Status')) ?>" class="col status"><?= $block->escapeHtml($_order->getStatusLabel()) ?></td>
                 */ ?>

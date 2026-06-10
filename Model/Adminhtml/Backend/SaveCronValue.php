@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Model\Adminhtml\Backend;
 
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -20,23 +22,17 @@ class SaveCronValue extends Value
 {
     const CRON_SCHEDULE_PATH = 'crontab/default/jobs/mollie_subscriptions_cron/schedule/cron_expr';
 
-    /**
-     * @var WriterInterface
-     */
-    private $configWriter;
-
     public function __construct(
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        WriterInterface $configWriter,
+        private readonly WriterInterface $configWriter,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
-        $this->configWriter = $configWriter;
     }
 
     public function afterSave()

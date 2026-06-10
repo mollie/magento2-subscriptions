@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Cart;
 
 use Magento\Catalog\Model\Product\Attribute\Source\Boolean;
@@ -14,22 +16,10 @@ use Mollie\Subscriptions\Config;
 
 class CartContainsSubscriptionProduct
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
     public function __construct(
-        Config $config,
-        SerializerInterface $serializer
+        private readonly Config $config,
+        private readonly SerializerInterface $serializer
     ) {
-        $this->config = $config;
-        $this->serializer = $serializer;
     }
 
     public function check(CartInterface $cart): bool
@@ -57,7 +47,7 @@ class CartContainsSubscriptionProduct
         if ($allowOneTimePurchase == Boolean::VALUE_NO ||
             (
                 $allowOneTimePurchase == Boolean::VALUE_USE_CONFIG &&
-                $this->config->allowOneTimePurchase($item->getStoreId()) == 0
+                $this->config->allowOneTimePurchase(storeId($item->getStoreId())) == 0
             )
         ) {
             return true;

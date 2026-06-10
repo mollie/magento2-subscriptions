@@ -13,15 +13,9 @@ use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 
 class UpdateNextPaymentDate
 {
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
     public function __construct(
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
     ) {
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
     }
 
     public function execute(Subscription $subscription): void

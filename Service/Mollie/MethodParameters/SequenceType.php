@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Mollie\MethodParameters;
 
 use Magento\Quote\Api\Data\CartInterface;
@@ -12,15 +14,9 @@ use Mollie\Subscriptions\Service\Cart\CartContainsSubscriptionProduct;
 
 class SequenceType implements ParameterPartInterface
 {
-    /**
-     * @var CartContainsSubscriptionProduct
-     */
-    private $cartContainsSubscriptionProduct;
-
     public function __construct(
-        CartContainsSubscriptionProduct $cartContainsSubscriptionProduct
+        private readonly CartContainsSubscriptionProduct $cartContainsSubscriptionProduct
     ) {
-        $this->cartContainsSubscriptionProduct = $cartContainsSubscriptionProduct;
     }
 
     public function enhance(array $parameters, CartInterface $cart): array

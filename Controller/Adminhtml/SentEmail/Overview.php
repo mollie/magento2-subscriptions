@@ -13,17 +13,11 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Overview extends Action
 {
-    /**
-     * @var PageFactory
-     */
-    private $pageFactory;
-
     public function __construct(
         Action\Context $context,
-        PageFactory $pageFactory
+        private readonly PageFactory $pageFactory
     ) {
         parent::__construct($context);
-        $this->pageFactory = $pageFactory;
     }
 
     public function execute()

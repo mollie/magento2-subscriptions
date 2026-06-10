@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Adminhtml\Subscriptions;
 
 use Magento\Backend\App\Action;
@@ -14,43 +16,19 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class Cancel extends Action
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
-
     public function __construct(
         Action\Context $context,
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        ManagerInterface $eventManager
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly ManagerInterface $eventManager
     ) {
         parent::__construct($context);
-        $this->config = $config;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->eventManager = $eventManager;
     }
 
     public function execute()
     {
-        $api = $this->mollieSubscriptionApi->loadByStore($this->getRequest()->getParam('store_id'));
+        $api = $this->mollieSubscriptionApi->loadByStore(storeId($this->getRequest()->getParam('store_id')));
         $customerId = $this->getRequest()->getParam('customer_id');
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
         $canceled = false;

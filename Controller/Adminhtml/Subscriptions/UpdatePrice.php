@@ -14,22 +14,10 @@ use Magento\Framework\View\Result\PageFactory;
 
 class UpdatePrice implements HttpGetActionInterface
 {
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
-     * @var PageFactory
-     */
-    private $pageFactory;
-
     public function __construct(
-        RequestInterface $request,
-        PageFactory $pageFactory
-    )
-    {
-        $this->pageFactory = $pageFactory;
-        $this->request = $request;
+        private readonly RequestInterface $request,
+        private readonly PageFactory $pageFactory
+    ) {
     }
 
     public function execute()

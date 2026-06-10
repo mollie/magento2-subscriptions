@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Mollie;
 
 use Mollie\Payment\Service\Mollie\MollieApiClient;

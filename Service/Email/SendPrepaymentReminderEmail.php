@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Email;
 
 use Magento\Framework\Mail\Template\TransportBuilder;
@@ -14,47 +16,18 @@ use Mollie\Subscriptions\Config;
 
 class SendPrepaymentReminderEmail
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var TransportBuilder
-     */
-    private $transportBuilder;
-
-    /**
-     * @var IdentityInterface
-     */
-    private $identityContainer;
-
-    /**
-     * @var SubscriptionToProductEmailVariables
-     */
-    private $emailVariables;
-    /**
-     * @var LogEmail
-     */
-    private $logEmail;
-
     public function __construct(
-        Config $config,
-        TransportBuilder $transportBuilder,
-        IdentityInterface $identityContainer,
-        SubscriptionToProductEmailVariables $emailVariables,
-        LogEmail $logEmail
+        private readonly Config $config,
+        private readonly TransportBuilder $transportBuilder,
+        private readonly IdentityInterface $identityContainer,
+        private readonly SubscriptionToProductEmailVariables $emailVariables,
+        private readonly LogEmail $logEmail
     ) {
-        $this->config = $config;
-        $this->transportBuilder = $transportBuilder;
-        $this->identityContainer = $identityContainer;
-        $this->emailVariables = $emailVariables;
-        $this->logEmail = $logEmail;
     }
 
-    public function execute(SubscriptionToProductInterface $subscriptionToProduct)
+    public function execute(SubscriptionToProductInterface $subscriptionToProduct): void
     {
-        $storeId = $subscriptionToProduct->getStoreId();
+        $storeId = storeId($subscriptionToProduct->getStoreId());
         $templateId = $this->config->prepaymentReminderTemplate($storeId);
         $builder = $this->transportBuilder->setTemplateIdentifier($templateId);
         $builder->setTemplateOptions(['area' => 'frontend', 'store' => $storeId]);

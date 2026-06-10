@@ -19,27 +19,11 @@ use Mollie\Api\Resources\Subscription;
 
 class SubscriptionAddProductToCart
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-    /**
-     * @var TaxCalculation
-     */
-    private $taxCalculation;
-    /**
-     * @var TaxConfig
-     */
-    private $taxConfig;
-
     public function __construct(
-        ProductRepositoryInterface $productRepository,
-        TaxCalculation $taxCalculation,
-        TaxConfig $taxConfig
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly TaxCalculation $taxCalculation,
+        private readonly TaxConfig $taxConfig
     ) {
-        $this->productRepository = $productRepository;
-        $this->taxCalculation = $taxCalculation;
-        $this->taxConfig = $taxConfig;
     }
 
     public function execute(CartInterface $cart, Subscription $subscription): ProductInterface

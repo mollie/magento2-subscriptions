@@ -73,7 +73,10 @@ interface SubscriptionToProductRepositoryInterface
      * @throws \Magento\Framework\Exception\NotFoundException
      *@return \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface
      */
-    public function getByCustomerIdAndProductId(string $mollieCustomerId, int $productId);
+    public function getByCustomerIdAndProductId(
+        string $mollieCustomerId,
+        int $productId
+    ): \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 
     /**
      * Delete subscription_to_product

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Cart;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -10,22 +12,10 @@ use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 
 class CustomerAlreadyHasSubscriptionToProduct
 {
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
     public function __construct(
-        CustomerRepositoryInterface $customerRepository,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
+        private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
     ) {
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->customerRepository = $customerRepository;
     }
 
     public function execute(CustomerInterface $customer, ProductInterface $product): bool
@@ -38,7 +28,7 @@ class CustomerAlreadyHasSubscriptionToProduct
                 return false;
             }
 
-            $this->subscriptionToProductRepository->getByCustomerIdAndProductId($mollieCustomerId, $product->getId());
+            $this->subscriptionToProductRepository->getByCustomerIdAndProductId($mollieCustomerId, (int) $product->getId());
             return true;
         } catch (NotFoundException $e) {
             return false;

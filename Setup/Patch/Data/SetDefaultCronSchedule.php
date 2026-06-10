@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Setup\Patch\Data;
 
 use Magento\Framework\App\Config\Storage\WriterInterface;
@@ -8,18 +10,12 @@ use Mollie\Subscriptions\Model\Adminhtml\Backend\SaveCronValue;
 
 class SetDefaultCronSchedule implements DataPatchInterface
 {
-    /**
-     * @var WriterInterface
-     */
-    private $configWriter;
-
     public function __construct(
-        WriterInterface $configWriter
+        private readonly WriterInterface $configWriter
     ) {
-        $this->configWriter = $configWriter;
     }
 
-    public function apply()
+    public function apply(): self
     {
         $this->configWriter->save(SaveCronValue::CRON_SCHEDULE_PATH, '0 1 * * *');
 

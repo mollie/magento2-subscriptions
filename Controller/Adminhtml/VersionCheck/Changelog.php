@@ -24,47 +24,12 @@ use Mollie\Subscriptions\Config;
  */
 class Changelog extends Action
 {
-
-    /**
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var JsonSerializer
-     */
-    private $json;
-
-    /**
-     * @var File
-     */
-    private $file;
-
-    /**
-     * Check constructor.
-     *
-     * @param Action\Context $context
-     * @param JsonFactory $resultJsonFactory
-     * @param Config $config
-     * @param JsonSerializer $json
-     * @param File $file
-     */
     public function __construct(
         Action\Context $context,
-        JsonFactory $resultJsonFactory,
-        Config $config,
-        JsonSerializer $json,
-        File $file
+        private readonly JsonFactory $resultJsonFactory,
+        private readonly JsonSerializer $json,
+        private readonly File $file
     ) {
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->config = $config;
-        $this->json = $json;
-        $this->file = $file;
         parent::__construct($context);
     }
 

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Adminhtml\Subscriptions;
 
 use Magento\Backend\App\Action;
@@ -12,17 +14,11 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action
 {
-    /**
-     * @var PageFactory
-     */
-    private $pageFactory;
-
     public function __construct(
         Action\Context $context,
-        PageFactory $pageFactory
+        private readonly PageFactory $pageFactory
     ) {
         parent::__construct($context);
-        $this->pageFactory = $pageFactory;
     }
 
     public function execute()

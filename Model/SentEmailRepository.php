@@ -21,51 +21,15 @@ use Mollie\Subscriptions\Model\ResourceModel\SentEmail\CollectionFactory as Sent
 
 class SentEmailRepository implements SentEmailRepositoryInterface
 {
-    /**
-     * @var ResourceSentEmail
-     */
-    private $resource;
-    /**
-     * @var SentEmailFactory
-     */
-    private $sentEmailFactory;
-    /**
-     * @var SentEmailCollectionFactory
-     */
-    private $sentEmailCollectionFactory;
-    /**
-     * @var SentEmailSearchResultsInterfaceFactory
-     */
-    private $searchResultsFactory;
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-    /**
-     * @var JoinProcessorInterface
-     */
-    private $extensionAttributesJoinProcessor;
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    private $extensibleDataObjectConverter;
-
     public function __construct(
-        ResourceSentEmail $resource,
-        SentEmailFactory $sentEmailFactory,
-        SentEmailCollectionFactory $sentEmailCollectionFactory,
-        SentEmailSearchResultsInterfaceFactory $searchResultsFactory,
-        CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter
+        private readonly ResourceSentEmail $resource,
+        private readonly SentEmailFactory $sentEmailFactory,
+        private readonly SentEmailCollectionFactory $sentEmailCollectionFactory,
+        private readonly SentEmailSearchResultsInterfaceFactory $searchResultsFactory,
+        private readonly CollectionProcessorInterface $collectionProcessor,
+        private readonly JoinProcessorInterface $extensionAttributesJoinProcessor,
+        private readonly ExtensibleDataObjectConverter $extensibleDataObjectConverter
     ) {
-        $this->resource = $resource;
-        $this->sentEmailFactory = $sentEmailFactory;
-        $this->sentEmailCollectionFactory = $sentEmailCollectionFactory;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
     }
 
     /**

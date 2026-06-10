@@ -15,30 +15,15 @@ use Monolog\Logger;
 class ErrorLogger
 {
     /**
-     * @var Json
-     */
-    private $json;
-    /**
-     * @var Logger
-     */
-    private $logger;
-    /**
-     * @var StreamHandler
-     */
-    private $handler;
-    /**
      * @var Logger
      */
     private $instance;
 
     public function __construct(
-        Json $json,
-        Logger $logger,
-        StreamHandler $handler
+        private readonly Json $json,
+        private readonly Logger $logger,
+        private readonly StreamHandler $handler
     ) {
-        $this->json = $json;
-        $this->logger = $logger;
-        $this->handler = $handler;
     }
 
     private function getLogger(): Logger

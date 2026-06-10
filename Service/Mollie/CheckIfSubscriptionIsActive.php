@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Mollie;
 
 use Mollie\Api\Exceptions\ApiException;
@@ -10,34 +12,16 @@ use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 
 class CheckIfSubscriptionIsActive
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
     public function __construct(
-        Config $config,
-        MollieApiClient $mollieApiClient,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
+        private readonly Config $config,
+        private readonly MollieApiClient $mollieApiClient,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
     ) {
-        $this->config = $config;
-        $this->mollieApiClient = $mollieApiClient;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
     }
 
     public function execute(SubscriptionToProductInterface $subscriptionModel): bool
     {
-        $mollieApi = $this->mollieApiClient->loadByStore($subscriptionModel->getStoreId());
+        $mollieApi = $this->mollieApiClient->loadByStore(storeId($subscriptionModel->getStoreId()));
         try {
             $subscription = $mollieApi->subscriptions->getForId(
                 $subscriptionModel->getCustomerId(),

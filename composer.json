@@ -2,19 +2,20 @@
     "name": "mollie/magento2-subscriptions",
     "description": "Mollie subscriptions extension for Magento 2",
     "type": "magento2-module",
-    "version": "1.19.0",
+    "version": "3.0.0",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
     ],
     "require": {
-        "magento/framework": ">=102.0.0",
-        "mollie/magento2": ">=2.29.1",
-        "beberlei/assert": "*",
+        "php": ">=8.1",
+        "magento/framework": ">=103.0.5",
+        "mollie/magento2": "^3.0.0",
+        "beberlei/assert": "^3.0",
         "ext-json": "*"
     },
     "require-dev": {
-        "phpstan/phpstan": "*"
+        "phpstan/phpstan": "^1.12"
     },
     "autoload": {
         "files": [

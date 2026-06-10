@@ -26,27 +26,16 @@ class Selftest extends Command
      */
     const COMMAND_NAME = 'mollie:subscriptions:selftest';
 
-    /**
-     * @var SelftestRepository
-     */
-    private $selftestRepository;
-
-    /**
-     * Selftest constructor.
-     *
-     * @param SelftestRepository $selftestRepository
-     */
     public function __construct(
-        SelftestRepository $selftestRepository
+        private readonly SelftestRepository $selftestRepository
     ) {
-        $this->selftestRepository = $selftestRepository;
         parent::__construct();
     }
 
     /**
      *  {@inheritdoc}
      */
-    public function configure()
+    public function configure(): void
     {
         $this->setName(self::COMMAND_NAME);
         $this->setDescription('Perform self test of extension');

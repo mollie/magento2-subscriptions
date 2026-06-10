@@ -11,17 +11,12 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class SubscriptionToProduct extends AbstractDb
 {
-    /**
-     * Define resource model
-     *
-     * @return void
-     */
-    protected function _construct()
+    protected function _construct(): void
     {
         $this->_init('mollie_subscription_to_product', 'entity_id');
     }
 
-    public function deleteBySubscriptionId(string $customerId, string $subscriptionId)
+    public function deleteBySubscriptionId(string $customerId, string $subscriptionId): void
     {
         $this->getConnection()->delete($this->getMainTable(), [
             'customer_id = ?' => $customerId,
@@ -29,7 +24,7 @@ class SubscriptionToProduct extends AbstractDb
         ]);
     }
 
-    public function updateProductHasUpdateFor(int $productId)
+    public function updateProductHasUpdateFor(int $productId): void
     {
         $this->getConnection()->update(
             $this->getMainTable(),

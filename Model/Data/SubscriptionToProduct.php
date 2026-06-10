@@ -75,7 +75,7 @@ class SubscriptionToProduct extends AbstractExtensibleObject implements Subscrip
      */
     public function getProductId(): int
     {
-        return $this->_get(self::PRODUCT_ID);
+        return (int) $this->_get(self::PRODUCT_ID);
     }
 
     /**
@@ -113,7 +113,9 @@ class SubscriptionToProduct extends AbstractExtensibleObject implements Subscrip
      */
     public function getStoreId(): ?int
     {
-        return $this->_get(self::STORE_ID);
+        $storeId = $this->_get(self::STORE_ID);
+
+        return $storeId === null ? null : (int) $storeId;
     }
 
     /**
@@ -132,7 +134,7 @@ class SubscriptionToProduct extends AbstractExtensibleObject implements Subscrip
      */
     public function getHasPriceUpdate(): int
     {
-        return $this->_get(self::HAS_PRICE_UPDATE) ?? 0;
+        return (int) ($this->_get(self::HAS_PRICE_UPDATE) ?? 0);
     }
 
     /**

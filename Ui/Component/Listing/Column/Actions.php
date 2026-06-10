@@ -3,9 +3,9 @@
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Ui\Component\Listing\Column;
-
 
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -14,23 +14,17 @@ use Magento\Ui\Component\Listing\Columns\Column;
 
 class Actions extends Column
 {
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        UrlInterface $urlBuilder,
+        private readonly UrlInterface $urlBuilder,
         array $components = [],
-        array $data = [])
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
-        $this->urlBuilder = $urlBuilder;
     }
 
-    public function prepareDataSource(array $dataSource)
+    public function prepareDataSource(array $dataSource): array
     {
         if (!isset($dataSource['data']['items'])) {
             return $dataSource;

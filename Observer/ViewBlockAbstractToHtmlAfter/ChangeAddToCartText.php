@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Observer\ViewBlockAbstractToHtmlAfter;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -17,32 +19,14 @@ use Mollie\Payment\Config;
 
 class ChangeAddToCartText implements ObserverInterface
 {
-    /**
-     * @var DomDocumentFactory
-     */
-    private $domDocumentFactory;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
-
     public function __construct(
-        Config $config,
-        DomDocumentFactory $domDocumentFactory,
-        Registry $registry
+        private readonly Config $config,
+        private readonly DomDocumentFactory $domDocumentFactory,
+        private readonly Registry $registry
     ) {
-        $this->domDocumentFactory = $domDocumentFactory;
-        $this->config = $config;
-        $this->registry = $registry;
     }
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         $block = $observer->getData('block');
         if (!$block instanceof Template ||

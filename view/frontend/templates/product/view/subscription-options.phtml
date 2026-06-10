@@ -41,7 +41,7 @@
             <?= $block->escapeHtml($option->getTitle()); ?>
 
             <?php if ($block->showPriceInSubscriptionButton()): ?>
-                <?= $block->formatPrice($option->getPrice()) ?>
+                <?= $block->formatPrice((float) $option->getPrice()) ?>
             <?php endif; ?>
         </button>
     <?php endforeach; ?>

@@ -19,24 +19,13 @@ use Magento\Ui\Component\MassAction\Filter;
 class MassDelete extends Action implements HttpPostActionInterface
 {
     const ADMIN_RESOURCE = 'Mollie_Subscriptions::SentEmail_delete';
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-    /**
-     * @var Filter
-     */
-    private $filter;
 
     public function __construct(
         Context $context,
-        CollectionFactory $collectionFactory,
-        Filter $filter
+        private readonly CollectionFactory $collectionFactory,
+        private readonly Filter $filter
     ) {
         parent::__construct($context);
-
-        $this->collectionFactory = $collectionFactory;
-        $this->filter = $filter;
     }
 
     public function execute(): Redirect

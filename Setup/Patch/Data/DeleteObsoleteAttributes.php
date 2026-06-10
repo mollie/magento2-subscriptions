@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Setup\Patch\Data;
 
 use Magento\Catalog\Model\Product;
@@ -13,15 +15,9 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 class DeleteObsoleteAttributes implements DataPatchInterface
 {
-    /**
-     * @var EavSetupFactory
-     */
-    private $eavSetupFactory;
-
     public function __construct(
-        EavSetupFactory $eavSetupFactory
+        private readonly EavSetupFactory $eavSetupFactory
     ) {
-        $this->eavSetupFactory = $eavSetupFactory;
     }
 
     public function apply(): self

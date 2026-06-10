@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Plugin\Checkout\Model;
 
 use Magento\Checkout\Model\Session;
@@ -13,34 +15,13 @@ use Mollie\Subscriptions\Service\Cart\CustomerAlreadyHasSubscriptionToProduct;
 
 class PreventDuplicateSubscriptionProductsInCart
 {
-    /**
-     * @var CartInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $messageManager;
-
-    /**
-     * @var CustomerAlreadyHasSubscriptionToProduct
-     */
-    private $customerAlreadyHasSubscriptionToProduct;
-
-    /**
-     * @var bool
-     */
-    private $itemRemoved = false;
+    private bool $itemRemoved = false;
 
     public function __construct(
-        CartRepositoryInterface $cartRepository,
-        ManagerInterface $messageManager,
-        CustomerAlreadyHasSubscriptionToProduct $customerAlreadyHasSubscriptionToProduct
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly ManagerInterface $messageManager,
+        private readonly CustomerAlreadyHasSubscriptionToProduct $customerAlreadyHasSubscriptionToProduct
     ) {
-        $this->cartRepository = $cartRepository;
-        $this->messageManager = $messageManager;
-        $this->customerAlreadyHasSubscriptionToProduct = $customerAlreadyHasSubscriptionToProduct;
     }
 
     public function afterLoadCustomerQuote(Session $subject, Session $result): Session
@@ -66,11 +47,6 @@ class PreventDuplicateSubscriptionProductsInCart
         return $result;
     }
 
-    /**
-     * @param CartItemInterface $item
-     * @param CartInterface $cart
-     * @return void
-     */
     public function removeItem(CartItemInterface $item, CartInterface $cart): void
     {
         $productName = $item->getProduct()->getName();

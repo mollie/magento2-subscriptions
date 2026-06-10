@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Order;
 
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -13,22 +15,10 @@ use Mollie\Subscriptions\Service\Cart\CartContainsSubscriptionProduct;
 
 class OrderContainsSubscriptionProduct
 {
-    /**
-     * @var CartContainsSubscriptionProduct
-     */
-    private $cartContainsSubscriptionProduct;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
     public function __construct(
-        CartContainsSubscriptionProduct $cartContainsSubscriptionProduct,
-        CartRepositoryInterface $cartRepository
+        private readonly CartContainsSubscriptionProduct $cartContainsSubscriptionProduct,
+        private readonly CartRepositoryInterface $cartRepository
     ) {
-        $this->cartContainsSubscriptionProduct = $cartContainsSubscriptionProduct;
-        $this->cartRepository = $cartRepository;
     }
 
     public function check(OrderInterface $order): bool

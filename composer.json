@@ -7,13 +7,14 @@
         "AFL-3.0"
     ],
     "require": {
-        "magento/framework": ">=102.0.0",
+        "php": ">=8.1",
+        "magento/framework": ">=103.0.5",
         "mollie/magento2": "^3.0.0",
-        "beberlei/assert": "*",
+        "beberlei/assert": "^3.0",
         "ext-json": "*"
     },
     "require-dev": {
-        "phpstan/phpstan": "*"
+        "phpstan/phpstan": "^1.12"
     },
     "autoload": {
         "files": [

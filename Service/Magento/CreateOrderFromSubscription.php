@@ -36,10 +36,6 @@ use Mollie\Subscriptions\Model\Carrier\SubscriptionShipping;
 class CreateOrderFromSubscription
 {
     /**
-     * @var MollieApiClient
-     */
-    private $api;
-    /**
      * @var Subscription
      */
     private $subscription;
@@ -47,97 +43,31 @@ class CreateOrderFromSubscription
      * @var CustomerInterface
      */
     private $customer;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var MollieCustomerRepositoryInterface
-     */
-    private $mollieCustomerRepository;
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-    /**
-     * @var AddressRepositoryInterface
-     */
-    private $addressRepository;
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-    /**
-     * @var CartManagementInterface
-     */
-    private $cartManagement;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-    /**
-     * @var AddressInterfaceFactory
-     */
-    private $addressFactory;
-    /**
-     * @var MollieLogger
-     */
-    private $mollieLogger;
-    /**
-     * @var OrderAddressRepositoryInterface
-     */
-    private $orderAddressRepository;
 
     /**
      * @var ProductInterface
      */
     private $product;
-    /**
-     * @var SubscriptionAddProductToCart
-     */
-    private $subscriptionAddToCart;
-    /**
-     * @var RateFactory
-     */
-    private $rateFactory;
 
     public function __construct(
-        Config $config,
-        MollieCustomerRepositoryInterface $mollieCustomerRepository,
-        CustomerRepositoryInterface $customerRepository,
-        AddressRepositoryInterface $addressRepository,
-        CartRepositoryInterface $cartRepository,
-        CartManagementInterface $cartManagement,
-        OrderRepositoryInterface $orderRepository,
-        ProductRepositoryInterface $productRepository,
-        AddressInterfaceFactory $addressFactory,
-        MollieLogger $mollieLogger,
-        OrderAddressRepositoryInterface $orderAddressRepository,
-        SubscriptionAddProductToCart $addProductToCart,
-        RateFactory $rateFactory
+        private readonly Config $config,
+        private readonly MollieCustomerRepositoryInterface $mollieCustomerRepository,
+        private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly AddressRepositoryInterface $addressRepository,
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly CartManagementInterface $cartManagement,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly AddressInterfaceFactory $addressFactory,
+        private readonly MollieLogger $mollieLogger,
+        private readonly OrderAddressRepositoryInterface $orderAddressRepository,
+        private readonly SubscriptionAddProductToCart $subscriptionAddToCart,
+        private readonly RateFactory $rateFactory
     ) {
-        $this->mollieCustomerRepository = $mollieCustomerRepository;
-        $this->customerRepository = $customerRepository;
-        $this->addressRepository = $addressRepository;
-        $this->cartRepository = $cartRepository;
-        $this->cartManagement = $cartManagement;
-        $this->orderRepository = $orderRepository;
-        $this->productRepository = $productRepository;
-        $this->addressFactory = $addressFactory;
-        $this->config = $config;
-        $this->mollieLogger = $mollieLogger;
-        $this->orderAddressRepository = $orderAddressRepository;
-        $this->subscriptionAddToCart = $addProductToCart;
-        $this->rateFactory = $rateFactory;
     }
 
     public function execute(MollieApiClient $api, Payment $molliePayment, Subscription $subscription): OrderInterface
     {
-        $this->api = $api;
         $this->subscription = $subscription;
 
         $mollieCustomer = $this->mollieCustomerRepository->getByMollieCustomerId($molliePayment->customerId);
@@ -178,7 +108,7 @@ class CreateOrderFromSubscription
     {
         $cartId = $this->cartManagement->createEmptyCart();
         $cart = $this->cartRepository->get($cartId);
-        $cart->setStoreId($this->customer->getStoreId());
+        $cart->setStoreId(storeId($this->customer->getStoreId()));
         $cart->setCustomer($this->customer);
         $cart->setCustomerIsGuest(0);
 
@@ -211,7 +141,7 @@ class CreateOrderFromSubscription
         return $quoteAddress;
     }
 
-    private function configureShipping(CartInterface $cart)
+    private function configureShipping(CartInterface $cart): void
     {
         $shippingAddress = $cart->getShippingAddress();
         $shippingAddress->setCollectShippingRates(true);
@@ -259,10 +189,7 @@ class CreateOrderFromSubscription
         );
     }
 
-    /**
-     * @return CustomerAddressInterface|OrderAddressInterface
-     */
-    private function getAddress(string $type)
+    private function getAddress(string $type): CustomerAddressInterface|OrderAddressInterface
     {
         if (isset($this->subscription->metadata->{$type . 'AddressId'})) {
             $id = $this->subscription->metadata->{$type . 'AddressId'};

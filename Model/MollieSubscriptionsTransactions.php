@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Model;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -20,75 +22,22 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class MollieSubscriptionsTransactions extends Listing
 {
-    /**
-     * @var Config
-     */
-    private $config;
+    private ?string $next;
 
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilderFactory;
-
-    /**
-     * @var CustomerInterfaceFactory
-     */
-    private $customerFactory;
-
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-
-    /**
-     * @var MollieCustomerRepositoryInterface
-     */
-    private $mollieCustomerRepository;
-
-    /**
-     * @var string|null
-     */
-    private $next;
-
-    /**
-     * @var CustomerInterface[]
-     */
-    private $customers = [];
-
-    /**
-     * @var string|null
-     */
-    private $previous;
+    private ?string $previous;
 
     public function __construct(
         ContextInterface $context,
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        CustomerInterfaceFactory $customerFactory,
-        CustomerRepositoryInterface $customerRepository,
-        MollieCustomerRepositoryInterface $mollieCustomerRepository,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
         array $components = [],
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $components, $data);
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->customerFactory = $customerFactory;
-        $this->customerRepository = $customerRepository;
-        $this->mollieCustomerRepository = $mollieCustomerRepository;
-        $this->config = $config;
     }
 
     public function getDataSourceData(): array
     {
-        $storeId = $this->getContext()->getRequestParam('filters')['store_id'] ?? null;
+        $storeId = storeId($this->getContext()->getRequestParam('filters')['store_id'] ?? null);
         $customerId = $this->getContext()->getRequestParam('customer_id');
         $subscriptionId = $this->getContext()->getRequestParam('subscription_id');
 

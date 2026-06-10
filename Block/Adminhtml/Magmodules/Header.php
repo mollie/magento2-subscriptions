@@ -23,22 +23,10 @@ class Header extends Field
      */
     protected $_template = 'Mollie_Subscriptions::system/config/fieldset/header.phtml';
 
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * Header constructor.
-     *
-     * @param Context $context
-     * @param Config $config
-     */
     public function __construct(
         Context $context,
-        Config $config
+        private readonly Config $config
     ) {
-        $this->config = $config;
         parent::__construct($context);
     }
 

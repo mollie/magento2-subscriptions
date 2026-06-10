@@ -17,34 +17,16 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class UpdateWebhookPath implements DataPatchInterface
 {
-    /**
-     * @var StoreRepositoryInterface
-     */
-    private $storeRepository;
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-    /**
-     * @var array
-     */
-    private $storeCodeToId = [];
+    private array $storeCodeToId = [];
 
     public function __construct(
-        StoreRepositoryInterface $storeRepository,
-        UrlInterface $urlBuilder,
-        MollieApiClient $mollieApiClient
+        private readonly StoreRepositoryInterface $storeRepository,
+        private readonly UrlInterface $urlBuilder,
+        private readonly MollieApiClient $mollieApiClient
     ) {
-        $this->storeRepository = $storeRepository;
-        $this->urlBuilder = $urlBuilder;
-        $this->mollieApiClient = $mollieApiClient;
     }
 
-    public function apply()
+    public function apply(): self
     {
         foreach ($this->storeRepository->getList() as $store) {
             $this->storeCodeToId[$store->getCode()] = $store->getId();
@@ -52,7 +34,7 @@ class UpdateWebhookPath implements DataPatchInterface
 
         foreach ($this->storeRepository->getList() as $store) {
             try {
-                $api = $this->mollieApiClient->loadByStore((int)$store->getId());
+                $api = $this->mollieApiClient->loadByStore(storeId($store->getId()));
             } catch (\Exception $exception) {
                 continue;
             }
@@ -107,12 +89,12 @@ class UpdateWebhookPath implements DataPatchInterface
         $subscription->update();
     }
 
-    public function getAliases()
+    public function getAliases(): array
     {
         return [];
     }
 
-    public static function getDependencies()
+    public static function getDependencies(): array
     {
         return [];
     }

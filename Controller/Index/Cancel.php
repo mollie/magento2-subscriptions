@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Index;
 
 use Magento\Customer\Helper\Session\CurrentCustomer;
@@ -20,66 +22,18 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class Cancel extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
-    /**
-     * @var CurrentCustomer
-     */
-    private $currentCustomer;
-
-    /**
-     * @var Session
-     */
-    private $customerSession;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
-
-    /**
-     * @var SendNotificationEmail
-     */
-    private $sendAdminCancelNotificationEmail;
-
-    /**
-     * @var SendNotificationEmail
-     */
-    private $sendCustomerCancelNotificationEmail;
-
     public function __construct(
         Context $context,
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        CurrentCustomer $currentCustomer,
-        Session $customerSession,
-        ManagerInterface $eventManager,
-        SendNotificationEmail $sendAdminCancelNotificationEmail,
-        SendNotificationEmail $sendCustomerCancelNotificationEmail
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly CurrentCustomer $currentCustomer,
+        private readonly Session $customerSession,
+        private readonly ManagerInterface $eventManager,
+        private readonly SendNotificationEmail $sendAdminCancelNotificationEmail,
+        private readonly SendNotificationEmail $sendCustomerCancelNotificationEmail
     ) {
         parent::__construct($context);
-        $this->config = $config;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->currentCustomer = $currentCustomer;
-        $this->customerSession = $customerSession;
-        $this->eventManager = $eventManager;
-        $this->sendAdminCancelNotificationEmail = $sendAdminCancelNotificationEmail;
-        $this->sendCustomerCancelNotificationEmail = $sendCustomerCancelNotificationEmail;
     }
 
     public function dispatch(RequestInterface $request)
@@ -97,7 +51,7 @@ class Cancel extends Action implements HttpPostActionInterface
         $extensionAttributes = $customer->getExtensionAttributes();
         $canceled = false;
 
-        $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
+        $api = $this->mollieSubscriptionApi->loadByStore(storeId($customer->getStoreId()));
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
 
         try {
@@ -130,7 +84,7 @@ class Cancel extends Action implements HttpPostActionInterface
         return $this->_redirect('*/*/');
     }
 
-    private function deleteSubscriptionReference(string $customerId, string $subscriptionId)
+    private function deleteSubscriptionReference(string $customerId, string $subscriptionId): void
     {
         $this->subscriptionToProductRepository->deleteBySubscriptionId($customerId, $subscriptionId);
 

@@ -11,21 +11,10 @@ use Mollie\Subscriptions\Service\Mollie\GetSelectedOption;
 
 class GetSelectedCartItemOption
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-    /**
-     * @var GetSelectedOption
-     */
-    private $getSelectedOption;
-
     public function __construct(
-        SerializerInterface $serializer,
-        GetSelectedOption $getSelectedOption
+        private readonly SerializerInterface $serializer,
+        private readonly GetSelectedOption $getSelectedOption
     ) {
-        $this->serializer = $serializer;
-        $this->getSelectedOption = $getSelectedOption;
     }
 
     public function execute(CartItemInterface $item): ?ProductSubscriptionOption

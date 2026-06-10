@@ -4,8 +4,9 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Subscriptions\Cron;
+declare(strict_types=1);
 
+namespace Mollie\Subscriptions\Cron;
 
 use Exception;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -19,67 +20,25 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 
 class UpdateSubscriptionsWithAPriceUpdate
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    private $apis = [];
-
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $priceCurrency;
-    /**
-     * @var GetPriceUpdateForSubscription
-     */
-    private $getPriceUpdateForSubscription;
+    private array $apis = [];
 
     public function __construct(
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        General $mollieHelper,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        ProductRepositoryInterface $productRepository,
-        PriceCurrencyInterface $priceCurrency,
-        GetPriceUpdateForSubscription $getPriceUpdateForSubscription
-    )
-    {
-        $this->config = $config;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->mollieHelper = $mollieHelper;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->productRepository = $productRepository;
-        $this->priceCurrency = $priceCurrency;
-        $this->getPriceUpdateForSubscription = $getPriceUpdateForSubscription;
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly General $mollieHelper,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly PriceCurrencyInterface $priceCurrency,
+        private readonly GetPriceUpdateForSubscription $getPriceUpdateForSubscription
+    ) {
     }
 
-    public function execute()
+    public function execute(): void
     {
         $subscriptions = $this->subscriptionToProductRepository->getSubscriptionsWithAPriceUpdate();
 
         foreach ($subscriptions->getItems() as $item) {
-            if (!$this->config->updateSubscriptionWhenPriceChanges($item->getStoreId())) {
+            if (!$this->config->updateSubscriptionWhenPriceChanges(storeId($item->getStoreId()))) {
                 continue;
             }
 
@@ -95,7 +54,7 @@ class UpdateSubscriptionsWithAPriceUpdate
         }
     }
 
-    private function getApiForStore(int $storeId)
+    private function getApiForStore(?int $storeId): \Mollie\Api\MollieApiClient
     {
         if (array_key_exists($storeId, $this->apis)) {
             return $this->apis[$storeId];

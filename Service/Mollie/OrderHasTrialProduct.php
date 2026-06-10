@@ -10,21 +10,10 @@ use Mollie\Subscriptions\DTO\ProductSubscriptionOption;
 
 class OrderHasTrialProduct
 {
-    /**
-     * @var OrderHasTrialProductResultFactory
-     */
-    private $resultFactory;
-    /**
-     * @var GetSelectedOption
-     */
-    private $getSelectedOption;
-
     public function __construct(
-        OrderHasTrialProductResultFactory $resultFactory,
-        GetSelectedOption $getSelectedOption
+        private readonly OrderHasTrialProductResultFactory $resultFactory,
+        private readonly GetSelectedOption $getSelectedOption
     ) {
-        $this->resultFactory = $resultFactory;
-        $this->getSelectedOption = $getSelectedOption;
     }
 
     public function execute(OrderInterface $order): OrderHasTrialProductResult

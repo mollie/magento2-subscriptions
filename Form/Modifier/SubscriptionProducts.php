@@ -3,6 +3,7 @@
  * Copyright Magmodules.eu. All rights reserved.
  *  See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Form\Modifier;
 
@@ -20,50 +21,14 @@ class SubscriptionProducts extends AbstractModifier
 {
     public const ALLOW_ONE_TIME_PURCHASE = 'mollie_allow_one_time_purchase';
 
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var ArrayManager
-     */
-    private $arrayManager;
-
-    /**
-     * @var IntervalType
-     */
-    private $intervalType;
-
-    /**
-     * @var RepetitionType
-     */
-    private $repetitionType;
-
-    /**
-     * @var LocatorInterface
-     */
-    private $locator;
-
-    /**
-     * @var string[]
-     */
-    private $supportedProductTypeIds;
-
     public function __construct(
-        Config $config,
-        ArrayManager $arrayManager,
-        IntervalType $intervalType,
-        RepetitionType $repetitionType,
-        LocatorInterface $locator,
-        array $supportedProductTypeIds
+        private readonly Config $config,
+        private readonly ArrayManager $arrayManager,
+        private readonly IntervalType $intervalType,
+        private readonly RepetitionType $repetitionType,
+        private readonly LocatorInterface $locator,
+        private readonly array $supportedProductTypeIds
     ) {
-        $this->config = $config;
-        $this->arrayManager = $arrayManager;
-        $this->intervalType = $intervalType;
-        $this->repetitionType = $repetitionType;
-        $this->locator = $locator;
-        $this->supportedProductTypeIds = $supportedProductTypeIds;
     }
 
     public function modifyMeta(array $meta): array
@@ -103,7 +68,7 @@ class SubscriptionProducts extends AbstractModifier
         );
     }
 
-    public function mergeToGroup(array $meta, $field1, $field2): array
+    public function mergeToGroup(array $meta, string $field1, string $field2): array
     {
         $field1Path = $this->arrayManager->findPath($field1, $meta, null, 'children');
         $field2Path = $this->arrayManager->findPath($field2, $meta, null, 'children');
@@ -135,11 +100,8 @@ class SubscriptionProducts extends AbstractModifier
 
     /**
      * Customization of allow gift message field
-     *
-     * @param array $meta
-     * @return array
      */
-    private function customizeOneTimePurchaseField(array $meta)
+    private function customizeOneTimePurchaseField(array $meta): array
     {
         $groupCode = $this->getGroupCodeByField($meta, 'container_' . static::ALLOW_ONE_TIME_PURCHASE);
 

@@ -25,78 +25,18 @@ use Mollie\Subscriptions\Model\ResourceModel\SubscriptionToProduct\CollectionFac
 
 class SubscriptionToProductRepository implements SubscriptionToProductRepositoryInterface
 {
-    /**
-     * @var ResourceSubscriptionToProduct
-     */
-    protected $resource;
-
-    /**
-     * @var SubscriptionToProductFactory
-     */
-    protected $subscriptionToProductFactory;
-
-    /**
-     * @var SubscriptionToProductCollectionFactory
-     */
-    protected $subscriptionToProductCollectionFactory;
-
-    /**
-     * @var SubscriptionToProductSearchResultsInterfaceFactory
-     */
-    protected $searchResultsFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    protected $dataObjectProcessor;
-
-    /**
-     * @var SubscriptionToProductInterfaceFactory
-     */
-    protected $dataSubscriptionToProductFactory;
-
-    /**
-     * @var JoinProcessorInterface
-     */
-    protected $extensionAttributesJoinProcessor;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    protected $extensibleDataObjectConverter;
-
     public function __construct(
-        ResourceSubscriptionToProduct $resource,
-        SubscriptionToProductFactory $subscriptionToProductFactory,
-        SubscriptionToProductInterfaceFactory $dataSubscriptionToProductFactory,
-        SubscriptionToProductCollectionFactory $subscriptionToProductCollectionFactory,
-        SubscriptionToProductSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter
+        protected readonly ResourceSubscriptionToProduct $resource,
+        protected readonly SubscriptionToProductFactory $subscriptionToProductFactory,
+        protected readonly SubscriptionToProductInterfaceFactory $dataSubscriptionToProductFactory,
+        protected readonly SubscriptionToProductCollectionFactory $subscriptionToProductCollectionFactory,
+        protected readonly SubscriptionToProductSearchResultsInterfaceFactory $searchResultsFactory,
+        protected readonly DataObjectHelper $dataObjectHelper,
+        protected readonly DataObjectProcessor $dataObjectProcessor,
+        private readonly CollectionProcessorInterface $collectionProcessor,
+        protected readonly JoinProcessorInterface $extensionAttributesJoinProcessor,
+        protected readonly ExtensibleDataObjectConverter $extensibleDataObjectConverter
     ) {
-        $this->resource = $resource;
-        $this->subscriptionToProductFactory = $subscriptionToProductFactory;
-        $this->subscriptionToProductCollectionFactory = $subscriptionToProductCollectionFactory;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataSubscriptionToProductFactory = $dataSubscriptionToProductFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
     }
 
     /**
@@ -234,7 +174,7 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
     /**
      * {@inheritdoc}
      */
-    public function getByCustomerIdAndProductId(string $mollieCustomerId, int $productId) {
+    public function getByCustomerIdAndProductId(string $mollieCustomerId, int $productId): \Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface {
         $collection = $this->subscriptionToProductCollectionFactory->create();
         $collection->addFieldToFilter('customer_id', $mollieCustomerId);
         $collection->addFieldToFilter('product_id', $productId);
@@ -253,7 +193,7 @@ class SubscriptionToProductRepository implements SubscriptionToProductRepository
             ));
         }
 
-        return $collection->getFirstItem();
+        return $collection->getFirstItem()->getDataModel();
     }
 
     /**

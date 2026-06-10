@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Observer\CheckoutAllowGuest;
 
 use Magento\Framework\DataObject;
@@ -14,18 +16,12 @@ use Mollie\Subscriptions\Service\Cart\CartContainsSubscriptionProduct;
 
 class ForceCustomerLoginWhenSubscriptionItemInCart implements ObserverInterface
 {
-    /**
-     * @var CartContainsSubscriptionProduct
-     */
-    private $cartContainsSubscriptionProduct;
-
     public function __construct(
-        CartContainsSubscriptionProduct $cartContainsSubscriptionProduct
+        private readonly CartContainsSubscriptionProduct $cartContainsSubscriptionProduct
     ) {
-        $this->cartContainsSubscriptionProduct = $cartContainsSubscriptionProduct;
     }
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var CartInterface $cart */
         $cart = $observer->getData('quote');

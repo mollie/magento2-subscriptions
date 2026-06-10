@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Index;
 
 use Magento\Customer\Model\Session;
@@ -15,24 +17,12 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action implements HttpGetActionInterface
 {
-    /**
-     * @var PageFactory
-     */
-    private $resultPageFactory;
-
-    /**
-     * @var Session
-     */
-    private $customerSession;
-
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory,
-        Session $customerSession
+        private readonly PageFactory $resultPageFactory,
+        private readonly Session $customerSession
     ) {
         parent::__construct($context);
-        $this->resultPageFactory = $resultPageFactory;
-        $this->customerSession = $customerSession;
     }
 
     public function dispatch(RequestInterface $request)

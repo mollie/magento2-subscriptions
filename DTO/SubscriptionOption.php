@@ -4,82 +4,24 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Subscriptions\DTO;
+declare(strict_types=1);
 
+namespace Mollie\Subscriptions\DTO;
 
 class SubscriptionOption
 {
-    /**
-     * @var int
-     */
-    private $productId;
-
-    /**
-     * @var string
-     */
-    private $optionId;
-
-    /**
-     * @var int
-     */
-    private $storeId;
-
-    /**
-     * @var array
-     */
-    private $amount;
-
-    /**
-     * @var string
-     */
-    private $interval;
-
-    /**
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @var array
-     */
-    private $metadata;
-
-    /**
-     * @var string
-     */
-    private $webhookUrl;
-
-    /**
-     * @var \DateTimeImmutable
-     */
-    private $startDate;
-    /**
-     * @var int|null
-     */
-    private $times;
-
     public function __construct(
-        int $productId,
-        string $optionId,
-        int $storeId,
-        array $amount,
-        string $interval,
-        string $description,
-        array $metadata,
-        string $webhookUrl,
-        \DateTimeImmutable $startDate,
-        ?int $times = null
+        private readonly int $productId,
+        private readonly string $optionId,
+        private readonly int $storeId,
+        private readonly array $amount,
+        private readonly string $interval,
+        private readonly string $description,
+        private readonly array $metadata,
+        private readonly string $webhookUrl,
+        private readonly \DateTimeImmutable $startDate,
+        private readonly ?int $times = null
     ) {
-        $this->productId = $productId;
-        $this->optionId = $optionId;
-        $this->storeId = $storeId;
-        $this->amount = $amount;
-        $this->interval = $interval;
-        $this->description = $description;
-        $this->metadata = $metadata;
-        $this->webhookUrl = $webhookUrl;
-        $this->startDate = $startDate;
-        $this->times = $times;
     }
 
     public function getProductId(): int

@@ -3,6 +3,7 @@
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+declare(strict_types=1);
 
 namespace Mollie\Subscriptions\Block\Frontend\Customer\Account;
 
@@ -15,37 +16,18 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 class ActiveSubscriptions extends Template
 {
     /**
-     * @var CurrentCustomer
-     */
-    private $currentCustomer;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $priceCurrency;
-
-    /**
      * @var SubscriptionResponse[]|null
      */
     private $subscriptions = null;
 
     public function __construct(
         Template\Context $context,
-        CurrentCustomer $currentCustomer,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        PriceCurrencyInterface $priceCurrency,
+        private readonly CurrentCustomer $currentCustomer,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly PriceCurrencyInterface $priceCurrency,
         array $data = []
     ) {
         parent::__construct($context, $data);
-
-        $this->currentCustomer = $currentCustomer;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->priceCurrency = $priceCurrency;
     }
 
     /**
@@ -72,7 +54,7 @@ class ActiveSubscriptions extends Template
             return [];
         }
 
-        $api = $this->mollieSubscriptionApi->loadByStore($customer->getStoreId());
+        $api = $this->mollieSubscriptionApi->loadByStore(storeId($customer->getStoreId()));
         $subscriptions = $api->subscriptions->pageForId($extensionAttributes->getMollieCustomerId());
 
         $this->subscriptions = array_map(function ($subscription) use ($customer) {

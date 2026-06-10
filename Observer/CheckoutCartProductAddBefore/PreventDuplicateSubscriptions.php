@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Observer\CheckoutCartProductAddBefore;
 
 use Magento\Customer\Model\Session;
@@ -10,25 +12,13 @@ use Mollie\Subscriptions\Service\Cart\CustomerAlreadyHasSubscriptionToProduct;
 
 class PreventDuplicateSubscriptions implements ObserverInterface
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @var CustomerAlreadyHasSubscriptionToProduct
-     */
-    private $customerAlreadyHasSubscriptionToProduct;
-
     public function __construct(
-        Session $session,
-        CustomerAlreadyHasSubscriptionToProduct $customerAlreadyHasSubscriptionToProduct
+        private readonly Session $session,
+        private readonly CustomerAlreadyHasSubscriptionToProduct $customerAlreadyHasSubscriptionToProduct
     ) {
-        $this->session = $session;
-        $this->customerAlreadyHasSubscriptionToProduct = $customerAlreadyHasSubscriptionToProduct;
     }
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         $product = $observer->getData('product');
         if (!$product->getData('mollie_subscription_product')) {

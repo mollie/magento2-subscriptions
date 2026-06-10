@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Order\TransactionPart;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;

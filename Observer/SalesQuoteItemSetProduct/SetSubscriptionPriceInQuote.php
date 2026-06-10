@@ -11,15 +11,9 @@ use Mollie\Subscriptions\Service\Cart\GetSelectedCartItemOption;
 
 class SetSubscriptionPriceInQuote implements ObserverInterface
 {
-    /**
-     * @var GetSelectedCartItemOption
-     */
-    private $getSelectedCartItemOption;
-
     public function __construct(
-        GetSelectedCartItemOption $getSelectedCartItemOption
+        private readonly GetSelectedCartItemOption $getSelectedCartItemOption
     ) {
-        $this->getSelectedCartItemOption = $getSelectedCartItemOption;
     }
 
     public function execute(Observer $observer): void

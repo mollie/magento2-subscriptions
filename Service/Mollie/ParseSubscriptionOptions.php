@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Mollie;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -14,32 +16,14 @@ use Mollie\Subscriptions\DTO\ProductSubscriptionOptionFactory;
 
 class ParseSubscriptionOptions
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    /**
-     * @var ProductSubscriptionOptionFactory
-     */
-    private $productSubscriptionOptionFactory;
-    /**
-     * @var Data
-     */
-    private $catalogHelper;
-
     public function __construct(
-        SerializerInterface $serializer,
-        ProductSubscriptionOptionFactory $productSubscriptionOptionFactory,
-        Data $catalogHelper
+        private readonly SerializerInterface $serializer,
+        private readonly ProductSubscriptionOptionFactory $productSubscriptionOptionFactory,
+        private readonly Data $catalogHelper
     ) {
-        $this->serializer = $serializer;
-        $this->productSubscriptionOptionFactory = $productSubscriptionOptionFactory;
-        $this->catalogHelper = $catalogHelper;
     }
 
     /**
-     * @param ProductInterface $product
      * @return ProductSubscriptionOption[]
      */
     public function execute(ProductInterface $product): array

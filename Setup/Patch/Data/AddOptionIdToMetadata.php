@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Setup\Patch\Data;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -16,39 +18,13 @@ use Mollie\Subscriptions\Service\Mollie\ParseSubscriptionOptions;
 
 class AddOptionIdToMetadata implements DataPatchInterface
 {
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $repository;
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-    /**
-     * @var ParseSubscriptionOptions
-     */
-    private $parseSubscriptionOptions;
-
     public function __construct(
-        SubscriptionToProductRepositoryInterface $repository,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilder,
-        MollieApiClient $mollieApiClient,
-        ProductRepositoryInterface $productRepository,
-        ParseSubscriptionOptions $parseSubscriptionOptions
+        private readonly SubscriptionToProductRepositoryInterface $repository,
+        private readonly SearchCriteriaBuilderFactory $searchCriteriaBuilder,
+        private readonly MollieApiClient $mollieApiClient,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly ParseSubscriptionOptions $parseSubscriptionOptions
     ) {
-        $this->repository = $repository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->mollieApiClient = $mollieApiClient;
-        $this->productRepository = $productRepository;
-        $this->parseSubscriptionOptions = $parseSubscriptionOptions;
     }
 
     public function apply(): self

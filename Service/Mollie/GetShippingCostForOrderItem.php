@@ -21,40 +21,16 @@ use Mollie\Subscriptions\Config;
 class GetShippingCostForOrderItem
 {
     /**
-     * @var RateRequestFactory
-     */
-    private $rateRequestFactory;
-
-    /**
-     * @var RateCollectorInterfaceFactory
-     */
-    private $rateCollectorFactory;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
      * @var OrderInterface
      */
     private $order;
 
     public function __construct(
-        RateRequestFactory $rateRequestFactory,
-        RateCollectorInterfaceFactory $rateCollectorFactory,
-        CartRepositoryInterface $cartRepository,
-        Config $config
+        private readonly RateRequestFactory $rateRequestFactory,
+        private readonly RateCollectorInterfaceFactory $rateCollectorFactory,
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly Config $config
     ) {
-        $this->rateRequestFactory = $rateRequestFactory;
-        $this->rateCollectorFactory = $rateCollectorFactory;
-        $this->cartRepository = $cartRepository;
-        $this->config = $config;
     }
 
     public function execute(OrderInterface $order, OrderItemInterface $orderItem): float
@@ -118,7 +94,7 @@ class GetShippingCostForOrderItem
         $orderItem->setAddress($address);
 
         $request->setAllItems([$orderItem]);
-        $request->setStoreId($order->getStoreId());
+        $request->setStoreId(storeId($order->getStoreId()));
         $request->setWebsiteId($websiteId);
         $request->setDestCountryId($address->getCountryId());
         $request->setDestRegionId($address->getRegionId());

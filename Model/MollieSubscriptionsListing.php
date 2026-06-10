@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Model;
 
 use DateInterval;
@@ -25,36 +27,6 @@ use Mollie\Subscriptions\Service\Mollie\MollieSubscriptionApi;
 class MollieSubscriptionsListing extends Listing
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilderFactory;
-
-    /**
-     * @var CustomerInterfaceFactory
-     */
-    private $customerFactory;
-
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-
-    /**
-     * @var MollieCustomerRepositoryInterface
-     */
-    private $mollieCustomerRepository;
-
-    /**
      * @var string|null
      */
     private $next;
@@ -71,28 +43,21 @@ class MollieSubscriptionsListing extends Listing
 
     public function __construct(
         ContextInterface $context,
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        CustomerInterfaceFactory $customerFactory,
-        CustomerRepositoryInterface $customerRepository,
-        MollieCustomerRepositoryInterface $mollieCustomerRepository,
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
+        private readonly CustomerInterfaceFactory $customerFactory,
+        private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly MollieCustomerRepositoryInterface $mollieCustomerRepository,
         array $components = [],
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $components, $data);
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->customerFactory = $customerFactory;
-        $this->customerRepository = $customerRepository;
-        $this->mollieCustomerRepository = $mollieCustomerRepository;
-        $this->config = $config;
     }
 
     public function getDataSourceData()
     {
-        $storeId = $this->getContext()->getRequestParam('filters')['store_id'] ?? null;
+        $storeId = storeId($this->getContext()->getRequestParam('filters')['store_id'] ?? null);
         $api = $this->mollieSubscriptionApi->loadByStore($storeId);
         $paging = $this->getContext()->getRequestParam('paging');
 
@@ -139,7 +104,7 @@ class MollieSubscriptionsListing extends Listing
         ];
     }
 
-    private function getCustomerMollieCustomerById(string $customerId)
+    private function getCustomerMollieCustomerById(string $customerId): CustomerInterface
     {
         foreach ($this->customers as $customer) {
             if ($customer->getExtensionAttributes()->getMollieCustomerId() == $customerId) {
@@ -158,7 +123,7 @@ class MollieSubscriptionsListing extends Listing
         return $parts['from'];
     }
 
-    private function parsePreviousNext(SubscriptionCollection $result)
+    private function parsePreviousNext(SubscriptionCollection $result): void
     {
         if ($result->hasNext()) {
             $this->next = $this->parseLink($result->_links->next->href);
@@ -169,7 +134,7 @@ class MollieSubscriptionsListing extends Listing
         }
     }
 
-    private function preloadCustomers(array $result)
+    private function preloadCustomers(array $result): void
     {
         $mollieCustomerIds = array_column($result, 'customerId');
 

@@ -16,44 +16,18 @@ use Psr\Log\LoggerInterface;
 
 class DataProvider extends AbstractDataProvider
 {
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
-     * @var DataPersistorInterface
-     */
-    private $dataPersistor;
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionRepository;
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieApi;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     public function __construct(
         $name,
         $primaryFieldName,
         $requestFieldName,
-        RequestInterface $request,
-        DataPersistorInterface $dataPersistor,
-        SubscriptionToProductRepositoryInterface $subscriptionRepository,
-        MollieSubscriptionApi $mollieApi,
-        LoggerInterface $logger,
+        private readonly RequestInterface $request,
+        private readonly DataPersistorInterface $dataPersistor,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionRepository,
+        private readonly MollieSubscriptionApi $mollieApi,
+        private readonly LoggerInterface $logger,
         array $meta = [],
         array $data = []
     ) {
-        $this->request = $request;
-        $this->dataPersistor = $dataPersistor;
-        $this->subscriptionRepository = $subscriptionRepository;
-        $this->mollieApi = $mollieApi;
-        $this->logger = $logger;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 

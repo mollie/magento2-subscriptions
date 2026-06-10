@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Setup\Patch\Data;
 
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
@@ -11,25 +13,13 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 class MakeAttributesInvisible implements DataPatchInterface
 {
-    /**
-     * @var Config
-     */
-    private $eavConfig;
-
-    /**
-     * @var ProductAttributeRepositoryInterface
-     */
-    private $productAttributeRepository;
-
     public function __construct(
-        Config $eavConfig,
-        ProductAttributeRepositoryInterface $productAttributeRepository
+        private readonly Config $eavConfig,
+        private readonly ProductAttributeRepositoryInterface $productAttributeRepository
     ) {
-        $this->eavConfig = $eavConfig;
-        $this->productAttributeRepository = $productAttributeRepository;
     }
 
-    public function apply()
+    public function apply(): self
     {
         foreach (['mollie_subscription_table', 'mollie_subscription_product'] as $attributeCode) {
             /** @var Attribute $attribute */
@@ -44,7 +34,7 @@ class MakeAttributesInvisible implements DataPatchInterface
         return $this;
     }
 
-    public static function getDependencies()
+    public static function getDependencies(): array
     {
         return [
             SubscriptionAttributes::class,
@@ -52,7 +42,7 @@ class MakeAttributesInvisible implements DataPatchInterface
         ];
     }
 
-    public function getAliases()
+    public function getAliases(): array
     {
         return [];
     }

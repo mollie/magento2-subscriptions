@@ -6,7 +6,6 @@ namespace Mollie\Subscriptions\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Helper\General;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 use Mollie\Subscriptions\Service\Mollie\OrderHasTrialProduct;
 

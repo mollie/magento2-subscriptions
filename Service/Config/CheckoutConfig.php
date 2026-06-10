@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Config;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
@@ -12,28 +14,11 @@ use Mollie\Subscriptions\Service\Cart\GetTrialDiscountForCart;
 
 class CheckoutConfig implements \Magento\Checkout\Model\ConfigProviderInterface
 {
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-
-    /**
-     * @var CartContainsSubscriptionProduct
-     */
-    private $cartContainsSubscriptionProduct;
-    /**
-     * @var GetTrialDiscountForCart
-     */
-    private $getTrialDiscountForCart;
-
     public function __construct(
-        CheckoutSession $checkoutSession,
-        CartContainsSubscriptionProduct $cartContainsSubscriptionProduct,
-        GetTrialDiscountForCart $getTrialDiscountForCart
+        private readonly CheckoutSession $checkoutSession,
+        private readonly CartContainsSubscriptionProduct $cartContainsSubscriptionProduct,
+        private readonly GetTrialDiscountForCart $getTrialDiscountForCart
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->cartContainsSubscriptionProduct = $cartContainsSubscriptionProduct;
-        $this->getTrialDiscountForCart = $getTrialDiscountForCart;
     }
 
 

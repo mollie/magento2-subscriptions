@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Email;
 
 use Mollie\Api\Resources\Payment;
@@ -13,21 +15,10 @@ use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 
 class SendForPayment
 {
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-    /**
-     * @var SendNotificationEmail
-     */
-    private $sendFailureNotificationEmail;
-
     public function __construct(
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        SendNotificationEmail $sendFailureNotificationEmail
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly SendNotificationEmail $sendFailureNotificationEmail
     ) {
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->sendFailureNotificationEmail = $sendFailureNotificationEmail;
     }
 
     public function execute(Subscription $subscription, Payment $molliePayment): void

@@ -12,39 +12,13 @@ use Mollie\Subscriptions\Service\Email\LogEmail;
 
 class SendAdminNotification
 {
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var TransportBuilder
-     */
-    private $transportBuilder;
-    /**
-     * @var SenderResolverInterface
-     */
-    private $senderResolver;
-    /**
-     * @var UrlInterface
-     */
-    private $urlInterface;
-    /**
-     * @var LogEmail
-     */
-    private $logEmail;
-
     public function __construct(
-        Config $config,
-        TransportBuilder $transportBuilder,
-        SenderResolverInterface $senderResolver,
-        UrlInterface $urlInterface,
-        LogEmail $logEmail
+        private readonly Config $config,
+        private readonly TransportBuilder $transportBuilder,
+        private readonly SenderResolverInterface $senderResolver,
+        private readonly UrlInterface $urlInterface,
+        private readonly LogEmail $logEmail
     ) {
-        $this->config = $config;
-        $this->transportBuilder = $transportBuilder;
-        $this->senderResolver = $senderResolver;
-        $this->urlInterface = $urlInterface;
-        $this->logEmail = $logEmail;
     }
 
     public function send(string $id, \Throwable $exception): void

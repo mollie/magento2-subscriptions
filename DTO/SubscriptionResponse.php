@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\DTO;
 
 use DateTimeInterface;
@@ -12,29 +14,11 @@ use Mollie\Api\Resources\Subscription;
 
 class SubscriptionResponse
 {
-    /**
-     * @var Subscription
-     */
-    private $subscription;
-
-    /**
-     * @var CustomerInterface
-     */
-    private $customer;
-
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $prePaymentReminderDate;
-
     public function __construct(
-        Subscription $subscription,
-        CustomerInterface $customer,
-        ?DateTimeInterface $prePaymentReminder = null
+        private readonly Subscription $subscription,
+        private readonly CustomerInterface $customer,
+        private readonly ?DateTimeInterface $prePaymentReminderDate = null
     ) {
-        $this->subscription = $subscription;
-        $this->customer = $customer;
-        $this->prePaymentReminderDate = $prePaymentReminder;
     }
 
     /**

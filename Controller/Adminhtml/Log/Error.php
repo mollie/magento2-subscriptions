@@ -31,50 +31,12 @@ class Error extends Action
      * Error log file path pattern
      */
     const ERROR_LOG_FILE = '%s/log/mollie-subscriptions/error.log';
-    /**
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var DirectoryList
-     */
-    private $dir;
-    /**
-     * @var File
-     */
-    private $file;
-    /**
-     * @var SerializerJson
-     */
-    private $serializerJson;
-
-    /**
-     * Check constructor.
-     *
-     * @param Action\Context $context
-     * @param JsonFactory $resultJsonFactory
-     * @param Config $config
-     * @param DirectoryList $dir
-     * @param File $file
-     * @param SerializerJson $serializerJson
-     */
     public function __construct(
         Action\Context $context,
-        JsonFactory $resultJsonFactory,
-        Config $config,
-        DirectoryList $dir,
-        File $file,
-        SerializerJson $serializerJson
+        private readonly JsonFactory $resultJsonFactory,
+        private readonly DirectoryList $dir,
+        private readonly File $file,
     ) {
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->config = $config;
-        $this->dir = $dir;
-        $this->file = $file;
-        $this->serializerJson = $serializerJson;
         parent::__construct($context);
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Service\Email;
 
 use Assert\Assertion;
@@ -12,41 +14,6 @@ use Mollie\Subscriptions\Config;
 class SendNotificationEmail
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var TransportBuilder
-     */
-    private $transportBuilder;
-
-    /**
-     * @var IdentityInterface
-     */
-    private $identityContainer;
-
-    /**
-     * @var SubscriptionToProductEmailVariables
-     */
-    private $emailVariables;
-
-    /**
-     * @var SenderResolverInterface
-     */
-    private $senderResolver;
-
-    /**
-     * @var LogEmail
-     */
-    private $logEmail;
-
-    /**
-     * @var string
-     */
-    private $sendTo;
-
-    /**
      * @var string
      */
     private $enabledMethod;
@@ -56,23 +23,15 @@ class SendNotificationEmail
     private $templateMethod;
 
     public function __construct(
-        Config $config,
-        TransportBuilder $transportBuilder,
-        IdentityInterface $identityContainer,
-        SubscriptionToProductEmailVariables $emailVariables,
-        SenderResolverInterface $senderResolver,
-        LogEmail $logEmail,
+        private readonly Config $config,
+        private readonly TransportBuilder $transportBuilder,
+        private readonly IdentityInterface $identityContainer,
+        private readonly SubscriptionToProductEmailVariables $emailVariables,
+        private readonly SenderResolverInterface $senderResolver,
+        private readonly LogEmail $logEmail,
         string $configSource,
-        string $sendTo
+        private readonly string $sendTo
     ) {
-        $this->config = $config;
-        $this->transportBuilder = $transportBuilder;
-        $this->identityContainer = $identityContainer;
-        $this->emailVariables = $emailVariables;
-        $this->senderResolver = $senderResolver;
-        $this->logEmail = $logEmail;
-        $this->sendTo = $sendTo;
-
         $this->enabledMethod = 'enable' . ucfirst($configSource) . 'Email';
         $this->templateMethod = 'get' . ucfirst($configSource) . 'Template';
 

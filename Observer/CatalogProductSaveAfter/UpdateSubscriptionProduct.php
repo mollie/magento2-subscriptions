@@ -3,6 +3,9 @@
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Observer\CatalogProductSaveAfter;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -13,24 +16,13 @@ use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
 
 class UpdateSubscriptionProduct implements ObserverInterface
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
     public function __construct(
-        SerializerInterface $serializer,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
+        private readonly SerializerInterface $serializer,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository
     ) {
-        $this->serializer = $serializer;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
     }
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var \Magento\Catalog\Model\Product $product */
         $product = $observer->getData('product');
@@ -71,10 +63,8 @@ class UpdateSubscriptionProduct implements ObserverInterface
      * - Null/empty/false values are treated as empty arrays
      * - Already-array values are returned as-is
      * - Any unserialize errors result in an empty array
-     *
-     * @param mixed $value
      */
-    private function safeUnserializeToArray($value): array
+    private function safeUnserializeToArray(mixed $value): array
     {
         if (is_array($value)) {
             return $value;

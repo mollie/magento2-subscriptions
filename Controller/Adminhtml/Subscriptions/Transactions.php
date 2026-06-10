@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Controller\Adminhtml\Subscriptions;
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -11,16 +13,9 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Transactions implements HttpGetActionInterface
 {
-    /**
-     * @var PageFactory
-     */
-    private $pageFactory;
-
     public function __construct(
-        PageFactory $pageFactory
-    )
-    {
-        $this->pageFactory = $pageFactory;
+        private readonly PageFactory $pageFactory
+    ) {
     }
 
     public function execute()

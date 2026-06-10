@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Observer\MollieProcessTransactionEnd;
 
 use Magento\Framework\Event\ManagerInterface;
@@ -26,83 +28,20 @@ use Throwable;
 
 class CreateSubscriptions implements ObserverInterface
 {
-    /**
-     * @var MollieSubscriptionApi
-     */
-    private $mollieSubscriptionApi;
-
-    /**
-     * @var OrderContainsSubscriptionProduct
-     */
-    private $orderContainsSubscriptionProduct;
-
-    /**
-     * @var SubscriptionOptions
-     */
-    private $subscriptionOptions;
-
-    /**
-     * @var SubscriptionToProductInterfaceFactory
-     */
-    private $subscriptionToProductFactory;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var SubscriptionToProductRepositoryInterface
-     */
-    private $subscriptionToProductRepository;
-
-    /**
-     * @var MollieApiClient|null
-     */
-    private $mollieApi;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
-
-    /**
-     * @var SendNotificationEmail
-     */
-    private $sendAdminNotificationEmail;
-
-    /**
-     * @var SendNotificationEmail
-     */
-    private $sendCustomerNotificationEmail;
+    private ?MollieApiClient $mollieApi = null;
 
     public function __construct(
-        Config $config,
-        MollieSubscriptionApi $mollieSubscriptionApi,
-        OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
-        SubscriptionOptions $subscriptionOptions,
-        SubscriptionToProductInterfaceFactory $subscriptionToProductFactory,
-        SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
-        OrderRepositoryInterface $orderRepository,
-        ManagerInterface $eventManager,
-        SendNotificationEmail $sendAdminNotificationEmail,
-        SendNotificationEmail $sendCustomerNotificationEmail
+        private readonly Config $config,
+        private readonly MollieSubscriptionApi $mollieSubscriptionApi,
+        private readonly OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
+        private readonly SubscriptionOptions $subscriptionOptions,
+        private readonly SubscriptionToProductInterfaceFactory $subscriptionToProductFactory,
+        private readonly SubscriptionToProductRepositoryInterface $subscriptionToProductRepository,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly ManagerInterface $eventManager,
+        private readonly SendNotificationEmail $sendAdminNotificationEmail,
+        private readonly SendNotificationEmail $sendCustomerNotificationEmail
     ) {
-        $this->config = $config;
-        $this->mollieSubscriptionApi = $mollieSubscriptionApi;
-        $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
-        $this->subscriptionOptions = $subscriptionOptions;
-        $this->subscriptionToProductFactory = $subscriptionToProductFactory;
-        $this->subscriptionToProductRepository = $subscriptionToProductRepository;
-        $this->eventManager = $eventManager;
-        $this->orderRepository = $orderRepository;
-        $this->sendAdminNotificationEmail = $sendAdminNotificationEmail;
-        $this->sendCustomerNotificationEmail = $sendCustomerNotificationEmail;
     }
 
     public function execute(Observer $observer): void
@@ -120,7 +59,7 @@ class CreateSubscriptions implements ObserverInterface
             return;
         }
 
-        $this->mollieApi = $this->mollieSubscriptionApi->loadByStore($order->getStoreId());
+        $this->mollieApi = $this->mollieSubscriptionApi->loadByStore(storeId($order->getStoreId()));
         $payment = $this->getPayment($order);
 
         $subscriptions = $this->subscriptionOptions->forOrder($order);

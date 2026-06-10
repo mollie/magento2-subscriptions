@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Model;
 
 use Magento\Framework\Api\SearchResults;

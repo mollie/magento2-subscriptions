@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Subscriptions\Test\Integration\Cron;
 
 use DateInterval;
@@ -14,8 +16,8 @@ use Magento\Framework\Exception\LocalizedException;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Subscriptions\Api\Data\SubscriptionToProductInterface;
 use Mollie\Subscriptions\Api\SubscriptionToProductRepositoryInterface;
+use Mollie\Subscriptions\Config;
 use Mollie\Subscriptions\Cron\SendPrePaymentReminderEmailCron;
-use Mollie\Subscriptions\Model\Adminhtml\Backend\SaveCronValue;
 use Mollie\Subscriptions\Model\SubscriptionToProduct;
 use Mollie\Subscriptions\Service\Email\SendPrepaymentReminderEmail;
 use Mollie\Subscriptions\Service\Mollie\CheckIfSubscriptionIsActive;
@@ -108,7 +110,7 @@ class SendPrePaymentReminderEmailCronTest extends IntegrationTestCase
         /** @var ScopeConfigInterface $config */
         $config = $this->objectManager->get(ScopeConfigInterface::class);
 
-        $value = $config->getValue(SaveCronValue::CRON_SCHEDULE_PATH);
+        $value = $config->getValue(Config::XML_PATH_PREPAYMENT_REMINDER_CRON_EXPR);
 
         $this->assertEquals('0 1 * * *', $value);
     }

@@ -33,6 +33,7 @@ class Config
     const XML_PATH_PREPAYMENT_REMINDER_ENABLED = 'mollie_subscriptions/prepayment_reminder/enabled';
     const XML_PATH_PREPAYMENT_REMINDER_TEMPLATE = 'mollie_subscriptions/prepayment_reminder/template';
     const XML_PATH_PREPAYMENT_REMINDER_SEND_BCC_TO = 'mollie_subscriptions/prepayment_reminder/send_bcc_to';
+    const XML_PATH_PREPAYMENT_REMINDER_CRON_EXPR = 'mollie_subscriptions/prepayment_reminder/cron_expr';
     const XML_PATH_EMAILS_ENABLE_ADMIN_NOTIFICATION = 'mollie_subscriptions/emails/enable_admin_notification';
     const XML_PATH_EMAILS_ADMIN_NOTIFICATION_TEMPLATE = 'mollie_subscriptions/emails/admin_notification_template';
     const XML_PATH_EMAILS_ENABLE_CUSTOMER_NOTIFICATION = 'mollie_subscriptions/emails/enable_customer_notification';

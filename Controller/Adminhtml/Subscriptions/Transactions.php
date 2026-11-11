@@ -21,7 +21,7 @@ class Transactions implements HttpGetActionInterface
     public function execute()
     {
         $page = $this->pageFactory->create();
-        $page->setActiveMenu('Mollie_Subscriptions::view_subscription_payments');
+        $page->setActiveMenu('Mollie_Subscriptions::view_subscriptions');
         $page->getConfig()->getTitle()->prepend(__('Subscription Transactions'));
 
         return $page;

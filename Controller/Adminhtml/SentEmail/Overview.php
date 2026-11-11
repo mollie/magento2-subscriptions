@@ -23,7 +23,7 @@ class Overview extends Action
     public function execute()
     {
         $page = $this->pageFactory->create();
-        $page->setActiveMenu('Mollie_Subscriptions::reminder_overview');
+        $page->setActiveMenu('Mollie_Subscriptions::sent_email_overview');
         $page->getConfig()->getTitle()->prepend(__('Sent Subscription Emails'));
 
         return $page;

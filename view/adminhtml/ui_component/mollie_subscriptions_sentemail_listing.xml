@@ -19,7 +19,7 @@
                 <param name="indexField" xsi:type="string">entity_id</param>
             </storageConfig>
         </settings>
-        <aclResource>Subscriptions_Mollie::SentEmail</aclResource>
+        <aclResource>Mollie_Subscriptions::sent_email_overview</aclResource>
         <dataProvider name="mollie_subscriptions_sentemail_listing_data_source" class="Mollie\Subscriptions\Ui\DataProvider\SentEmail\ListingDataProvider">
             <settings>
                 <requestFieldName>entity_id</requestFieldName>

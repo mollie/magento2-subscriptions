@@ -18,7 +18,7 @@ use Magento\Ui\Component\MassAction\Filter;
 
 class MassDelete extends Action implements HttpPostActionInterface
 {
-    const ADMIN_RESOURCE = 'Mollie_Subscriptions::SentEmail_delete';
+    const ADMIN_RESOURCE = 'Mollie_Subscriptions::sent_email_overview';
 
     public function __construct(
         Context $context,
